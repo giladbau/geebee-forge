@@ -12,6 +12,12 @@
       <p class="card-desc">An interactive Three.js star field — data's neural sky.</p>
       <a href="/constellation" class="card-link">Launch Constellation</a>
     </article>
+
+    <article role="article" data-testid="demo-card" class="card">
+      <h2 data-testid="card-title">Playwright + Vision</h2>
+      <p class="card-desc">Same prompt. Two outputs. One AI can see.</p>
+      <a href="/playwright" class="card-link">Launch Demo</a>
+    </article>
   </div>
 </div>
 
