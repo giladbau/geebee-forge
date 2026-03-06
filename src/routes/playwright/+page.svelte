@@ -2,12 +2,16 @@
 	import { onMount } from 'svelte';
 	import * as THREE from 'three';
 
-	let playing = $state(false);
+	let playing = $state(true);
 	let sceneWithout: HTMLDivElement;
 	let sceneWith: HTMLDivElement;
 
+	// Mutable ref so animation loops can read current value across closure boundary
+	const playRef = { value: true };
+
 	function togglePlay() {
 		playing = !playing;
+		playRef.value = playing;
 	}
 
 	onMount(() => {
@@ -91,6 +95,7 @@
 			let animId: number;
 			const animate = () => {
 				animId = requestAnimationFrame(animate);
+				if (!playRef.value) return;
 				const t = clock.getElapsedTime();
 				// Slow orbit — matches "with vision" speed
 				camera.position.x = Math.sin(t * 0.15) * 2;
@@ -223,6 +228,7 @@
 
 			const animate = () => {
 				animId = requestAnimationFrame(animate);
+				if (!playRef.value) return;
 				const t = clock.getElapsedTime();
 
 				// Gentle camera orbit
