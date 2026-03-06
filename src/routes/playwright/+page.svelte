@@ -27,68 +27,88 @@
 	});
 
 	function initScenes(cleanups: (() => void)[]) {
-		// --- WITHOUT VISION scene (mediocre attempt — has elements but wrong) ---
+		// --- WITHOUT VISION scene (decent render — proper bridge, fewer details) ---
 		{
 			const scene = new THREE.Scene();
-			scene.background = new THREE.Color(0x1a1a1a);
+			scene.background = new THREE.Color(0x1a2535);
+			scene.fog = new THREE.FogExp2(0x2a3040, 0.018);
 
 			const w = sceneWithout.clientWidth || 400;
 			const h = sceneWithout.clientHeight || 300;
-			const camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
-			camera.position.set(0, 3, 18);
-			camera.lookAt(0, 3, 0);
+			const camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 200);
+			camera.position.set(0, 4, 20);
+			camera.lookAt(0, 4, 0);
 
 			const renderer = new THREE.WebGLRenderer({ antialias: true });
 			renderer.setSize(w, h);
 			renderer.setPixelRatio(window.devicePixelRatio);
+			renderer.toneMapping = THREE.NoToneMapping;
 			sceneWithout.appendChild(renderer.domElement);
 
-			// Basic directional light — flat but not completely unlit
-			const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-			dirLight.position.set(5, 10, 5);
-			scene.add(dirLight);
-			const ambientLight = new THREE.AmbientLight(0x333333, 0.5);
+			// Lighting — functional but flatter/harsher than "with vision"
+			const ambientLight = new THREE.AmbientLight(0x2a3a5a, 0.5);
 			scene.add(ambientLight);
 
-			// Dull gray material with some lighting response
-			const grayMat = new THREE.MeshStandardMaterial({
-				color: 0x555555,
-				roughness: 0.9,
-				metalness: 0.0
+			const dirLight = new THREE.DirectionalLight(0xc0c8d0, 1.0);
+			dirLight.position.set(8, 12, 6);
+			scene.add(dirLight);
+
+			// Tower material — cool gray-blue, solid
+			const towerMat = new THREE.MeshStandardMaterial({
+				color: 0x607090,
+				roughness: 0.8,
+				metalness: 0.2
 			});
 
-			// Two towers
-			const towerGeo = new THREE.BoxGeometry(0.8, 8, 0.8);
-			const tower1 = new THREE.Mesh(towerGeo, grayMat);
-			tower1.position.set(-4, 4, 0);
+			// Two tall bridge towers
+			const towerGeo = new THREE.BoxGeometry(1, 10, 1);
+			const tower1 = new THREE.Mesh(towerGeo, towerMat);
+			tower1.position.set(-5, 5, 0);
 			scene.add(tower1);
 
-			const tower2 = new THREE.Mesh(towerGeo, grayMat);
-			tower2.position.set(4, 4, 0);
+			const tower2 = new THREE.Mesh(towerGeo, towerMat);
+			tower2.position.set(5, 5, 0);
 			scene.add(tower2);
 
-			// Road deck — wider but still basic
-			const roadGeo = new THREE.BoxGeometry(14, 0.3, 3);
-			const road = new THREE.Mesh(roadGeo, grayMat);
-			road.position.set(0, 0.15, 0);
+			// Road deck
+			const roadMat = new THREE.MeshStandardMaterial({
+				color: 0x3a3a44,
+				roughness: 0.9,
+				metalness: 0.1
+			});
+			const roadGeo = new THREE.BoxGeometry(18, 0.4, 3);
+			const road = new THREE.Mesh(roadGeo, roadMat);
+			road.position.set(0, 0.2, 0);
 			scene.add(road);
 
-			// Random "cable" attempts — thin boxes, wrong placement/proportions
-			const cableMat = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.8 });
-			const cablePositions = [
-				{ x: -3, y: 4.5, h: 4, z: 0.6 },
-				{ x: -1, y: 3, h: 2.5, z: -0.4 },
-				{ x: 1.5, y: 5, h: 5, z: 0.2 },
-				{ x: 3, y: 3.5, h: 3, z: -0.7 },
-				{ x: 5.5, y: 2, h: 1.5, z: 0.5 },
-				{ x: -5.5, y: 3, h: 2.5, z: -0.3 },
-			];
-			for (const c of cablePositions) {
-				const geo = new THREE.BoxGeometry(0.08, c.h, 0.08);
-				const mesh = new THREE.Mesh(geo, cableMat);
-				mesh.position.set(c.x, c.y, c.z);
-				mesh.rotation.z = (c.x * 0.03);
-				scene.add(mesh);
+			// Suspension cables — parabolic curves (same geometry, fewer suspenders)
+			const cableMat = new THREE.LineBasicMaterial({ color: 0x8090a0, linewidth: 1 });
+			const cableSegments = 40;
+
+			for (const side of [-1, 1]) {
+				const cablePoints: THREE.Vector3[] = [];
+				for (let i = 0; i <= cableSegments; i++) {
+					const t = i / cableSegments;
+					const x = -9 + t * 18;
+					const sag = 0.015 * (x * x);
+					const y = 10 - sag;
+					cablePoints.push(new THREE.Vector3(x, Math.max(y, 0.5), side * 0.8));
+				}
+				const cableGeo = new THREE.BufferGeometry().setFromPoints(cablePoints);
+				const cable = new THREE.Line(cableGeo, cableMat);
+				scene.add(cable);
+
+				// Fewer vertical suspenders (every 6 instead of every 3)
+				for (let i = 3; i < cableSegments - 3; i += 6) {
+					const pt = cablePoints[i];
+					const suspenderPoints = [
+						pt.clone(),
+						new THREE.Vector3(pt.x, 0.4, pt.z)
+					];
+					const suspGeo = new THREE.BufferGeometry().setFromPoints(suspenderPoints);
+					const suspender = new THREE.Line(suspGeo, new THREE.LineBasicMaterial({ color: 0x708090, transparent: true, opacity: 0.5 }));
+					scene.add(suspender);
+				}
 			}
 
 			const clock = new THREE.Clock();
@@ -99,8 +119,8 @@
 				const t = clock.getElapsedTime();
 				// Slow orbit — matches "with vision" speed
 				camera.position.x = Math.sin(t * 0.15) * 2;
-				camera.position.y = 3 + Math.sin(t * 0.1) * 0.3;
-				camera.lookAt(0, 3, 0);
+				camera.position.y = 4 + Math.sin(t * 0.1) * 0.3;
+				camera.lookAt(0, 4, 0);
 				renderer.render(scene, camera);
 			};
 			animate();
@@ -269,12 +289,12 @@
 				<div class="scene-container" bind:this={sceneWithout} data-testid="scene-without" aria-label="Three.js scene without vision">
 				</div>
 				<div class="annotations">
-					<span class="annotation" style="top: 18%; left: 12%;">no cables</span>
+					<span class="annotation" style="top: 18%; left: 12%;">fewer cables</span>
 					<span class="annotation" style="top: 50%; right: 12%;">flat lighting</span>
-					<span class="annotation" style="bottom: 12%; left: 20%;">no atmosphere</span>
+					<span class="annotation" style="bottom: 12%; left: 20%;">no reflections</span>
 				</div>
 			</div>
-			<p class="panel-desc">Blind generation — sparse geometry, no atmosphere, flat materials, missing structural details.</p>
+			<p class="panel-desc">Decent render — proper structure and atmosphere, but fewer cables, no water reflections, flatter lighting.</p>
 		</div>
 
 		<div class="vs-divider" aria-hidden="true">VS</div>
