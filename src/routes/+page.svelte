@@ -4,7 +4,7 @@
 
 <div class="landing">
   <h1>GeeBee Forge</h1>
-  <p class="subtitle">Cloudflare Pages Demo Hub</p>
+  <p class="subtitle">AI-coded. Vision-guided. Deployed to the edge.</p>
 
   <div class="grid">
     <article role="article" data-testid="demo-card" class="card">
@@ -28,6 +28,34 @@
     flex-direction: column;
     align-items: center;
     padding: 4rem 2rem;
+    position: relative;
+  }
+
+  .landing::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    background:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 25% 35%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 40% 8%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 55% 45%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 70% 20%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 85% 60%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 15% 70%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 45% 80%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 65% 75%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 5% 50%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 78% 85%, rgba(255,255,255,0.2), transparent),
+      radial-gradient(1px 1px at 33% 22%, rgba(255,255,255,0.35), transparent),
+      radial-gradient(1px 1px at 95% 12%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 50% 55%, rgba(255,255,255,0.25), transparent),
+      radial-gradient(ellipse at 50% 0%, rgba(107, 163, 255, 0.06) 0%, transparent 60%);
   }
 
   h1 {

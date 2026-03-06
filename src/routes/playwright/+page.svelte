@@ -23,10 +23,10 @@
 	});
 
 	function initScenes(cleanups: (() => void)[]) {
-		// --- WITHOUT VISION scene (sparse, flat, no atmosphere) ---
+		// --- WITHOUT VISION scene (mediocre attempt — has elements but wrong) ---
 		{
 			const scene = new THREE.Scene();
-			scene.background = new THREE.Color(0x111111);
+			scene.background = new THREE.Color(0x1a1a1a);
 
 			const w = sceneWithout.clientWidth || 400;
 			const h = sceneWithout.clientHeight || 300;
@@ -39,10 +39,21 @@
 			renderer.setPixelRatio(window.devicePixelRatio);
 			sceneWithout.appendChild(renderer.domElement);
 
-			// Flat gray material — no lighting response
-			const grayMat = new THREE.MeshBasicMaterial({ color: 0x666666 });
+			// Basic directional light — flat but not completely unlit
+			const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+			dirLight.position.set(5, 10, 5);
+			scene.add(dirLight);
+			const ambientLight = new THREE.AmbientLight(0x333333, 0.5);
+			scene.add(ambientLight);
 
-			// Two towers only
+			// Dull gray material with some lighting response
+			const grayMat = new THREE.MeshStandardMaterial({
+				color: 0x555555,
+				roughness: 0.9,
+				metalness: 0.0
+			});
+
+			// Two towers
 			const towerGeo = new THREE.BoxGeometry(0.8, 8, 0.8);
 			const tower1 = new THREE.Mesh(towerGeo, grayMat);
 			tower1.position.set(-4, 4, 0);
@@ -52,15 +63,39 @@
 			tower2.position.set(4, 4, 0);
 			scene.add(tower2);
 
-			// Road deck — flat box
-			const roadGeo = new THREE.BoxGeometry(14, 0.3, 2);
+			// Road deck — wider but still basic
+			const roadGeo = new THREE.BoxGeometry(14, 0.3, 3);
 			const road = new THREE.Mesh(roadGeo, grayMat);
 			road.position.set(0, 0.15, 0);
 			scene.add(road);
 
+			// Random "cable" attempts — thin boxes, wrong placement/proportions
+			const cableMat = new THREE.MeshStandardMaterial({ color: 0x777777, roughness: 0.8 });
+			const cablePositions = [
+				{ x: -3, y: 4.5, h: 4, z: 0.6 },
+				{ x: -1, y: 3, h: 2.5, z: -0.4 },
+				{ x: 1.5, y: 5, h: 5, z: 0.2 },
+				{ x: 3, y: 3.5, h: 3, z: -0.7 },
+				{ x: 5.5, y: 2, h: 1.5, z: 0.5 },
+				{ x: -5.5, y: 3, h: 2.5, z: -0.3 },
+			];
+			for (const c of cablePositions) {
+				const geo = new THREE.BoxGeometry(0.08, c.h, 0.08);
+				const mesh = new THREE.Mesh(geo, cableMat);
+				mesh.position.set(c.x, c.y, c.z);
+				mesh.rotation.z = (c.x * 0.03);
+				scene.add(mesh);
+			}
+
+			const clock = new THREE.Clock();
 			let animId: number;
 			const animate = () => {
 				animId = requestAnimationFrame(animate);
+				const t = clock.getElapsedTime();
+				// Slow orbit — matches "with vision" speed
+				camera.position.x = Math.sin(t * 0.15) * 2;
+				camera.position.y = 3 + Math.sin(t * 0.1) * 0.3;
+				camera.lookAt(0, 3, 0);
 				renderer.render(scene, camera);
 			};
 			animate();
@@ -217,16 +252,37 @@
 	<h1>Playwright + Vision</h1>
 	<p class="subtitle">Same prompt. Two outputs. One AI can see.</p>
 
+	<p class="prompt-text" data-testid="demo-prompt">
+		Prompt: "Generate a suspension bridge over calm water at twilight"
+	</p>
+
 	<div class="comparison" data-testid="comparison-container">
 		<div class="panel" data-testid="panel-without-vision" role="region" aria-label="Scene without vision">
 			<div class="panel-label without">Without Vision</div>
-			<div class="scene-container" bind:this={sceneWithout} data-testid="scene-without" aria-label="Three.js scene without vision">
+			<div class="scene-wrapper">
+				<div class="scene-container" bind:this={sceneWithout} data-testid="scene-without" aria-label="Three.js scene without vision">
+				</div>
+				<div class="annotations">
+					<span class="annotation" style="top: 18%; left: 12%;">no cables</span>
+					<span class="annotation" style="top: 50%; right: 12%;">flat lighting</span>
+					<span class="annotation" style="bottom: 12%; left: 20%;">no atmosphere</span>
+				</div>
 			</div>
 			<p class="panel-desc">Blind generation — sparse geometry, no atmosphere, flat materials, missing structural details.</p>
 		</div>
-		<div class="panel" data-testid="panel-with-vision" role="region" aria-label="Scene with vision">
+
+		<div class="vs-divider" aria-hidden="true">VS</div>
+
+		<div class="panel panel-vision" data-testid="panel-with-vision" role="region" aria-label="Scene with vision">
 			<div class="panel-label with">With Vision</div>
-			<div class="scene-container" bind:this={sceneWith} data-testid="scene-with" aria-label="Three.js scene with vision">
+			<div class="scene-wrapper">
+				<div class="scene-container" bind:this={sceneWith} data-testid="scene-with" aria-label="Three.js scene with vision">
+				</div>
+				<div class="annotations">
+					<span class="annotation good" style="top: 12%; left: 8%;">suspension cables</span>
+					<span class="annotation good" style="top: 40%; right: 8%;">atmospheric fog</span>
+					<span class="annotation good" style="bottom: 12%; left: 15%;">water reflection</span>
+				</div>
 			</div>
 			<p class="panel-desc">Vision-guided — suspension cables, atmospheric fog, warm lighting, water reflections.</p>
 		</div>
@@ -279,16 +335,30 @@
 	.subtitle {
 		color: #888;
 		font-size: 1rem;
-		margin: 0.5rem 0 2rem;
+		margin: 0.5rem 0 1rem;
 		letter-spacing: 0.05em;
+	}
+
+	.prompt-text {
+		font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+		font-size: 0.85rem;
+		color: #999;
+		background: rgba(255, 255, 255, 0.04);
+		border: 1px solid #2a2a2a;
+		border-radius: 6px;
+		padding: 0.6rem 1.2rem;
+		margin: 0 0 1.5rem;
+		max-width: 1100px;
+		text-align: center;
 	}
 
 	.comparison {
 		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 1.5rem;
+		grid-template-columns: 1fr auto 1fr;
+		gap: 0.75rem;
 		width: 100%;
 		max-width: 1100px;
+		align-items: center;
 	}
 
 	@media (max-width: 700px) {
@@ -304,6 +374,32 @@
 		overflow: hidden;
 		display: flex;
 		flex-direction: column;
+	}
+
+	.panel-vision {
+		border-color: rgba(245, 158, 11, 0.3);
+		animation: glow-pulse 3s ease-in-out infinite;
+	}
+
+	@keyframes glow-pulse {
+		0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.1); }
+		50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.25); }
+	}
+
+	.vs-divider {
+		font-size: 1.4rem;
+		font-weight: 800;
+		color: #f59e0b;
+		text-align: center;
+		letter-spacing: 0.1em;
+		padding: 0 0.25rem;
+		user-select: none;
+	}
+
+	@media (max-width: 700px) {
+		.vs-divider {
+			padding: 0.5rem 0;
+		}
 	}
 
 	.panel-label {
@@ -324,9 +420,15 @@
 		background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent);
 	}
 
-	.scene-container {
+	.scene-wrapper {
+		position: relative;
 		width: 100%;
 		height: 300px;
+	}
+
+	.scene-container {
+		width: 100%;
+		height: 100%;
 		background: #111;
 	}
 
@@ -334,6 +436,34 @@
 		display: block;
 		width: 100% !important;
 		height: 100% !important;
+	}
+
+	.annotations {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		pointer-events: none;
+	}
+
+	.annotation {
+		position: absolute;
+		font-size: 0.65rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		padding: 0.2rem 0.5rem;
+		border-radius: 3px;
+		background: rgba(0, 0, 0, 0.6);
+		color: #ff6b6b;
+		border: 1px solid rgba(255, 107, 107, 0.3);
+		white-space: nowrap;
+	}
+
+	.annotation.good {
+		color: #4ade80;
+		border-color: rgba(74, 222, 128, 0.3);
 	}
 
 	.panel-desc {
