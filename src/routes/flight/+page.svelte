@@ -206,7 +206,7 @@
 	<!-- ── Flight Header ─────────────────────────────────────────── -->
 	<header class="flight-header">
 		<div class="flight-id">
-			<h1>{FLIGHT}</h1>
+			<h1><span class="flight-icon">✈</span> {FLIGHT}</h1>
 			<span class="airline">El Al</span>
 			<span class="aircraft">{AIRCRAFT}</span>
 		</div>
@@ -218,7 +218,11 @@
 				<span class="time">Dep {DEP_LOCAL} ICT</span>
 				<span class="utc">{SCHED_DEP_UTC} UTC</span>
 			</div>
-			<div class="route-arrow">→</div>
+			<div class="route-arrow">
+				<span class="route-line"></span>
+				<span class="route-plane-icon">✈</span>
+				<span class="route-line"></span>
+			</div>
 			<div class="airport dest">
 				<span class="code">{DEST.code}</span>
 				<span class="city">{DEST.city}</span>
@@ -227,7 +231,8 @@
 			</div>
 		</div>
 
-		<div class="status-badge" data-testid="status-badge" style="background: {statusColor(status)}20; color: {statusColor(status)}; border-color: {statusColor(status)}40">
+		<div class="status-badge" data-testid="status-badge" style="background: {statusColor(status)}10; color: {statusColor(status)}; border-color: {statusColor(status)}30; box-shadow: 0 0 16px {statusColor(status)}12">
+			<span class="status-dot" class:pulsing={status === 'Airborne'} style="background: {statusColor(status)}; box-shadow: 0 0 6px {statusColor(status)}80"></span>
 			{status}
 		</div>
 	</header>
@@ -235,20 +240,20 @@
 	<!-- ── Live Data ─────────────────────────────────────────────── -->
 	<section class="live-data" data-testid="live-data" class:dimmed={status !== 'Airborne'}>
 		<div class="metric">
-			<span class="metric-value">{altitude}</span>
-			<span class="metric-label">Altitude (ft)</span>
+			<span class="metric-label">Altitude</span>
+			<span class="metric-value">{altitude} <span class="metric-unit">ft</span></span>
 		</div>
 		<div class="metric">
-			<span class="metric-value">{speed}</span>
-			<span class="metric-label">Speed (kts)</span>
+			<span class="metric-label">Speed</span>
+			<span class="metric-value">{speed} <span class="metric-unit">kts</span></span>
 		</div>
 		<div class="metric">
-			<span class="metric-value">{heading}</span>
-			<span class="metric-label">Heading (°)</span>
+			<span class="metric-label">Heading</span>
+			<span class="metric-value">{heading} <span class="metric-unit">°</span></span>
 		</div>
 		<div class="metric updated">
+			<span class="metric-label">Last Update</span>
 			<span class="metric-value small">{lastUpdated}</span>
-			<span class="metric-label">Last Updated</span>
 		</div>
 	</section>
 
@@ -265,7 +270,7 @@
 		min-height: 100vh;
 		max-width: 960px;
 		margin: 0 auto;
-		padding: 2rem 1.5rem;
+		padding: 2.5rem 1.5rem;
 	}
 
 	/* ── Flight Header ──────────────────────────────────────────── */
@@ -274,127 +279,194 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 1.5rem;
-		margin-bottom: 2rem;
+		margin-bottom: 2.5rem;
+		padding-bottom: 2rem;
+		border-bottom: 1px solid #1a1a1a;
 	}
 
 	.flight-id h1 {
-		font-size: 2.5rem;
-		font-weight: 700;
+		font-size: 3rem;
+		font-weight: 800;
 		margin: 0;
 		color: #fff;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.03em;
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+		line-height: 1;
+	}
+
+	.flight-icon {
+		font-size: 1.6rem;
+		color: #4a7fff;
+		display: inline-block;
+		transform: rotate(-30deg);
 	}
 
 	.airline {
 		display: block;
 		color: #4a7fff;
-		font-size: 0.85rem;
+		font-size: 0.78rem;
 		font-weight: 600;
 		text-transform: uppercase;
-		letter-spacing: 0.1em;
+		letter-spacing: 0.12em;
+		margin-top: 0.35rem;
 	}
 
 	.aircraft {
 		display: block;
-		color: #666;
-		font-size: 0.8rem;
-		margin-top: 0.15rem;
+		color: #555;
+		font-size: 0.72rem;
+		margin-top: 0.1rem;
 	}
 
 	.route {
 		display: flex;
 		align-items: center;
-		gap: 1.25rem;
+		gap: 0.5rem;
 		flex: 1;
 		justify-content: center;
 	}
 
 	.airport {
 		text-align: center;
+		min-width: 70px;
 	}
 
 	.code {
 		display: block;
-		font-size: 1.6rem;
-		font-weight: 700;
+		font-size: 1.75rem;
+		font-weight: 800;
 		color: #e0e0e0;
+		letter-spacing: 0.02em;
 	}
 
 	.city {
 		display: block;
-		color: #888;
-		font-size: 0.8rem;
+		color: #777;
+		font-size: 0.72rem;
+		margin-top: 0.1rem;
 	}
 
 	.time {
 		display: block;
 		color: #6ba3ff;
-		font-size: 0.75rem;
-		margin-top: 0.35rem;
+		font-size: 0.7rem;
+		margin-top: 0.4rem;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.utc {
 		display: block;
-		color: #555;
-		font-size: 0.7rem;
+		color: #4a4a4a;
+		font-size: 0.62rem;
+		font-variant-numeric: tabular-nums;
 	}
 
 	.route-arrow {
-		font-size: 1.5rem;
+		display: flex;
+		align-items: center;
+		flex: 1;
+		max-width: 140px;
+		min-width: 60px;
+	}
+
+	.route-line {
+		flex: 1;
+		height: 1px;
+		background: #4a7fff40;
+	}
+
+	.route-plane-icon {
 		color: #4a7fff;
-		opacity: 0.7;
+		font-size: 1rem;
+		line-height: 1;
+		flex-shrink: 0;
+		padding: 0 0.3rem;
 	}
 
 	.status-badge {
-		padding: 0.4rem 1rem;
-		border-radius: 20px;
-		font-size: 0.85rem;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.45rem 1.1rem;
+		border-radius: 999px;
+		font-size: 0.78rem;
 		font-weight: 600;
 		border: 1px solid;
 		white-space: nowrap;
+		letter-spacing: 0.03em;
+		text-transform: uppercase;
+		transition: box-shadow 0.4s ease, background 0.4s ease;
+	}
+
+	.status-dot {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		flex-shrink: 0;
+		transition: background 0.4s ease, box-shadow 0.4s ease;
+	}
+
+	.status-dot.pulsing {
+		animation: pulse 2s ease-in-out infinite;
 	}
 
 	/* ── Live Data ──────────────────────────────────────────────── */
 	.live-data {
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
-		gap: 1rem;
-		padding: 1.5rem;
-		background: #151515;
+		gap: 1px;
+		background: #222;
 		border: 1px solid #2a2a2a;
 		border-radius: 12px;
 		margin-bottom: 2rem;
-		transition: opacity 0.3s;
+		overflow: hidden;
+		transition: opacity 0.4s ease;
 	}
 
 	.live-data.dimmed {
-		opacity: 0.35;
+		opacity: 0.3;
 	}
 
 	.metric {
 		text-align: center;
-	}
-
-	.metric-value {
-		display: block;
-		font-size: 1.8rem;
-		font-weight: 700;
-		color: #fff;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.metric-value.small {
-		font-size: 1rem;
-		color: #888;
+		padding: 1.25rem 0.75rem;
+		background: #131313;
+		display: flex;
+		flex-direction: column;
+		gap: 0.3rem;
 	}
 
 	.metric-label {
 		display: block;
-		color: #666;
-		font-size: 0.75rem;
+		color: #555;
+		font-size: 0.62rem;
 		text-transform: uppercase;
-		letter-spacing: 0.08em;
-		margin-top: 0.25rem;
+		letter-spacing: 0.1em;
+		font-weight: 500;
+	}
+
+	.metric-value {
+		display: block;
+		font-size: 1.75rem;
+		font-weight: 700;
+		color: #fff;
+		font-variant-numeric: tabular-nums;
+		line-height: 1.1;
+	}
+
+	.metric-unit {
+		font-size: 0.7rem;
+		color: #555;
+		font-weight: 400;
+		margin-left: 0.15rem;
+	}
+
+	.metric-value.small {
+		font-size: 1rem;
+		color: #777;
+		font-weight: 500;
 	}
 
 	/* ── Map ─────────────────────────────────────────────────────── */
@@ -407,6 +479,7 @@
 
 	#map {
 		height: 450px;
+		min-height: 400px;
 		width: 100%;
 		background: #0d0d0d;
 	}
@@ -450,28 +523,53 @@
 		display: inline-block;
 		color: #6ba3ff;
 		text-decoration: none;
-		font-size: 0.85rem;
-		opacity: 0.7;
-		transition: opacity 0.2s;
+		font-size: 0.8rem;
+		opacity: 0.6;
+		transition: opacity 0.2s ease;
 	}
 
 	.back-link:hover {
 		opacity: 1;
 	}
 
+	/* ── Animations ─────────────────────────────────────────────── */
+	@keyframes pulse {
+		0%, 100% { opacity: 1; }
+		50% { opacity: 0.35; }
+	}
+
 	/* ── Responsive ──────────────────────────────────────────────── */
 	@media (max-width: 640px) {
+		.dashboard {
+			padding: 1.5rem 1rem;
+		}
+
 		.flight-header {
 			flex-direction: column;
 			align-items: flex-start;
+			gap: 1rem;
+		}
+
+		.flight-id h1 {
+			font-size: 2.4rem;
+		}
+
+		.route {
+			width: 100%;
+			justify-content: flex-start;
 		}
 
 		.live-data {
 			grid-template-columns: repeat(2, 1fr);
 		}
 
+		.metric-value {
+			font-size: 1.4rem;
+		}
+
 		#map {
-			height: 300px;
+			height: 320px;
+			min-height: 280px;
 		}
 	}
 </style>
