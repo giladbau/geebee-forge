@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import L from 'leaflet';
+
+	// Leaflet loaded dynamically — it requires browser APIs (window/document)
+	let L: typeof import('leaflet')['default'];
 
 	// ── Flight constants ──────────────────────────────────────────────
 	const FLIGHT = 'LY90';
@@ -180,11 +182,14 @@
 	});
 
 	onMount(async () => {
+		// Dynamic import — Leaflet must not run during SSR
+		const leafletModule = await import('leaflet');
+		L = leafletModule.default;
+		await import('leaflet/dist/leaflet.css');
+
 		await fetchFlight();
 		intervalId = setInterval(fetchFlight, REFRESH_MS);
-		if (typeof window !== 'undefined') {
-			initMap();
-		}
+		initMap();
 	});
 
 	onDestroy(() => {
