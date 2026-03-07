@@ -28,7 +28,17 @@
 	};
 
 	let acData: AcData | null = $state(null);
-	let status: 'Not Departed' | 'Airborne' | 'Landed' = $state('Not Departed');
+	// Initialize from scheduled times immediately — don't wait for API
+	function initialStatus(): 'Not Departed' | 'Airborne' | 'Landed' {
+		const now = new Date();
+		const today = now.toISOString().slice(0, 10);
+		const dep = new Date(`${today}T15:35:00Z`);
+		const arr = new Date(new Date(dep.getTime() + 86_400_000).toISOString().slice(0, 10) + 'T01:40:00Z');
+		if (now < dep) return 'Not Departed';
+		if (now > arr) return 'Landed';
+		return 'Airborne';
+	}
+	let status: 'Not Departed' | 'Airborne' | 'Landed' = $state(initialStatus());
 	let lastUpdated: string = $state('—');
 	let globeLoaded = $state(false);
 	let intervalId: ReturnType<typeof setInterval> | undefined;
@@ -124,7 +134,10 @@
 				updateGlobePlane();
 			}
 		} catch {
-			// keep previous state
+			// API unreachable — still update status from scheduled times
+			acData = null;
+			status = resolveEmptyStatus();
+			lastUpdated = new Date().toLocaleTimeString();
 		}
 	}
 
