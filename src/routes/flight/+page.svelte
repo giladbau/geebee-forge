@@ -43,6 +43,26 @@
 	let speed = $derived(acData ? String(acData.gs) : '—');
 	let heading = $derived(acData ? String(acData.track) : '—');
 
+	// ── Route progress (0.0–1.0) ────────────────────────────────
+	function haversineDist(lat1: number, lon1: number, lat2: number, lon2: number): number {
+		const R = 6371;
+		const dLat = (lat2 - lat1) * Math.PI / 180;
+		const dLon = (lon2 - lon1) * Math.PI / 180;
+		const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLon/2)**2;
+		return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	}
+
+	let routeProgress = $derived.by(() => {
+		if (status === 'Not Departed') return 0;
+		if (status === 'Landed') return 1;
+		if (acData) {
+			const total = haversineDist(ORIGIN.lat, ORIGIN.lon, DEST.lat, DEST.lon);
+			const flown = haversineDist(ORIGIN.lat, ORIGIN.lon, acData.lat, acData.lon);
+			return Math.min(1, Math.max(0, flown / total));
+		}
+		return 0;
+	});
+
 	function statusColor(s: string) {
 		if (s === 'Airborne') return '#22c55e';
 		if (s === 'Landed') return '#eab308';
@@ -224,9 +244,10 @@
 				<span class="utc">{SCHED_DEP_UTC} UTC</span>
 			</div>
 			<div class="route-arrow">
-				<span class="route-line"></span>
-				<span class="route-plane-icon">✈</span>
-				<span class="route-line"></span>
+				<div class="route-track">
+					<div class="route-fill" style="width: {routeProgress * 100}%"></div>
+					<span class="route-plane-icon" style="left: {routeProgress * 100}%">✈</span>
+				</div>
 			</div>
 			<div class="airport dest">
 				<span class="code">{DEST.code}</span>
@@ -376,18 +397,30 @@
 		min-width: 60px;
 	}
 
-	.route-line {
+	.route-track {
+		position: relative;
 		flex: 1;
-		height: 1px;
-		background: #4a7fff40;
+		height: 2px;
+		background: #2a2a2a;
+	}
+
+	.route-fill {
+		position: absolute;
+		left: 0;
+		top: 0;
+		height: 100%;
+		background: #4a7fff;
+		transition: width 1s ease;
 	}
 
 	.route-plane-icon {
+		position: absolute;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		transition: left 1s ease;
+		font-size: 1.2rem;
 		color: #4a7fff;
-		font-size: 1rem;
 		line-height: 1;
-		flex-shrink: 0;
-		padding: 0 0.3rem;
 	}
 
 	.status-badge {
