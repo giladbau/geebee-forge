@@ -13,6 +13,12 @@
       <a href="/constellation" class="card-link">Launch Constellation</a>
     </article>
 
+    <article role="article" class="card">
+      <h2>LY90 Live Tracker</h2>
+      <p class="card-desc">Real-time El Al flight from Phuket to Tel Aviv. Departs 22:35 local.</p>
+      <a href="/flight" class="card-link">Track Flight</a>
+    </article>
+
   </div>
 </div>
 
