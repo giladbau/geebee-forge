@@ -63,10 +63,15 @@
 
 	let routeProgress = $derived.by(() => {
 		if (status === 'Landed') return 1;
-		if (status === 'Airborne' && acData) {
-			const total = haversineDist(ORIGIN.lat, ORIGIN.lon, DEST.lat, DEST.lon);
-			const flown = haversineDist(ORIGIN.lat, ORIGIN.lon, acData.lat, acData.lon);
-			return Math.min(1, Math.max(0, flown / total));
+		if (status === 'Airborne') {
+			if (acData) {
+				// Live position from ADSB
+				const total = haversineDist(ORIGIN.lat, ORIGIN.lon, DEST.lat, DEST.lon);
+				const flown = haversineDist(ORIGIN.lat, ORIGIN.lon, acData.lat, acData.lon);
+				return Math.min(1, Math.max(0, flown / total));
+			}
+			// No ADSB signal — fall back to time-based estimate
+			return timeBasedProgress();
 		}
 		return 0;
 	});
@@ -77,7 +82,8 @@
 		return '#888';
 	}
 
-	function resolveEmptyStatus(): 'Not Departed' | 'Landed' {
+	// When ADSB has no signal, estimate status + progress from scheduled times
+	function resolveEmptyStatus(): 'Not Departed' | 'Airborne' | 'Landed' {
 		const now = new Date();
 		const today = now.toISOString().slice(0, 10);
 		const depUTC = new Date(`${today}T15:35:00Z`);
@@ -85,7 +91,20 @@
 		const arrUTC = new Date(`${tomorrow}T01:40:00Z`);
 		if (now < depUTC) return 'Not Departed';
 		if (now > arrUTC) return 'Landed';
-		return 'Not Departed';
+		return 'Airborne'; // past dep, before arr, no signal = in the air somewhere
+	}
+
+	// Time-based progress fallback (0–1) when no live ADSB position
+	function timeBasedProgress(): number {
+		const now = new Date();
+		const today = now.toISOString().slice(0, 10);
+		const depUTC = new Date(`${today}T15:35:00Z`).getTime();
+		const tomorrow = new Date(depUTC + 86_400_000).toISOString().slice(0, 10);
+		const arrUTC = new Date(`${tomorrow}T01:40:00Z`).getTime();
+		const nowMs = now.getTime();
+		if (nowMs <= depUTC) return 0;
+		if (nowMs >= arrUTC) return 1;
+		return (nowMs - depUTC) / (arrUTC - depUTC);
 	}
 
 	// ── Fetch ADSB data ───────────────────────────────────────────────
