@@ -28,7 +28,7 @@
 
   <div class="title-overlay">
     <h1>Unicorn Farm</h1>
-    <p>Click on things to interact!</p>
+    <p>Click unicorns • Scroll to zoom • Drag to orbit</p>
   </div>
 </div>
 

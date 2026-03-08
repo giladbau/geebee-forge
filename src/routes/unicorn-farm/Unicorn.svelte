@@ -21,9 +21,9 @@
   let sparkles: Array<{ id: number; x: number; y: number; z: number; life: number }> = $state([]);
   let time = $state(0);
 
-  // Each unicorn walks in a small circle/path
-  const walkSpeed = 0.15 + idx * 0.05;
-  const walkRadius = 1.5 + idx * 0.3;
+  // Each unicorn walks in a highly visible circle/path — much faster
+  const walkSpeed = 0.8 + idx * 0.18;
+  const walkRadius = 2.8 + idx * 0.5;
   const startAngle = idx * Math.PI / 2;
 
   let posX = $state(position[0]);
@@ -40,8 +40,8 @@
     posZ = position[2] + Math.sin(angle) * walkRadius;
     rotation = -angle + Math.PI / 2;
 
-    // Gentle bobbing
-    bobOffset = Math.sin(time * 2 + idx) * 0.08;
+    // Highly visible bobbing
+    bobOffset = Math.sin(time * 4 + idx) * 0.35;
 
     // Jump animation
     if (jumping) {
@@ -90,13 +90,13 @@
   <!-- Body -->
   <T.Mesh position={[0, 0.7, 0]} castShadow>
     <T.BoxGeometry args={[0.8, 0.7, 1.4]} />
-    <T.MeshStandardMaterial {color} />
+    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.4} roughness={0.3} metalness={0.1} />
   </T.Mesh>
 
   <!-- Head -->
   <T.Mesh position={[0, 1.15, -0.6]} castShadow>
     <T.BoxGeometry args={[0.55, 0.55, 0.55]} />
-    <T.MeshStandardMaterial {color} />
+    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.4} roughness={0.3} />
   </T.Mesh>
 
   <!-- Snout -->
@@ -117,8 +117,8 @@
 
   <!-- Horn -->
   <T.Mesh position={[0, 1.6, -0.6]} castShadow>
-    <T.ConeGeometry args={[0.1, 0.6, 4]} />
-    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.4} />
+    <T.ConeGeometry args={[0.12, 0.7, 4]} />
+    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={1.5} />
   </T.Mesh>
 
   <!-- Ears -->
@@ -131,9 +131,9 @@
     <T.MeshStandardMaterial {color} />
   </T.Mesh>
 
-  <!-- Legs -->
+  <!-- Legs — visible swing animation -->
   {#each [[0.25, 0, -0.4], [-0.25, 0, -0.4], [0.25, 0, 0.4], [-0.25, 0, 0.4]] as [lx, ly, lz], i}
-    <T.Mesh position={[lx, 0.2 + Math.sin(time * 3 + i * Math.PI / 2 + idx) * 0.05, lz]} castShadow>
+    <T.Mesh position={[lx, 0.2 + Math.sin(time * 5 + i * Math.PI / 2 + idx) * 0.12, lz]} castShadow>
       <T.BoxGeometry args={[0.2, 0.45, 0.2]} />
       <T.MeshStandardMaterial {color} />
     </T.Mesh>
@@ -144,28 +144,28 @@
     </T.Mesh>
   {/each}
 
-  <!-- Tail (mane-like, colorful) -->
-  <T.Mesh position={[0, 0.9, 0.75]} rotation.x={0.3 + Math.sin(time * 1.5) * 0.15}>
-    <T.BoxGeometry args={[0.12, 0.5, 0.12]} />
-    <T.MeshStandardMaterial color={hornColor} />
+  <!-- Tail (wagging brightly) -->
+  <T.Mesh position={[0, 0.9, 0.75]} rotation.x={0.3 + Math.sin(time * 3) * 0.35}>
+    <T.BoxGeometry args={[0.14, 0.55, 0.14]} />
+    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.6} />
   </T.Mesh>
-  <T.Mesh position={[0, 0.65, 0.85]} rotation.x={0.5 + Math.sin(time * 1.5 + 0.5) * 0.15}>
-    <T.BoxGeometry args={[0.1, 0.35, 0.1]} />
-    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.2} />
+  <T.Mesh position={[0, 0.62, 0.88]} rotation.x={0.5 + Math.sin(time * 3 + 0.5) * 0.35}>
+    <T.BoxGeometry args={[0.1, 0.38, 0.1]} />
+    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.8} />
   </T.Mesh>
 
-  <!-- Mane -->
+  <!-- Mane — glowing -->
   {#each [0, 0.2, 0.4] as mz}
     <T.Mesh position={[0, 1.35, -0.45 + mz]}>
-      <T.BoxGeometry args={[0.15, 0.2, 0.15]} />
-      <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.15} />
+      <T.BoxGeometry args={[0.17, 0.22, 0.17]} />
+      <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.7} />
     </T.Mesh>
   {/each}
 
-  <!-- Click sparkles -->
+  <!-- Click sparkles — bigger and brighter -->
   {#each sparkles as sp (sp.id)}
     <T.Mesh position={[sp.x, sp.y, sp.z]}>
-      <T.BoxGeometry args={[0.12, 0.12, 0.12]} />
+      <T.BoxGeometry args={[0.22, 0.22, 0.22]} />
       <T.MeshBasicMaterial
         color={hornColor}
         transparent
@@ -174,6 +174,6 @@
     </T.Mesh>
   {/each}
 
-  <!-- Point light on horn for magical glow -->
-  <T.PointLight position={[0, 1.8, -0.6]} color={hornColor} intensity={0.5} distance={3} />
+  <!-- Strong point light on horn for magical glow -->
+  <T.PointLight position={[0, 1.8, -0.6]} color={hornColor} intensity={4.0} distance={8} />
 </T.Group>

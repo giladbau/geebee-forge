@@ -6,7 +6,7 @@
   let bladeRotation = $state(0);
 
   useTask((delta) => {
-    bladeRotation += delta * 0.8;
+    bladeRotation += delta * 7.0;  // fast, clearly spinning
   });
 </script>
 

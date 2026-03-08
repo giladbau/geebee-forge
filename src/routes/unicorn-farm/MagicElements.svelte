@@ -5,16 +5,16 @@
   let clickedFlower = $state(-1);
   let flowerBloom = $state(0);
 
-  // Floating sparkles
-  const sparkleCount = 30;
+  // Floating sparkles — more, faster, bigger
+  const sparkleCount = 55;
   let sparkles = $state(
     Array.from({ length: sparkleCount }, (_, i) => ({
-      x: (Math.random() - 0.5) * 20,
-      y: Math.random() * 5 + 1,
-      z: (Math.random() - 0.5) * 20,
-      speed: 0.3 + Math.random() * 0.5,
+      x: (Math.random() - 0.5) * 18,
+      y: Math.random() * 4 + 0.5,
+      z: (Math.random() - 0.5) * 18,
+      speed: 0.7 + Math.random() * 1.2,
       phase: Math.random() * Math.PI * 2,
-      color: ['#ffdd44', '#ff88cc', '#88ddff', '#ccaaff', '#aaffaa'][Math.floor(Math.random() * 5)]
+      color: ['#ffee22', '#ff66cc', '#44eeff', '#cc88ff', '#88ff88', '#ff8844'][Math.floor(Math.random() * 6)]
     }))
   );
 
@@ -36,12 +36,12 @@
   useTask((delta) => {
     time += delta;
 
-    // Animate sparkles floating up
+    // Animate sparkles floating up faster, reset lower
     sparkles = sparkles.map(s => ({
       ...s,
       y: s.y + delta * s.speed,
-      x: s.x + Math.sin(time + s.phase) * delta * 0.3,
-    })).map(s => s.y > 8 ? { ...s, y: 0.5, x: (Math.random() - 0.5) * 20, z: (Math.random() - 0.5) * 20 } : s);
+      x: s.x + Math.sin(time + s.phase) * delta * 0.5,
+    })).map(s => s.y > 7 ? { ...s, y: 0.3, x: (Math.random() - 0.5) * 18, z: (Math.random() - 0.5) * 18 } : s);
 
     // Flower bloom animation
     if (clickedFlower >= 0) {
@@ -62,12 +62,12 @@
   }
 </script>
 
-<!-- Floating sparkles -->
+<!-- Floating sparkles — big and bright -->
 {#each sparkles as sp, i}
-  {@const flicker = Math.sin(time * 4 + i) * 0.5 + 0.5}
-  <T.Mesh position={[sp.x, sp.y, sp.z]} scale={0.06 + flicker * 0.06}>
+  {@const flicker = Math.sin(time * 6 + i) * 0.5 + 0.5}
+  <T.Mesh position={[sp.x, sp.y, sp.z]} scale={0.22 + flicker * 0.2}>
     <T.BoxGeometry args={[1, 1, 1]} />
-    <T.MeshBasicMaterial color={sp.color} transparent opacity={0.6 + flicker * 0.4} />
+    <T.MeshBasicMaterial color={sp.color} transparent opacity={0.9 + flicker * 0.1} />
   </T.Mesh>
 {/each}
 
@@ -96,7 +96,7 @@
     {#each [[0.15, 0], [-0.15, 0], [0, 0.15], [0, -0.15]] as [px, pz]}
       <T.Mesh position={[px, 0.55, pz]}>
         <T.BoxGeometry args={[0.12, 0.12, 0.12]} />
-        <T.MeshStandardMaterial color={flower.color} emissive={flower.color} emissiveIntensity={0.15} />
+        <T.MeshStandardMaterial color={flower.color} emissive={flower.color} emissiveIntensity={0.5} />
       </T.Mesh>
     {/each}
     <!-- Leaf -->
@@ -121,18 +121,18 @@
       {@const ry = Math.sin(angle) * radius}
       <T.Mesh position={[rx, ry, i * 0.1]}>
         <T.BoxGeometry args={[0.4, 0.2, 0.15]} />
-        <T.MeshBasicMaterial color={color} transparent opacity={0.6} />
+        <T.MeshBasicMaterial color={color} transparent opacity={0.85} />
       </T.Mesh>
     {/each}
   {/each}
 </T.Group>
 
-<!-- Ground glow spots (magical circles) -->
-{#each [[-1, 2], [4, -5], [-7, 6]] as [gx, gz], i}
-  {@const pulse = Math.sin(time * 1.2 + i * 2) * 0.3 + 0.7}
+<!-- Ground glow spots (magical circles) — brighter pulse -->
+{#each [[-1, 2], [4, -5], [-6, 5], [3, -8]] as [gx, gz], i}
+  {@const pulse = Math.sin(time * 1.8 + i * 1.5) * 0.4 + 0.6}
   <T.Mesh rotation.x={-Math.PI / 2} position={[gx, 0.02, gz]}>
-    <T.CircleGeometry args={[0.8, 16]} />
-    <T.MeshBasicMaterial color="#aa66ff" transparent opacity={pulse * 0.15} />
+    <T.CircleGeometry args={[1.2, 20]} />
+    <T.MeshBasicMaterial color="#cc55ff" transparent opacity={pulse * 0.55} />
   </T.Mesh>
-  <T.PointLight position={[gx, 0.3, gz]} color="#aa66ff" intensity={pulse * 0.3} distance={2} />
+  <T.PointLight position={[gx, 0.5, gz]} color="#cc55ff" intensity={pulse * 2.5} distance={5} />
 {/each}
