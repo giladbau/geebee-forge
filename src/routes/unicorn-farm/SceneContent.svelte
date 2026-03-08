@@ -1,6 +1,6 @@
 <script lang="ts">
   import { T, useTask } from '@threlte/core';
-  import { OrbitControls } from '@threlte/extras';
+  import { OrbitControls, interactivity } from '@threlte/extras';
   import * as THREE from 'three';
   import Terrain from './Terrain.svelte';
   import Unicorn from './Unicorn.svelte';
@@ -10,30 +10,28 @@
   import Trees from './Trees.svelte';
   import MagicElements from './MagicElements.svelte';
   import Pond from './Pond.svelte';
+  import Buildings from './Buildings.svelte';
 
-  // Isometric camera — camSize tuned so the farm fills the viewport.
-  // Scene spans camera-space x ≈ -9.5…+9.5, y ≈ -4…+4 (after centering on -1.5,0,-1.5).
-  // camSize=5 gives frustum ±5*aspect wide and ±5 tall — tightly framing the farm.
-  const camSize = 5;
+  // ── FIX #1: Enable raycasting so onclick fires on 3D objects ──
+  interactivity();
+
   const aspect = typeof window !== 'undefined' ? window.innerWidth / window.innerHeight : 1.77;
-
-  // True isometric direction: camera at equal X/Y/Z offset from origin
-  const camPos: [number, number, number] = [20, 20, 20];
+  const camPos: [number, number, number] = [40, 40, 40];
 </script>
 
-<!-- Orthographic camera for isometric view -->
+<!-- Isometric orthographic camera — wide enough for the expanded world -->
 <T.OrthographicCamera
   makeDefault
   position={camPos}
-  left={-camSize * aspect}
-  right={camSize * aspect}
-  top={camSize}
-  bottom={-camSize}
+  left={-14 * aspect}
+  right={14 * aspect}
+  top={14}
+  bottom={-14}
   near={0.1}
-  far={300}
-  zoom={25}
+  far={500}
+  zoom={12}
   oncreate={(ref) => {
-    ref.lookAt(-1.5, 0, -1.5);
+    ref.lookAt(0, 0, 0);
     ref.updateProjectionMatrix();
   }}
 >
@@ -41,47 +39,66 @@
     enableRotate
     enableZoom
     enablePan
-    minZoom={5}
-    maxZoom={150}
+    minZoom={3}
+    maxZoom={80}
     maxPolarAngle={Math.PI / 2.2}
     dampingFactor={0.08}
   />
 </T.OrthographicCamera>
 
-<!-- Warm magical lighting — high contrast -->
-<T.AmbientLight intensity={0.25} color="#ffe8cc" />
+<!-- Magical lighting setup -->
+<T.AmbientLight intensity={0.3} color="#ffe8cc" />
 <T.DirectionalLight
-  position={[15, 30, 10]}
-  intensity={2.0}
+  position={[30, 50, 20]}
+  intensity={2.2}
   color="#fff8e0"
   castShadow
   shadow.mapSize.width={2048}
   shadow.mapSize.height={2048}
-  shadow.camera.left={-30}
-  shadow.camera.right={30}
-  shadow.camera.top={30}
-  shadow.camera.bottom={-30}
+  shadow.camera.left={-60}
+  shadow.camera.right={60}
+  shadow.camera.top={60}
+  shadow.camera.bottom={-60}
 />
-<T.DirectionalLight position={[-10, 15, -10]} intensity={0.7} color="#cc88ff" />
-<T.HemisphereLight args={["#7040c0", "#285018", 0.6]} />
+<T.DirectionalLight position={[-20, 25, -15]} intensity={0.8} color="#cc88ff" />
+<T.HemisphereLight args={["#5030a0", "#204010", 0.7]} />
 
-<!-- Sky/background color -->
-<T.Color attach="background" args={[0.06, 0.03, 0.12]} />
+<!-- Sky/background -->
+<T.Color attach="background" args={[0.05, 0.02, 0.10]} />
 
-<!-- Scene elements -->
+<!-- ─── TERRAIN (100×100) ─── -->
 <Terrain />
-<Pond position={[6, 0.01, 5]} />
 
-<Unicorn position={[-3, 0, -2]} color="#ffffff" hornColor="#ffd700" idx={0} />
-<Unicorn position={[2, 0, 3]} color="#ffb6c1" hornColor="#ff69b4" idx={1} />
-<Unicorn position={[-5, 0, 4]} color="#b0e0ff" hornColor="#6ec6ff" idx={2} />
-<Unicorn position={[5, 0, -3]} color="#d8b0ff" hornColor="#a060e0" idx={3} />
+<!-- ─── WATER ─── -->
+<Pond position={[10, 0.01, 8]} />
+<Pond position={[-15, 0.01, 12]} />
 
-<Barn position={[-7, 0, -6]} />
-<Windmill position={[8, 0, -5]} />
+<!-- ─── 9 UNICORNS scattered around the farm ─── -->
+<Unicorn position={[-3,  0, -2]}  color="#ffffff"  hornColor="#ffd700"  idx={0} />
+<Unicorn position={[ 4,  0,  4]}  color="#ffb6c1"  hornColor="#ff69b4"  idx={1} />
+<Unicorn position={[-6,  0,  6]}  color="#b0e0ff"  hornColor="#6ec6ff"  idx={2} />
+<Unicorn position={[ 7,  0, -4]}  color="#d8b0ff"  hornColor="#a060e0"  idx={3} />
+<Unicorn position={[12,  0,  5]}  color="#fff0b0"  hornColor="#ffcc00"  idx={4} />
+<Unicorn position={[-12, 0, -3]}  color="#c8ffb0"  hornColor="#80ff40"  idx={5} />
+<Unicorn position={[ 2,  0, 14]}  color="#ffddbb"  hornColor="#ff8844"  idx={6} />
+<Unicorn position={[-9,  0, 10]}  color="#f0f0ff"  hornColor="#aa88ff"  idx={7} />
+<Unicorn position={[16,  0, -8]}  color="#ffd6ff"  hornColor="#ff44cc"  idx={8} />
 
+<!-- ─── MAIN BARN ─── -->
+<Barn position={[-14, 0, -10]} />
+
+<!-- ─── EXTRA BUILDINGS (farmhouse, second barn, hay bales, magic well, etc.) ─── -->
+<Buildings />
+
+<!-- ─── WINDMILLS ─── -->
+<Windmill position={[18, 0, -6]} />
+<Windmill position={[-18, 0, 8]} />
+
+<!-- ─── FENCE ─── -->
 <Fence />
 
+<!-- ─── TREES everywhere ─── -->
 <Trees />
 
+<!-- ─── MAGIC (flowers, sparkles, rainbow, glowing circles) ─── -->
 <MagicElements />

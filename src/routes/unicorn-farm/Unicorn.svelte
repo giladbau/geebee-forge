@@ -1,9 +1,8 @@
 <script lang="ts">
   import { T, useTask } from '@threlte/core';
-  import * as THREE from 'three';
 
   let {
-    position = [0, 0, 0],
+    position = [0, 0, 0] as [number, number, number],
     color = '#ffffff',
     hornColor = '#ffd700',
     idx = 0
@@ -14,166 +13,233 @@
     idx?: number;
   } = $props();
 
-  let bobOffset = $state(0);
-  let walkOffset = $state(0);
-  let jumping = $state(false);
-  let jumpHeight = $state(0);
-  let sparkles: Array<{ id: number; x: number; y: number; z: number; life: number }> = $state([]);
   let time = $state(0);
+  let jumping = $state(false);
+  let jumpProgress = $state(0);
+  let sparkles: Array<{
+    id: number; x: number; y: number; z: number;
+    life: number; vx: number; vz: number;
+  }> = $state([]);
 
-  // Each unicorn walks in a highly visible circle/path — much faster
-  const walkSpeed = 0.8 + idx * 0.18;
-  const walkRadius = 2.8 + idx * 0.5;
-  const startAngle = idx * Math.PI / 2;
+  // Varied walking params per unicorn (use let + $derived so Svelte 5 tracks prop refs)
+  let walkSpeed  = $derived(0.45 + idx * 0.08);
+  let walkRadius = $derived(2.8 + (idx % 5) * 0.9);
+  let startAngle = $derived((idx * Math.PI * 2) / 9);
 
-  let posX = $state(position[0]);
-  let posZ = $state(position[2]);
-  let rotation = $state(0);
+  // Capture position as orbit centre ($derived so Svelte 5 doesn't warn about prop capture)
+  let baseX = $derived(position[0]);
+  let baseZ = $derived(position[2]);
+
+  let posX = $state(0);
+  let posZ = $state(0);
+  let facing = $state(0);
+
+  // ── Leg geometry constants ──────────────────────────────────────────
+  // Hip pivot is at y = HIP_Y.  Leg mesh center at [0, -LEG_HALF, 0] rel. hip.
+  // Hoof mesh center at [0, -HOOF_OFFSET, 0] rel. hip.
+  // At rotation.x = 0 (straight down):
+  //   hoof centre y  = HIP_Y - HOOF_OFFSET
+  //   hoof bottom y  = HIP_Y - HOOF_OFFSET - HOOF_HALF
+  // We want hoof bottom = 0 when group y = 0:
+  //   ⟹  HIP_Y = HOOF_OFFSET + HOOF_HALF  = 0.46 + 0.04 = 0.50  ✓
+  const HIP_Y      = 0.50;
+  const LEG_HALF   = 0.22;   // half of 0.44 tall leg
+  const HOOF_OFF   = 0.46;   // distance from hip centre to hoof centre
+  const HOOF_HALF  = 0.04;
+  const LEG_SWING  = 0.42;   // radians swing amplitude
+
+  // Diagonal (trot) gait: front-right + back-left together (phase 0),
+  // front-left + back-right together (phase π)
+  // Order: front-right, front-left, back-right, back-left
+  const LEG_X   = [ 0.26, -0.26,  0.26, -0.26] as const;
+  const LEG_Z   = [-0.40, -0.40,  0.40,  0.40] as const;
+  const PHASES  = [    0,  Math.PI,  Math.PI,  0] as const;
 
   useTask((delta) => {
     time += delta;
 
-    // Walking in a gentle circle
-    walkOffset += delta * walkSpeed;
-    const angle = startAngle + walkOffset;
-    posX = position[0] + Math.cos(angle) * walkRadius;
-    posZ = position[2] + Math.sin(angle) * walkRadius;
-    rotation = -angle + Math.PI / 2;
+    // Walking in a circle around the base position
+    const angle = startAngle + time * walkSpeed;
+    posX   = baseX + Math.cos(angle) * walkRadius;
+    posZ   = baseZ + Math.sin(angle) * walkRadius;
+    facing = -angle + Math.PI / 2;
 
-    // Highly visible bobbing
-    bobOffset = Math.sin(time * 4 + idx) * 0.35;
-
-    // Jump animation
+    // Jump countdown
     if (jumping) {
-      jumpHeight += delta * 8;
-      if (jumpHeight > Math.PI) {
-        jumping = false;
-        jumpHeight = 0;
+      jumpProgress += delta * 3.0;
+      if (jumpProgress >= Math.PI) {
+        jumping      = false;
+        jumpProgress = 0;
       }
     }
 
-    // Update sparkles
+    // Sparkle physics
     sparkles = sparkles
-      .map(s => ({ ...s, y: s.y + delta * 2, life: s.life - delta }))
+      .map(s => ({
+        ...s,
+        x: s.x + s.vx * delta,
+        y: s.y + delta * 2.2,
+        z: s.z + s.vz * delta,
+        life: s.life - delta * 1.6,
+      }))
       .filter(s => s.life > 0);
   });
 
   function handleClick(e: any) {
     e?.stopPropagation?.();
-    if (!jumping) {
-      jumping = true;
-      jumpHeight = 0;
-      // Spawn sparkles
-      for (let i = 0; i < 8; i++) {
-        sparkles.push({
-          id: Math.random(),
-          x: (Math.random() - 0.5) * 2,
-          y: Math.random() * 0.5 + 1,
-          z: (Math.random() - 0.5) * 2,
-          life: 1.0
-        });
-      }
+    if (jumping) return;
+    jumping      = true;
+    jumpProgress = 0;
+    // Radial sparkle burst
+    for (let i = 0; i < 12; i++) {
+      const a = (i / 12) * Math.PI * 2;
+      sparkles = [
+        ...sparkles,
+        {
+          id:  Math.random(),
+          x:   Math.cos(a) * 0.25,
+          y:   0.8 + Math.random() * 0.4,
+          z:   Math.sin(a) * 0.25,
+          life: 1.1,
+          vx:  Math.cos(a) * (1.5 + Math.random()),
+          vz:  Math.sin(a) * (1.5 + Math.random()),
+        },
+      ];
     }
   }
 
-  let jumpY = $derived(jumping ? Math.sin(jumpHeight) * 2 : 0);
+  // ── Derived animation values ─────────────────────────────────────────
+  // Trot bounce: ONLY upward (abs-sin), so feet never sink below ground
+  let trotBob = $derived(
+    jumping ? 0 : Math.abs(Math.sin(time * walkSpeed * 5)) * 0.09
+  );
+  // Jump arc
+  let jumpY = $derived(jumping ? Math.sin(jumpProgress) * 2.2 : 0);
+  // Group y is always ≥ 0; at rest ≥ 0, max 0.09 trot or 2.2 jump
+  let groupY = $derived(trotBob + jumpY);
+
+  // Leg swing driven by walk speed (matches locomotion rate)
+  // 4× walkSpeed gives ≈2 full step-pairs per revolution
+  let legCycle = $derived(time * walkSpeed * 8);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <T.Group
   position.x={posX}
-  position.y={bobOffset + jumpY}
+  position.y={groupY}
   position.z={posZ}
-  rotation.y={rotation}
+  rotation.y={facing}
   onclick={handleClick}
 >
-  <!-- Body -->
-  <T.Mesh position={[0, 0.7, 0]} castShadow>
-    <T.BoxGeometry args={[0.8, 0.7, 1.4]} />
-    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.4} roughness={0.3} metalness={0.1} />
+
+  <!-- ── Body ── -->
+  <T.Mesh position={[0, 0.82, 0]} castShadow>
+    <T.BoxGeometry args={[0.80, 0.60, 1.40]} />
+    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.25} roughness={0.45} />
   </T.Mesh>
 
-  <!-- Head -->
-  <T.Mesh position={[0, 1.15, -0.6]} castShadow>
-    <T.BoxGeometry args={[0.55, 0.55, 0.55]} />
-    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.4} roughness={0.3} />
+  <!-- ── Neck ── -->
+  <T.Mesh position={[0, 1.18, -0.52]} rotation.x={-0.30} castShadow>
+    <T.BoxGeometry args={[0.40, 0.48, 0.38]} />
+    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.25} roughness={0.45} />
   </T.Mesh>
 
-  <!-- Snout -->
-  <T.Mesh position={[0, 1.0, -0.9]} castShadow>
-    <T.BoxGeometry args={[0.35, 0.3, 0.25]} />
+  <!-- ── Head ── -->
+  <T.Mesh position={[0, 1.48, -0.76]} castShadow>
+    <T.BoxGeometry args={[0.54, 0.50, 0.54]} />
+    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.25} roughness={0.45} />
+  </T.Mesh>
+
+  <!-- ── Snout ── -->
+  <T.Mesh position={[0, 1.32, -1.05]}>
+    <T.BoxGeometry args={[0.34, 0.26, 0.24]} />
     <T.MeshStandardMaterial color="#ffcccc" />
   </T.Mesh>
 
-  <!-- Eyes -->
-  <T.Mesh position={[0.18, 1.25, -0.83]}>
-    <T.BoxGeometry args={[0.1, 0.1, 0.05]} />
-    <T.MeshStandardMaterial color="#222222" />
+  <!-- ── Eyes ── -->
+  <T.Mesh position={[ 0.20, 1.52, -1.01]}>
+    <T.BoxGeometry args={[0.10, 0.10, 0.05]} />
+    <T.MeshStandardMaterial color="#111122" emissive="#4444ff" emissiveIntensity={0.5} />
   </T.Mesh>
-  <T.Mesh position={[-0.18, 1.25, -0.83]}>
-    <T.BoxGeometry args={[0.1, 0.1, 0.05]} />
-    <T.MeshStandardMaterial color="#222222" />
-  </T.Mesh>
-
-  <!-- Horn -->
-  <T.Mesh position={[0, 1.6, -0.6]} castShadow>
-    <T.ConeGeometry args={[0.12, 0.7, 4]} />
-    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={1.5} />
+  <T.Mesh position={[-0.20, 1.52, -1.01]}>
+    <T.BoxGeometry args={[0.10, 0.10, 0.05]} />
+    <T.MeshStandardMaterial color="#111122" emissive="#4444ff" emissiveIntensity={0.5} />
   </T.Mesh>
 
-  <!-- Ears -->
-  <T.Mesh position={[0.18, 1.45, -0.55]} rotation.z={0.3}>
-    <T.BoxGeometry args={[0.08, 0.2, 0.08]} />
+  <!-- ── Horn ── -->
+  <T.Mesh position={[0, 1.92, -0.76]} castShadow>
+    <T.ConeGeometry args={[0.09, 0.64, 4]} />
+    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={2.0} />
+  </T.Mesh>
+
+  <!-- ── Ears ── -->
+  <T.Mesh position={[ 0.21, 1.74, -0.65]} rotation.z={ 0.3}>
+    <T.BoxGeometry args={[0.08, 0.17, 0.08]} />
     <T.MeshStandardMaterial {color} />
   </T.Mesh>
-  <T.Mesh position={[-0.18, 1.45, -0.55]} rotation.z={-0.3}>
-    <T.BoxGeometry args={[0.08, 0.2, 0.08]} />
+  <T.Mesh position={[-0.21, 1.74, -0.65]} rotation.z={-0.3}>
+    <T.BoxGeometry args={[0.08, 0.17, 0.08]} />
     <T.MeshStandardMaterial {color} />
   </T.Mesh>
 
-  <!-- Legs — visible swing animation -->
-  {#each [[0.25, 0, -0.4], [-0.25, 0, -0.4], [0.25, 0, 0.4], [-0.25, 0, 0.4]] as [lx, ly, lz], i}
-    <T.Mesh position={[lx, 0.2 + Math.sin(time * 5 + i * Math.PI / 2 + idx) * 0.12, lz]} castShadow>
-      <T.BoxGeometry args={[0.2, 0.45, 0.2]} />
-      <T.MeshStandardMaterial {color} />
-    </T.Mesh>
-    <!-- Hoof -->
-    <T.Mesh position={[lx, 0.02, lz]}>
-      <T.BoxGeometry args={[0.22, 0.06, 0.22]} />
-      <T.MeshStandardMaterial color="#886644" />
+  <!-- ── Mane (glowing strands down the neck) ── -->
+  {#each [0, 0.20, 0.40] as mz}
+    <T.Mesh position={[0, 1.60, -0.50 + mz]}>
+      <T.BoxGeometry args={[0.15, 0.19, 0.15]} />
+      <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.9} />
     </T.Mesh>
   {/each}
 
-  <!-- Tail (wagging brightly) -->
-  <T.Mesh position={[0, 0.9, 0.75]} rotation.x={0.3 + Math.sin(time * 3) * 0.35}>
-    <T.BoxGeometry args={[0.14, 0.55, 0.14]} />
-    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.6} />
-  </T.Mesh>
-  <T.Mesh position={[0, 0.62, 0.88]} rotation.x={0.5 + Math.sin(time * 3 + 0.5) * 0.35}>
-    <T.BoxGeometry args={[0.1, 0.38, 0.1]} />
-    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.8} />
-  </T.Mesh>
-
-  <!-- Mane — glowing -->
-  {#each [0, 0.2, 0.4] as mz}
-    <T.Mesh position={[0, 1.35, -0.45 + mz]}>
-      <T.BoxGeometry args={[0.17, 0.22, 0.17]} />
-      <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.7} />
-    </T.Mesh>
+  <!-- ── Legs with walk cycle ────────────────────────────────── -->
+  <!--
+    Hip pivot at [lx, HIP_Y, lz].
+    Leg + hoof hang below.  At rotation.x = 0, hoof bottom = 0 (ground level).
+    When swinging, hoof rises — never sinks below group.y = 0.
+  -->
+  {#each { length: 4 } as _, i}
+    <T.Group
+      position={[LEG_X[i], HIP_Y, LEG_Z[i]]}
+      rotation.x={Math.sin(legCycle + PHASES[i]) * LEG_SWING}
+    >
+      <!-- Leg shaft -->
+      <T.Mesh position={[0, -LEG_HALF, 0]} castShadow>
+        <T.BoxGeometry args={[0.20, 0.44, 0.20]} />
+        <T.MeshStandardMaterial {color} roughness={0.5} />
+      </T.Mesh>
+      <!-- Hoof -->
+      <T.Mesh position={[0, -HOOF_OFF, 0]}>
+        <T.BoxGeometry args={[0.22, 0.08, 0.22]} />
+        <T.MeshStandardMaterial color="#886644" roughness={0.8} />
+      </T.Mesh>
+    </T.Group>
   {/each}
 
-  <!-- Click sparkles — bigger and brighter -->
+  <!-- ── Tail (wags) ── -->
+  <T.Mesh
+    position={[0, 0.94, 0.76]}
+    rotation.x={0.30 + Math.sin(time * 3.2) * 0.32}
+    castShadow
+  >
+    <T.BoxGeometry args={[0.14, 0.50, 0.14]} />
+    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.75} />
+  </T.Mesh>
+  <T.Mesh
+    position={[0, 0.68, 0.93]}
+    rotation.x={0.55 + Math.sin(time * 3.2 + 0.5) * 0.30}
+    castShadow
+  >
+    <T.BoxGeometry args={[0.10, 0.34, 0.10]} />
+    <T.MeshStandardMaterial color={hornColor} emissive={hornColor} emissiveIntensity={0.95} />
+  </T.Mesh>
+
+  <!-- ── Click sparkles ── -->
   {#each sparkles as sp (sp.id)}
     <T.Mesh position={[sp.x, sp.y, sp.z]}>
-      <T.BoxGeometry args={[0.22, 0.22, 0.22]} />
-      <T.MeshBasicMaterial
-        color={hornColor}
-        transparent
-        opacity={sp.life}
-      />
+      <T.BoxGeometry args={[0.17, 0.17, 0.17]} />
+      <T.MeshBasicMaterial color={hornColor} transparent opacity={sp.life} />
     </T.Mesh>
   {/each}
 
-  <!-- Strong point light on horn for magical glow -->
-  <T.PointLight position={[0, 1.8, -0.6]} color={hornColor} intensity={4.0} distance={8} />
+  <!-- ── Horn glow light ── -->
+  <T.PointLight position={[0, 1.92, -0.76]} color={hornColor} intensity={3.5} distance={7} />
 </T.Group>
