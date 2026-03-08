@@ -13,6 +13,11 @@
       <a href="/constellation" class="card-link">Launch Constellation</a>
     </article>
 
+    <article role="article" data-testid="demo-card" class="card">
+      <h2 data-testid="card-title">Unicorn Farm</h2>
+      <p class="card-desc">A cozy magical isometric voxel farm with interactive unicorns.</p>
+      <a href="/unicorn-farm" class="card-link">Visit the Farm</a>
+    </article>
 
   </div>
 </div>
