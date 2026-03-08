@@ -30,6 +30,8 @@
 		"vitest": "^4.0.18"
 	},
 	"dependencies": {
+		"@threlte/core": "^8.4.1",
+		"@threlte/extras": "^9.8.1",
 		"@types/leaflet": "^1.9.21",
 		"leaflet": "^1.9.4"
 	}
