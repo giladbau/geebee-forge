@@ -30,7 +30,7 @@
   }
 
   useTask((delta) => {
-    const speed = boosted ? 28.0 : 7.0;
+    const speed = boosted ? 12.0 : 1.2;
     bladeRotation += delta * speed;
 
     if (boosted) {
