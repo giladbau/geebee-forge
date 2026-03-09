@@ -4,6 +4,7 @@
   let time = $state(0);
   let clickedFlower = $state(-1);
   let flowerBloom = $state(0);
+  let petalParticles: Array<{ id: number; x: number; y: number; z: number; life: number; vx: number; vy: number; vz: number; color: string }> = $state([]);
 
   const fireflyCount = 35;
   let fireflies = $state(
@@ -55,12 +56,24 @@
     fireflies = fireflies;
 
     if (clickedFlower >= 0) {
-      flowerBloom -= delta * 2.2;
+      flowerBloom -= delta * 1.5;
       if (flowerBloom <= 0) {
         clickedFlower = -1;
         flowerBloom   = 0;
       }
     }
+
+    // Petal particle physics
+    for (let i = petalParticles.length - 1; i >= 0; i--) {
+      const p = petalParticles[i];
+      p.x += p.vx * delta;
+      p.y += p.vy * delta;
+      p.z += p.vz * delta;
+      p.vy -= delta * 4.0; // gravity
+      p.life -= delta * 1.4;
+      if (p.life <= 0) petalParticles.splice(i, 1);
+    }
+    if (petalParticles.length) petalParticles = petalParticles;
   });
 
   function bloomFlower(idx: number) {
@@ -68,6 +81,23 @@
       e?.stopPropagation?.();
       clickedFlower = idx;
       flowerBloom   = 1.0;
+      // Spawn petal particles
+      const f = flowers[idx];
+      const burst = Array.from({ length: 14 }, (_, i) => {
+        const a = (i / 14) * Math.PI * 2;
+        return {
+          id: Math.random(),
+          x: f.x + Math.cos(a) * 0.15,
+          y: 0.6,
+          z: f.z + Math.sin(a) * 0.15,
+          life: 1.0 + Math.random() * 0.4,
+          vx: Math.cos(a) * (1.5 + Math.random() * 1.5),
+          vy: 2.0 + Math.random() * 2.0,
+          vz: Math.sin(a) * (1.5 + Math.random() * 1.5),
+          color: f.color,
+        };
+      });
+      petalParticles = [...petalParticles, ...burst];
     };
   }
 </script>
@@ -81,7 +111,7 @@
 {/each}
 
 {#each flowers as flower, idx}
-  {@const bloomScale = clickedFlower === idx ? 1 + flowerBloom * 0.9 : 1}
+  {@const bloomScale = clickedFlower === idx ? 1 + flowerBloom * 1.8 : 1}
   {@const sway = Math.sin(time * 1.5 + idx * 0.7) * 0.05}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <T.Group
@@ -112,6 +142,14 @@
       <T.MeshLambertMaterial color="#2a8020" />
     </T.Mesh>
   </T.Group>
+{/each}
+
+<!-- Petal particles -->
+{#each petalParticles as petal}
+  <T.Mesh position={[petal.x, petal.y, petal.z]} scale={0.06 + petal.life * 0.06}>
+    <T.BoxGeometry args={[1, 0.4, 1]} />
+    <T.MeshBasicMaterial color={petal.color} transparent opacity={Math.min(petal.life, 1.0)} />
+  </T.Mesh>
 {/each}
 
 <T.Group position={[-5, 0, -5]}>
