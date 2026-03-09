@@ -72,7 +72,7 @@
 <Pond position={[-15, 0.01, 12]} />
 
 <!-- ─── 9 UNICORNS scattered around the farm ─── -->
-<Unicorn position={[-3,  0, -2]}  color="#ffffff"  hornColor="#ffd700"  idx={0} />
+<Unicorn position={[-3,  0, -2]}  color="#ffffff"  hornColor="#ffd700"  idx={0} rainbow />
 <Unicorn position={[ 4,  0,  4]}  color="#ffb6c1"  hornColor="#ff69b4"  idx={1} />
 <Unicorn position={[-6,  0,  6]}  color="#b0e0ff"  hornColor="#6ec6ff"  idx={2} />
 <Unicorn position={[ 7,  0, -4]}  color="#d8b0ff"  hornColor="#a060e0"  idx={3} />
