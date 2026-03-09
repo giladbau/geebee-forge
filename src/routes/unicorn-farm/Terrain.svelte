@@ -39,7 +39,7 @@
 
 <!-- Dirt path from barn toward center -->
 {#each Array.from({ length: 12 }, (_, i) => i) as i}
-  <T.Mesh rotation.x={-Math.PI / 2} position={[-14 + i * 2.0, -0.03, -8 + i * 0.6]}>
+  <T.Mesh rotation.x={-Math.PI / 2} position={[-14 + i * 2.0, 0.02, -8 + i * 0.6]}>
     <T.PlaneGeometry args={[2.2, 1.4]} />
     <T.MeshLambertMaterial color="#8B7355" />
   </T.Mesh>
@@ -47,7 +47,7 @@
 
 <!-- Second dirt path toward pond -->
 {#each Array.from({ length: 8 }, (_, i) => i) as i}
-  <T.Mesh rotation.x={-Math.PI / 2} position={[i * 1.8, -0.03, 6 + i * 0.4]}>
+  <T.Mesh rotation.x={-Math.PI / 2} position={[i * 1.8, 0.02, 6 + i * 0.4]}>
     <T.PlaneGeometry args={[2.0, 1.2]} />
     <T.MeshLambertMaterial color="#8B7355" />
   </T.Mesh>
