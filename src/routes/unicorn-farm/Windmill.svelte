@@ -4,13 +4,57 @@
   let { position = [0, 0, 0] }: { position?: [number, number, number] } = $props();
 
   let bladeRotation = $state(0);
+  let boosted = $state(false);
+  let boostTimer = $state(0);
+  let sparkles: Array<{ id: number; x: number; y: number; z: number; life: number; vx: number; vy: number; vz: number }> = $state([]);
+
+  function clickWindmill(e: any) {
+    e?.stopPropagation?.();
+    boosted = true;
+    boostTimer = 2.0;
+    // Burst sparkles from blade hub area
+    const burst = Array.from({ length: 10 }, (_, i) => {
+      const a = (i / 10) * Math.PI * 2;
+      return {
+        id: Math.random(),
+        x: Math.cos(a) * 0.5,
+        y: 3.5 + Math.random() * 0.5,
+        z: -1.0 + Math.sin(a) * 0.5,
+        life: 1.0 + Math.random() * 0.3,
+        vx: Math.cos(a) * (2 + Math.random()),
+        vy: 1.0 + Math.random() * 1.5,
+        vz: Math.sin(a) * (2 + Math.random()),
+      };
+    });
+    sparkles = [...sparkles, ...burst];
+  }
 
   useTask((delta) => {
-    bladeRotation += delta * 7.0;
+    const speed = boosted ? 28.0 : 7.0;
+    bladeRotation += delta * speed;
+
+    if (boosted) {
+      boostTimer -= delta;
+      if (boostTimer <= 0) {
+        boosted = false;
+        boostTimer = 0;
+      }
+    }
+
+    for (let i = sparkles.length - 1; i >= 0; i--) {
+      const s = sparkles[i];
+      s.x += s.vx * delta;
+      s.y += s.vy * delta;
+      s.z += s.vz * delta;
+      s.vy -= delta * 3.0; // gravity
+      s.life -= delta * 1.5;
+      if (s.life <= 0) sparkles.splice(i, 1);
+    }
+    if (sparkles.length) sparkles = sparkles;
   });
 </script>
 
-<T.Group position={position}>
+<T.Group position={position} onclick={clickWindmill}>
   <!-- Tower base (stone) -->
   <T.Mesh position={[0, 2, 0]} castShadow>
     <T.CylinderGeometry args={[0.9, 1.2, 4, 6]} />
@@ -69,4 +113,12 @@
     <T.BoxGeometry args={[0.5, 1.0, 0.08]} />
     <T.MeshLambertMaterial color="#5a3a20" />
   </T.Mesh>
+
+  <!-- Windmill sparkles -->
+  {#each sparkles as sp}
+    <T.Mesh position={[sp.x, sp.y, sp.z]} scale={0.06 + sp.life * 0.08}>
+      <T.BoxGeometry args={[1, 1, 1]} />
+      <T.MeshBasicMaterial color="#ffee44" transparent opacity={Math.min(sp.life, 1.0)} />
+    </T.Mesh>
+  {/each}
 </T.Group>
