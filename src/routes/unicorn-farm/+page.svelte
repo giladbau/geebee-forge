@@ -2,12 +2,10 @@
   import { onMount } from 'svelte';
 
   let SceneComponent: any = $state(null);
-  let loaded = $state(false);
 
   onMount(async () => {
     const mod = await import('./Scene.svelte');
     SceneComponent = mod.default;
-    loaded = true;
   });
 </script>
 
@@ -16,7 +14,7 @@
 </svelte:head>
 
 <div class="farm-page">
-  {#if loaded && SceneComponent}
+  {#if SceneComponent}
     <SceneComponent />
   {:else}
     <div class="loading">

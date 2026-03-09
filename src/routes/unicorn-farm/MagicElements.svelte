@@ -5,7 +5,7 @@
   let clickedFlower = $state(-1);
   let flowerBloom = $state(0);
 
-  const fireflyCount = 80;
+  const fireflyCount = 35;
   let fireflies = $state(
     Array.from({ length: fireflyCount }, (_, i) => ({
       x:     (Math.random() - 0.5) * 40,
@@ -41,18 +41,18 @@
   useTask((delta) => {
     time += delta;
 
-    fireflies = fireflies
-      .map(s => ({
-        ...s,
-        y: s.y + delta * s.speed,
-        x: s.x + Math.sin(time + s.phase) * delta * 0.6,
-        z: s.z + Math.cos(time * 0.7 + s.phase) * delta * 0.4,
-      }))
-      .map(s =>
-        s.y > 5
-          ? { ...s, y: 0.3, x: (Math.random() - 0.5) * 40, z: (Math.random() - 0.5) * 40 }
-          : s
-      );
+    for (let i = 0; i < fireflies.length; i++) {
+      const s = fireflies[i];
+      s.x += Math.sin(time + s.phase) * delta * 0.6;
+      s.y += delta * s.speed;
+      s.z += Math.cos(time * 0.7 + s.phase) * delta * 0.4;
+      if (s.y > 5) {
+        s.y = 0.3;
+        s.x = (Math.random() - 0.5) * 40;
+        s.z = (Math.random() - 0.5) * 40;
+      }
+    }
+    fireflies = fireflies;
 
     if (clickedFlower >= 0) {
       flowerBloom -= delta * 2.2;
@@ -92,11 +92,11 @@
   >
     <T.Mesh position={[0, 0.28, 0]}>
       <T.BoxGeometry args={[0.06, 0.56, 0.06]} />
-      <T.MeshStandardMaterial color="#2a8020" />
+      <T.MeshLambertMaterial color="#2a8020" />
     </T.Mesh>
     <T.Mesh position={[0, 0.60, 0]}>
       <T.BoxGeometry args={[0.16, 0.16, 0.16]} />
-      <T.MeshStandardMaterial color="#ffee44" emissive="#ffee44" emissiveIntensity={0.35} />
+      <T.MeshBasicMaterial color="#ffee44" />
     </T.Mesh>
     {#each [
       [0.17, 0, 0], [-0.17, 0, 0], [0, 0, 0.17], [0, 0, -0.17],
@@ -104,23 +104,20 @@
     ] as [px, py, pz]}
       <T.Mesh position={[px, 0.60, pz]}>
         <T.BoxGeometry args={[0.11, 0.11, 0.11]} />
-        <T.MeshStandardMaterial color={flower.color} emissive={flower.color} emissiveIntensity={0.55} />
+        <T.MeshBasicMaterial color={flower.color} />
       </T.Mesh>
     {/each}
     <T.Mesh position={[0.14, 0.20, 0]} rotation.z={-0.5}>
       <T.BoxGeometry args={[0.16, 0.06, 0.08]} />
-      <T.MeshStandardMaterial color="#2a8020" />
+      <T.MeshLambertMaterial color="#2a8020" />
     </T.Mesh>
-    {#if clickedFlower === idx}
-      <T.PointLight position={[0, 0.65, 0]} color={flower.color} intensity={3 * flowerBloom} distance={4} />
-    {/if}
   </T.Group>
 {/each}
 
 <T.Group position={[-5, 0, -5]}>
   {#each rainbowColors as color, i}
-    {#each Array.from({ length: 20 }, (_, j) => j) as j}
-      {@const angle  = (j / 19) * Math.PI}
+    {#each Array.from({ length: 10 }, (_, j) => j) as j}
+      {@const angle  = (j / 9) * Math.PI}
       {@const radius = 7 + i * 0.55}
       {@const rx = Math.cos(angle) * radius}
       {@const ry = Math.sin(angle) * radius}
@@ -138,10 +135,9 @@
 ] as [gx, gz], i}
   {@const pulse = Math.sin(time * 1.6 + i * 1.3) * 0.4 + 0.6}
   <T.Mesh rotation.x={-Math.PI / 2} position={[gx, 0.02, gz]}>
-    <T.CircleGeometry args={[1.4, 20]} />
+    <T.CircleGeometry args={[1.4, 8]} />
     <T.MeshBasicMaterial color="#cc55ff" transparent opacity={pulse * 0.50} />
   </T.Mesh>
-  <T.PointLight position={[gx, 0.5, gz]} color="#cc55ff" intensity={pulse * 2.2} distance={6} />
 {/each}
 
 {#each [[10, -2], [-8, -10], [18, 14], [-18, 8]] as [sx, sz], si}
@@ -155,6 +151,5 @@
         <T.MeshBasicMaterial color={starColor} transparent opacity={glow} />
       </T.Mesh>
     {/each}
-    <T.PointLight color={starColor} intensity={glow * 1.5} distance={5} />
   </T.Group>
 {/each}
