@@ -1,6 +1,5 @@
 <script lang="ts">
   import { T, useTask } from '@threlte/core';
-  import * as THREE from 'three';
 
   let { position = [0, 0, 0] }: { position?: [number, number, number] } = $props();
 
@@ -10,7 +9,6 @@
 
   useTask((delta) => {
     time += delta;
-    // Animate door
     const targetAngle = doorOpen ? -Math.PI / 2 : 0;
     doorAngle += (targetAngle - doorAngle) * delta * 4;
   });
@@ -29,55 +27,51 @@
     <T.MeshStandardMaterial color="#8B4513" />
   </T.Mesh>
 
-  <!-- Roof (triangular prism via two slanted boxes) -->
+  <!-- Roof -->
   <T.Mesh position={[0, 3.4, 0]} rotation.z={Math.PI / 4} castShadow>
     <T.BoxGeometry args={[2.8, 2.8, 4.2]} />
     <T.MeshStandardMaterial color="#a02020" />
   </T.Mesh>
 
   <!-- Roof trim -->
-  <T.Mesh position={[0, 4.4, 0]} castShadow>
+  <T.Mesh position={[0, 4.4, 0]}>
     <T.BoxGeometry args={[0.3, 0.6, 4.4]} />
-    <T.MeshStandardMaterial color="#8B0000" />
+    <T.MeshLambertMaterial color="#8B0000" />
   </T.Mesh>
 
   <!-- White trim lines -->
-  <T.Mesh position={[2.52, 1.5, 0]}>
-    <T.BoxGeometry args={[0.05, 3.1, 4.1]} />
-    <T.MeshStandardMaterial color="#f5f0e0" />
-  </T.Mesh>
-  <T.Mesh position={[-2.52, 1.5, 0]}>
-    <T.BoxGeometry args={[0.05, 3.1, 4.1]} />
-    <T.MeshStandardMaterial color="#f5f0e0" />
-  </T.Mesh>
+  {#each [2.52, -2.52] as trimX}
+    <T.Mesh position={[trimX, 1.5, 0]}>
+      <T.BoxGeometry args={[0.05, 3.1, 4.1]} />
+      <T.MeshLambertMaterial color="#f5f0e0" />
+    </T.Mesh>
+  {/each}
 
   <!-- Cross beams on front -->
-  <T.Mesh position={[0, 1.5, -2.03]}>
-    <T.BoxGeometry args={[4.5, 0.12, 0.05]} />
-    <T.MeshStandardMaterial color="#f5f0e0" />
-  </T.Mesh>
-  <T.Mesh position={[0, 2.5, -2.03]}>
-    <T.BoxGeometry args={[4.5, 0.12, 0.05]} />
-    <T.MeshStandardMaterial color="#f5f0e0" />
-  </T.Mesh>
+  {#each [1.5, 2.5] as beamY}
+    <T.Mesh position={[0, beamY, -2.03]}>
+      <T.BoxGeometry args={[4.5, 0.12, 0.05]} />
+      <T.MeshLambertMaterial color="#f5f0e0" />
+    </T.Mesh>
+  {/each}
 
   <!-- Door frame -->
   <T.Mesh position={[0, 0.9, -2.03]}>
     <T.BoxGeometry args={[1.4, 1.8, 0.08]} />
-    <T.MeshStandardMaterial color="#5a2d0c" />
+    <T.MeshLambertMaterial color="#5a2d0c" />
   </T.Mesh>
 
   <!-- Animated door -->
   <T.Group position={[-0.65, 0, -2.05]} rotation.y={doorAngle}>
     <T.Mesh position={[0.325, 0.9, 0]}>
       <T.BoxGeometry args={[0.65, 1.7, 0.06]} />
-      <T.MeshStandardMaterial color="#6B3410" />
+      <T.MeshLambertMaterial color="#6B3410" />
     </T.Mesh>
   </T.Group>
   <T.Group position={[0.65, 0, -2.05]} rotation.y={-doorAngle}>
     <T.Mesh position={[-0.325, 0.9, 0]}>
       <T.BoxGeometry args={[0.65, 1.7, 0.06]} />
-      <T.MeshStandardMaterial color="#6B3410" />
+      <T.MeshLambertMaterial color="#6B3410" />
     </T.Mesh>
   </T.Group>
 
@@ -85,16 +79,15 @@
   {#each [-1.5, 1.5] as wx}
     <T.Mesh position={[wx, 2.0, -2.03]}>
       <T.BoxGeometry args={[0.6, 0.6, 0.08]} />
-      <T.MeshStandardMaterial color="#ffe88a" emissive="#ffe88a" emissiveIntensity={0.3} />
+      <T.MeshBasicMaterial color="#ffe88a" />
     </T.Mesh>
-    <!-- Window frame -->
     <T.Mesh position={[wx, 2.0, -2.05]}>
       <T.BoxGeometry args={[0.7, 0.08, 0.05]} />
-      <T.MeshStandardMaterial color="#f5f0e0" />
+      <T.MeshLambertMaterial color="#f5f0e0" />
     </T.Mesh>
     <T.Mesh position={[wx, 2.0, -2.05]}>
       <T.BoxGeometry args={[0.08, 0.7, 0.05]} />
-      <T.MeshStandardMaterial color="#f5f0e0" />
+      <T.MeshLambertMaterial color="#f5f0e0" />
     </T.Mesh>
   {/each}
 

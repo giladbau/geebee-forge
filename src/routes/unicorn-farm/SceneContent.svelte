@@ -1,7 +1,6 @@
 <script lang="ts">
-  import { T, useTask } from '@threlte/core';
+  import { T } from '@threlte/core';
   import { OrbitControls, interactivity } from '@threlte/extras';
-  import * as THREE from 'three';
   import Terrain from './Terrain.svelte';
   import Unicorn from './Unicorn.svelte';
   import Barn from './Barn.svelte';
@@ -12,7 +11,6 @@
   import Pond from './Pond.svelte';
   import Buildings from './Buildings.svelte';
 
-  // ── FIX #1: Enable raycasting so onclick fires on 3D objects ──
   interactivity();
 
   const aspect = typeof window !== 'undefined' ? window.innerWidth / window.innerHeight : 1.77;
@@ -53,12 +51,12 @@
   intensity={2.2}
   color="#fff8e0"
   castShadow
-  shadow.mapSize.width={2048}
-  shadow.mapSize.height={2048}
-  shadow.camera.left={-60}
-  shadow.camera.right={60}
-  shadow.camera.top={60}
-  shadow.camera.bottom={-60}
+  shadow.mapSize.width={1024}
+  shadow.mapSize.height={1024}
+  shadow.camera.left={-40}
+  shadow.camera.right={40}
+  shadow.camera.top={40}
+  shadow.camera.bottom={-40}
 />
 <T.DirectionalLight position={[-20, 25, -15]} intensity={0.8} color="#cc88ff" />
 <T.HemisphereLight args={["#5030a0", "#204010", 0.7]} />
