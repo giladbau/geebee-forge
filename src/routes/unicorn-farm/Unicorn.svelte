@@ -5,12 +5,14 @@
     position = [0, 0, 0] as [number, number, number],
     color = '#ffffff',
     hornColor = '#ffd700',
-    idx = 0
+    idx = 0,
+    rainbow = false
   }: {
     position?: [number, number, number];
     color?: string;
     hornColor?: string;
     idx?: number;
+    rainbow?: boolean;
   } = $props();
 
   let time = $state(0);
@@ -19,7 +21,21 @@
   let sparkles: Array<{
     id: number; x: number; y: number; z: number;
     life: number; vx: number; vz: number;
+    color: string;
   }> = $state([]);
+
+  function hslToHex(h: number, s: number, l: number): string {
+    h = ((h % 1) + 1) % 1;
+    const a = s * Math.min(l, 1 - l);
+    const f = (n: number) => {
+      const k = (n + h * 12) % 12;
+      const c = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * Math.max(0, Math.min(1, c))).toString(16).padStart(2, '0');
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+
+  const RAINBOW_SPARKLE_COLORS = ['#ff0000', '#ff8800', '#ffff00', '#00cc00', '#0066ff', '#4400cc', '#8800aa'];
 
   const OBSTACLES: Array<[number, number, number]> = [
     [-14, -10, 4.8],
@@ -146,8 +162,9 @@
     if (jumping) return;
     jumping      = true;
     jumpProgress = 0;
-    const burst = Array.from({ length: 8 }, (_, i) => {
-      const a = (i / 8) * Math.PI * 2;
+    const count = rainbow ? 12 : 8;
+    const burst = Array.from({ length: count }, (_, i) => {
+      const a = (i / count) * Math.PI * 2;
       return {
         id:   Math.random(),
         x:    Math.cos(a) * 0.25,
@@ -156,6 +173,7 @@
         life: 1.1,
         vx:   Math.cos(a) * (1.5 + Math.random()),
         vz:   Math.sin(a) * (1.5 + Math.random()),
+        color: rainbow ? RAINBOW_SPARKLE_COLORS[i % RAINBOW_SPARKLE_COLORS.length] : hornColor,
       };
     });
     sparkles = [...sparkles, ...burst];
@@ -167,6 +185,13 @@
   let jumpY    = $derived(jumping ? Math.sin(jumpProgress) * 2.2 : 0);
   let groupY   = $derived(trotBob + jumpY);
   let legCycle = $derived(time * walkSpeed * 8);
+
+  // Rainbow color cycling — only computed when rainbow=true
+  let baseHue = $derived(rainbow ? (time * 0.3) % 1 : 0);
+  let hornHue = $derived(rainbow ? (time * 0.8) % 1 : 0);
+  let bodyColor = $derived(rainbow ? hslToHex(baseHue, 0.85, 0.65) : color);
+  let bodyEmissive = $derived(rainbow ? hslToHex(baseHue, 0.9, 0.5) : color);
+  let hornGlow = $derived(rainbow ? hslToHex(hornHue, 1.0, 0.75) : hornColor);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -181,19 +206,19 @@
   <!-- Body -->
   <T.Mesh position={[0, 0.82, 0]} castShadow>
     <T.BoxGeometry args={[0.80, 0.60, 1.40]} />
-    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.25} roughness={0.45} />
+    <T.MeshStandardMaterial color={bodyColor} emissive={bodyEmissive} emissiveIntensity={rainbow ? 0.4 : 0.25} roughness={0.45} />
   </T.Mesh>
 
   <!-- Neck -->
   <T.Mesh position={[0, 1.18, -0.52]} rotation.x={-0.30}>
     <T.BoxGeometry args={[0.40, 0.48, 0.38]} />
-    <T.MeshLambertMaterial {color} emissive={color} emissiveIntensity={0.25} />
+    <T.MeshLambertMaterial color={bodyColor} emissive={bodyEmissive} emissiveIntensity={rainbow ? 0.4 : 0.25} />
   </T.Mesh>
 
   <!-- Head -->
   <T.Mesh position={[0, 1.48, -0.76]} castShadow>
     <T.BoxGeometry args={[0.54, 0.50, 0.54]} />
-    <T.MeshStandardMaterial {color} emissive={color} emissiveIntensity={0.25} roughness={0.45} />
+    <T.MeshStandardMaterial color={bodyColor} emissive={bodyEmissive} emissiveIntensity={rainbow ? 0.4 : 0.25} roughness={0.45} />
   </T.Mesh>
 
   <!-- Snout -->
@@ -212,27 +237,27 @@
     <T.MeshBasicMaterial color="#111122" />
   </T.Mesh>
 
-  <!-- Horn -->
+  <!-- Horn — faster cycling & brighter when rainbow -->
   <T.Mesh position={[0, 1.92, -0.76]}>
     <T.ConeGeometry args={[0.09, 0.64, 4]} />
-    <T.MeshBasicMaterial color={hornColor} />
+    <T.MeshBasicMaterial color={hornGlow} />
   </T.Mesh>
 
   <!-- Ears -->
   <T.Mesh position={[ 0.21, 1.74, -0.65]} rotation.z={ 0.3}>
     <T.BoxGeometry args={[0.08, 0.17, 0.08]} />
-    <T.MeshLambertMaterial {color} />
+    <T.MeshLambertMaterial color={bodyColor} />
   </T.Mesh>
   <T.Mesh position={[-0.21, 1.74, -0.65]} rotation.z={-0.3}>
     <T.BoxGeometry args={[0.08, 0.17, 0.08]} />
-    <T.MeshLambertMaterial {color} />
+    <T.MeshLambertMaterial color={bodyColor} />
   </T.Mesh>
 
-  <!-- Mane -->
-  {#each [0, 0.20, 0.40] as mz}
+  <!-- Mane — each segment offset in hue for rainbow gradient -->
+  {#each [0, 0.20, 0.40] as mz, mi}
     <T.Mesh position={[0, 1.60, -0.50 + mz]}>
       <T.BoxGeometry args={[0.15, 0.19, 0.15]} />
-      <T.MeshBasicMaterial color={hornColor} />
+      <T.MeshBasicMaterial color={rainbow ? hslToHex(baseHue + 0.25 + mi * 0.15, 1.0, 0.55) : hornColor} />
     </T.Mesh>
   {/each}
 
@@ -244,7 +269,7 @@
     >
       <T.Mesh position={[0, -LEG_HALF, 0]}>
         <T.BoxGeometry args={[0.20, 0.44, 0.20]} />
-        <T.MeshLambertMaterial {color} />
+        <T.MeshLambertMaterial color={bodyColor} />
       </T.Mesh>
       <T.Mesh position={[0, -HOOF_OFF, 0]}>
         <T.BoxGeometry args={[0.22, 0.08, 0.22]} />
@@ -253,27 +278,27 @@
     </T.Group>
   {/each}
 
-  <!-- Tail -->
+  <!-- Tail — offset hue from body -->
   <T.Mesh
     position={[0, 0.94, 0.76]}
     rotation.x={0.30 + Math.sin(time * 3.2) * 0.32}
   >
     <T.BoxGeometry args={[0.14, 0.50, 0.14]} />
-    <T.MeshBasicMaterial color={hornColor} />
+    <T.MeshBasicMaterial color={rainbow ? hslToHex(baseHue + 0.5, 1.0, 0.55) : hornColor} />
   </T.Mesh>
   <T.Mesh
     position={[0, 0.68, 0.93]}
     rotation.x={0.55 + Math.sin(time * 3.2 + 0.5) * 0.30}
   >
     <T.BoxGeometry args={[0.10, 0.34, 0.10]} />
-    <T.MeshBasicMaterial color={hornColor} />
+    <T.MeshBasicMaterial color={rainbow ? hslToHex(baseHue + 0.65, 1.0, 0.55) : hornColor} />
   </T.Mesh>
 
-  <!-- Click sparkles -->
+  <!-- Click sparkles — multicolored when rainbow -->
   {#each sparkles as sp (sp.id)}
     <T.Mesh position={[sp.x, sp.y, sp.z]}>
       <T.BoxGeometry args={[0.17, 0.17, 0.17]} />
-      <T.MeshBasicMaterial color={hornColor} transparent opacity={sp.life} />
+      <T.MeshBasicMaterial color={sp.color} transparent opacity={sp.life} />
     </T.Mesh>
   {/each}
 </T.Group>
