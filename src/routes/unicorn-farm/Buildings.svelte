@@ -4,25 +4,18 @@
   let time = $state(0);
 
   // ── Well click state ──
-  let wellOrbs: Array<{ id: number; x: number; y: number; z: number; life: number; vx: number; vz: number; color: string }> = $state([]);
+  let bucketAnimating = $state(false);
+  let bucketPhase = $state(0); // 0=idle, progresses through lower→pause→raise
+  let bucketY = $state(0.95);  // default resting Y position
+  const BUCKET_REST_Y = 0.95;
+  const BUCKET_LOW_Y = 0.35;
+  const BUCKET_SPEED = 0.8;
 
   function clickWell(e: any) {
     e?.stopPropagation?.();
-    const colors = ['#cc66ff', '#aa44ff', '#ff88dd', '#88ccff', '#eebbff'];
-    const burst = Array.from({ length: 12 }, (_, i) => {
-      const a = (i / 12) * Math.PI * 2;
-      return {
-        id: Math.random(),
-        x: Math.cos(a) * 0.3,
-        y: 0.6,
-        z: Math.sin(a) * 0.3,
-        life: 1.2 + Math.random() * 0.4,
-        vx: Math.cos(a) * (0.4 + Math.random() * 0.6),
-        vz: Math.sin(a) * (0.4 + Math.random() * 0.6),
-        color: colors[i % colors.length],
-      };
-    });
-    wellOrbs = [...wellOrbs, ...burst];
+    if (bucketAnimating) return;
+    bucketAnimating = true;
+    bucketPhase = 0;
   }
 
   // ── Hay bale click state ──
@@ -54,16 +47,26 @@
   useTask((delta) => {
     time += delta;
 
-    // Well orbs physics
-    for (let i = wellOrbs.length - 1; i >= 0; i--) {
-      const o = wellOrbs[i];
-      o.x += o.vx * delta * 0.5;
-      o.y += delta * 2.5;
-      o.z += o.vz * delta * 0.5;
-      o.life -= delta * 1.2;
-      if (o.life <= 0) wellOrbs.splice(i, 1);
+    // Well bucket animation: lower → pause → raise
+    if (bucketAnimating) {
+      bucketPhase += delta * BUCKET_SPEED;
+      if (bucketPhase < 1.0) {
+        // Lowering
+        bucketY = BUCKET_REST_Y - (BUCKET_REST_Y - BUCKET_LOW_Y) * bucketPhase;
+      } else if (bucketPhase < 1.8) {
+        // Pause at bottom
+        bucketY = BUCKET_LOW_Y;
+      } else if (bucketPhase < 2.8) {
+        // Raising
+        const raiseProgress = (bucketPhase - 1.8) / 1.0;
+        bucketY = BUCKET_LOW_Y + (BUCKET_REST_Y - BUCKET_LOW_Y) * raiseProgress;
+      } else {
+        // Done
+        bucketY = BUCKET_REST_Y;
+        bucketAnimating = false;
+        bucketPhase = 0;
+      }
     }
-    if (wellOrbs.length) wellOrbs = wellOrbs;
 
     // Hay bale bounce
     if (clickedBale >= 0) {
@@ -275,13 +278,16 @@
     <T.BoxGeometry args={[1.5, 0.12, 0.12]} />
     <T.MeshLambertMaterial color="#5a3a20" />
   </T.Mesh>
-  <!-- Rope -->
-  <T.Mesh position={[0, 1.6, -0.65]}>
-    <T.BoxGeometry args={[0.04, 1.2, 0.04]} />
+  <!-- Rope (stretches from crossbeam to bucket) -->
+  {@const ropeTopY = 2.1}
+  {@const ropeMidY = (ropeTopY + bucketY) / 2}
+  {@const ropeLen = ropeTopY - bucketY}
+  <T.Mesh position={[0, ropeMidY, -0.65]}>
+    <T.BoxGeometry args={[0.04, ropeLen, 0.04]} />
     <T.MeshLambertMaterial color="#c8a058" />
   </T.Mesh>
   <!-- Bucket -->
-  <T.Mesh position={[0, 0.95, -0.65]}>
+  <T.Mesh position={[0, bucketY, -0.65]}>
     <T.CylinderGeometry args={[0.14, 0.10, 0.28, 6]} />
     <T.MeshLambertMaterial color="#4a3a28" />
   </T.Mesh>
@@ -292,13 +298,7 @@
     intensity={wellGlow * 3}
     distance={8}
   />
-  <!-- Well orb particles -->
-  {#each wellOrbs as orb}
-    <T.Mesh position={[orb.x, orb.y, orb.z]} scale={0.08 + orb.life * 0.1}>
-      <T.SphereGeometry args={[1, 4, 4]} />
-      <T.MeshBasicMaterial color={orb.color} transparent opacity={Math.min(orb.life, 1.0)} />
-    </T.Mesh>
-  {/each}
+
 </T.Group>
 
 <!-- ════════════════════════════════════════════
