@@ -119,14 +119,14 @@
 
 <T.Group position={[-5, 0, -5]}>
   {#each rainbowColors as color, i}
-    {#each Array.from({ length: 14 }, (_, j) => j) as j}
-      {@const angle  = (j / 13) * Math.PI}
-      {@const radius = 7 + i * 0.28}
+    {#each Array.from({ length: 20 }, (_, j) => j) as j}
+      {@const angle  = (j / 19) * Math.PI}
+      {@const radius = 7 + i * 0.55}
       {@const rx = Math.cos(angle) * radius}
       {@const ry = Math.sin(angle) * radius}
-      <T.Mesh position={[rx, ry, i * 0.12]}>
-        <T.BoxGeometry args={[0.38, 0.20, 0.14]} />
-        <T.MeshBasicMaterial color={color} transparent opacity={0.85} />
+      <T.Mesh position={[rx, ry, i * 0.18]}>
+        <T.BoxGeometry args={[0.72, 0.52, 0.28]} />
+        <T.MeshBasicMaterial color={color} transparent opacity={0.90} />
       </T.Mesh>
     {/each}
   {/each}
