@@ -21,50 +21,137 @@
     life: number; vx: number; vz: number;
   }> = $state([]);
 
-  // Varied walking params per unicorn (use let + $derived so Svelte 5 tracks prop refs)
-  let walkSpeed  = $derived(0.45 + idx * 0.08);
-  let walkRadius = $derived(2.8 + (idx % 5) * 0.9);
-  let startAngle = $derived((idx * Math.PI * 2) / 9);
+  // ── Obstacle definitions [x, z, radius] ──────────────────────────────
+  // Keep unicorns clear of buildings, windmills, ponds, well
+  const OBSTACLES: Array<[number, number, number]> = [
+    [-14, -10, 4.8],  // Main barn
+    [  8, -16, 3.8],  // Farmhouse
+    [ 16, -14, 3.8],  // Second barn
+    [ 18,  -6, 3.2],  // Windmill 1
+    [-18,   8, 3.2],  // Windmill 2
+    [ 10,   8, 3.8],  // Pond 1
+    [-15,  12, 3.8],  // Pond 2
+    [ -8,   8, 2.8],  // Magic well
+    [  8,   0, 2.0],  // Small bridge area
+  ];
+  const FARM_LIMIT = 17.0; // soft wall — keep inside fences
 
-  // Capture position as orbit centre ($derived so Svelte 5 doesn't warn about prop capture)
-  let baseX = $derived(position[0]);
-  let baseZ = $derived(position[2]);
+  function isBlocked(x: number, z: number): boolean {
+    if (Math.abs(x) > FARM_LIMIT || Math.abs(z) > FARM_LIMIT) return true;
+    for (const [ox, oz, r] of OBSTACLES) {
+      const dx = x - ox, dz = z - oz;
+      if (dx * dx + dz * dz < r * r) return true;
+    }
+    return false;
+  }
 
-  let posX = $state(0);
-  let posZ = $state(0);
+  // ── Per-unicorn waypoint routes [x, z] ───────────────────────────────
+  // Carefully verified to avoid all obstacles listed above.
+  //
+  //   idx 0 (White)  – wanderer: barn side → center → pond
+  //   idx 1 (Pink)   – grazer:  tight loops near spawn
+  //   idx 2 (Blue)   – left fence walker
+  //   idx 3 (Purple) – front-field wanderer
+  //   idx 4 (Yellow) – right-side explorer
+  //   idx 5 (Green)  – left-side explorer
+  //   idx 6 (Orange) – back-area wanderer
+  //   idx 7 (Ghost)  – left mid-area wanderer
+  //   idx 8 (Pink2)  – front-right corner explorer
+  const ALL_WAYPOINTS: Array<Array<[number, number]>> = [
+    [[-8, -6], [-3, -2], [6,  5], [-5,  4]],
+    [[ 4,  4], [ 6,  6], [5,  2], [ 3,  5], [7,  3]],
+    [[-16, -5], [-16,  2], [-14, 5], [-10, 14], [0, 14]],
+    [[ 7, -4], [12, -6], [6, -12], [0, -8], [4, -2]],
+    [[12,  5], [15,  2], [13, 10], [ 7, 12], [10,  4]],
+    [[-12, -3], [-8, -8], [-10, 3], [-5, -2], [-2, -6]],
+    [[ 2, 14], [ 8, 14], [-2, 16], [-8, 10], [ 0,  8]],
+    [[-14,  4], [-12, -4], [-8, -10], [-6, -6], [-10,  6]],
+    [[15, -8], [10, -10], [6, -8], [12, -4], [15, -5]],
+  ];
+
+  // Walk speed (units/s) and pause time (s) per unicorn type
+  // Grazers (idx 1) move slower with longer pauses
+  const WALK_SPEEDS    = [2.5, 1.2, 2.8, 2.3, 2.6, 2.4, 2.0, 2.7, 2.9];
+  const PAUSE_DURATIONS = [1.2, 2.5, 0.8, 1.0, 1.5, 1.2, 1.8, 1.0, 0.8];
+
+  // Constants derived from idx (won't change after mount)
+  const myWaypoints   = ALL_WAYPOINTS[idx]    ?? ALL_WAYPOINTS[0];
+  const walkSpeed     = WALK_SPEEDS[idx]       ?? 2.0;
+  const pauseDuration = PAUSE_DURATIONS[idx]   ?? 1.0;
+
+  // Stagger starting waypoint so unicorns spread out immediately
+  const _startWp = idx % myWaypoints.length;
+
+  let wpIdx     = $state(_startWp);
+  let isPausing = $state(false);
+  let pauseTimer = $state(0);
+
+  // Start at the staggered waypoint position
+  let posX   = $state(myWaypoints[_startWp][0]);
+  let posZ   = $state(myWaypoints[_startWp][1]);
   let facing = $state(0);
 
-  // ── Leg geometry constants ──────────────────────────────────────────
-  // Hip pivot is at y = HIP_Y.  Leg mesh center at [0, -LEG_HALF, 0] rel. hip.
-  // Hoof mesh center at [0, -HOOF_OFFSET, 0] rel. hip.
-  // At rotation.x = 0 (straight down):
-  //   hoof centre y  = HIP_Y - HOOF_OFFSET
-  //   hoof bottom y  = HIP_Y - HOOF_OFFSET - HOOF_HALF
-  // We want hoof bottom = 0 when group y = 0:
-  //   ⟹  HIP_Y = HOOF_OFFSET + HOOF_HALF  = 0.46 + 0.04 = 0.50  ✓
-  const HIP_Y      = 0.50;
-  const LEG_HALF   = 0.22;   // half of 0.44 tall leg
-  const HOOF_OFF   = 0.46;   // distance from hip centre to hoof centre
-  const HOOF_HALF  = 0.04;
-  const LEG_SWING  = 0.42;   // radians swing amplitude
+  // ── Leg geometry constants ────────────────────────────────────────────
+  const HIP_Y     = 0.50;
+  const LEG_HALF  = 0.22;
+  const HOOF_OFF  = 0.46;
+  const LEG_SWING = 0.42;
 
-  // Diagonal (trot) gait: front-right + back-left together (phase 0),
-  // front-left + back-right together (phase π)
-  // Order: front-right, front-left, back-right, back-left
-  const LEG_X   = [ 0.26, -0.26,  0.26, -0.26] as const;
-  const LEG_Z   = [-0.40, -0.40,  0.40,  0.40] as const;
-  const PHASES  = [    0,  Math.PI,  Math.PI,  0] as const;
+  // Diagonal trot gait: front-right + back-left (phase 0), front-left + back-right (phase π)
+  const LEG_X  = [ 0.26, -0.26,  0.26, -0.26] as const;
+  const LEG_Z  = [-0.40, -0.40,  0.40,  0.40] as const;
+  const PHASES = [    0,  Math.PI,  Math.PI,  0] as const;
 
   useTask((delta) => {
     time += delta;
 
-    // Walking in a circle around the base position
-    const angle = startAngle + time * walkSpeed;
-    posX   = baseX + Math.cos(angle) * walkRadius;
-    posZ   = baseZ + Math.sin(angle) * walkRadius;
-    facing = -angle + Math.PI / 2;
+    // ── Waypoint navigation ───────────────────────────────────────────
+    if (isPausing) {
+      pauseTimer -= delta;
+      if (pauseTimer <= 0) {
+        isPausing = false;
+        // Advance to next waypoint, skipping any that land inside an obstacle
+        let attempts = 0;
+        do {
+          wpIdx = (wpIdx + 1) % myWaypoints.length;
+          attempts++;
+        } while (
+          isBlocked(myWaypoints[wpIdx][0], myWaypoints[wpIdx][1]) &&
+          attempts < myWaypoints.length
+        );
+      }
+    } else {
+      const targetX = myWaypoints[wpIdx][0];
+      const targetZ = myWaypoints[wpIdx][1];
+      const dx = targetX - posX;
+      const dz = targetZ - posZ;
+      const dist = Math.sqrt(dx * dx + dz * dz);
 
-    // Jump countdown
+      if (dist < 0.3) {
+        // Arrived — enter pause
+        isPausing  = true;
+        pauseTimer = pauseDuration * (0.7 + Math.random() * 0.6);
+      } else {
+        // Move toward waypoint at walkSpeed
+        const step = Math.min(walkSpeed * delta, dist);
+        const nx = dx / dist;
+        const nz = dz / dist;
+        posX += nx * step;
+        posZ += nz * step;
+
+        // ── Fix facing direction ─────────────────────────────────────
+        // Unicorn model faces -Z (head at z=-0.76, tail at z=+0.76).
+        // To face world direction (nx, nz):
+        //   rotation.y = atan2(-nx, -nz)
+        const targetFacing = Math.atan2(-nx, -nz);
+
+        // Shortest-path angle interpolation (no snapping)
+        let diff = ((targetFacing - facing) + Math.PI * 3) % (Math.PI * 2) - Math.PI;
+        facing += diff * Math.min(delta * 8.0, 1.0);
+      }
+    }
+
+    // ── Jump countdown ────────────────────────────────────────────────
     if (jumping) {
       jumpProgress += delta * 3.0;
       if (jumpProgress >= Math.PI) {
@@ -73,13 +160,13 @@
       }
     }
 
-    // Sparkle physics
+    // ── Sparkle physics ───────────────────────────────────────────────
     sparkles = sparkles
       .map(s => ({
         ...s,
-        x: s.x + s.vx * delta,
-        y: s.y + delta * 2.2,
-        z: s.z + s.vz * delta,
+        x:    s.x + s.vx * delta,
+        y:    s.y + delta * 2.2,
+        z:    s.z + s.vz * delta,
         life: s.life - delta * 1.6,
       }))
       .filter(s => s.life > 0);
@@ -108,18 +195,13 @@
     }
   }
 
-  // ── Derived animation values ─────────────────────────────────────────
-  // Trot bounce: ONLY upward (abs-sin), so feet never sink below ground
-  let trotBob = $derived(
-    jumping ? 0 : Math.abs(Math.sin(time * walkSpeed * 5)) * 0.09
+  // ── Derived animation values ──────────────────────────────────────────
+  // Trot bounce only while actually walking (pausing unicorns stand still)
+  let trotBob  = $derived(
+    jumping || isPausing ? 0 : Math.abs(Math.sin(time * walkSpeed * 5)) * 0.09
   );
-  // Jump arc
-  let jumpY = $derived(jumping ? Math.sin(jumpProgress) * 2.2 : 0);
-  // Group y is always ≥ 0; at rest ≥ 0, max 0.09 trot or 2.2 jump
-  let groupY = $derived(trotBob + jumpY);
-
-  // Leg swing driven by walk speed (matches locomotion rate)
-  // 4× walkSpeed gives ≈2 full step-pairs per revolution
+  let jumpY    = $derived(jumping ? Math.sin(jumpProgress) * 2.2 : 0);
+  let groupY   = $derived(trotBob + jumpY);
   let legCycle = $derived(time * walkSpeed * 8);
 </script>
 
@@ -190,16 +272,11 @@
     </T.Mesh>
   {/each}
 
-  <!-- ── Legs with walk cycle ────────────────────────────────── -->
-  <!--
-    Hip pivot at [lx, HIP_Y, lz].
-    Leg + hoof hang below.  At rotation.x = 0, hoof bottom = 0 (ground level).
-    When swinging, hoof rises — never sinks below group.y = 0.
-  -->
+  <!-- ── Legs with walk cycle ──────────────────────────────────────── -->
   {#each { length: 4 } as _, i}
     <T.Group
       position={[LEG_X[i], HIP_Y, LEG_Z[i]]}
-      rotation.x={Math.sin(legCycle + PHASES[i]) * LEG_SWING}
+      rotation.x={isPausing ? 0 : Math.sin(legCycle + PHASES[i]) * LEG_SWING}
     >
       <!-- Leg shaft -->
       <T.Mesh position={[0, -LEG_HALF, 0]} castShadow>
