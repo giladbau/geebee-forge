@@ -2,7 +2,89 @@
   import { T, useTask } from '@threlte/core';
 
   let time = $state(0);
-  useTask((delta) => { time += delta; });
+
+  // ── Well click state ──
+  let wellOrbs: Array<{ id: number; x: number; y: number; z: number; life: number; vx: number; vz: number; color: string }> = $state([]);
+
+  function clickWell(e: any) {
+    e?.stopPropagation?.();
+    const colors = ['#cc66ff', '#aa44ff', '#ff88dd', '#88ccff', '#eebbff'];
+    const burst = Array.from({ length: 12 }, (_, i) => {
+      const a = (i / 12) * Math.PI * 2;
+      return {
+        id: Math.random(),
+        x: Math.cos(a) * 0.3,
+        y: 0.6,
+        z: Math.sin(a) * 0.3,
+        life: 1.2 + Math.random() * 0.4,
+        vx: Math.cos(a) * (0.4 + Math.random() * 0.6),
+        vz: Math.sin(a) * (0.4 + Math.random() * 0.6),
+        color: colors[i % colors.length],
+      };
+    });
+    wellOrbs = [...wellOrbs, ...burst];
+  }
+
+  // ── Hay bale click state ──
+  let clickedBale = $state(-1);
+  let baleBounce = $state(0);
+
+  function clickBale(idx: number) {
+    return (e: any) => {
+      e?.stopPropagation?.();
+      clickedBale = idx;
+      baleBounce = 1.0;
+    };
+  }
+
+  // ── Crystal click state ──
+  let clickedCrystal = $state(-1);
+  let crystalPulse = $state(0);
+  let crystalRingScale = $state(0);
+
+  function clickCrystal(idx: number) {
+    return (e: any) => {
+      e?.stopPropagation?.();
+      clickedCrystal = idx;
+      crystalPulse = 1.0;
+      crystalRingScale = 0.2;
+    };
+  }
+
+  useTask((delta) => {
+    time += delta;
+
+    // Well orbs physics
+    for (let i = wellOrbs.length - 1; i >= 0; i--) {
+      const o = wellOrbs[i];
+      o.x += o.vx * delta * 0.5;
+      o.y += delta * 2.5;
+      o.z += o.vz * delta * 0.5;
+      o.life -= delta * 1.2;
+      if (o.life <= 0) wellOrbs.splice(i, 1);
+    }
+    if (wellOrbs.length) wellOrbs = wellOrbs;
+
+    // Hay bale bounce
+    if (clickedBale >= 0) {
+      baleBounce -= delta * 3.0;
+      if (baleBounce <= 0) {
+        clickedBale = -1;
+        baleBounce = 0;
+      }
+    }
+
+    // Crystal pulse + ring
+    if (clickedCrystal >= 0) {
+      crystalPulse -= delta * 1.8;
+      crystalRingScale += delta * 4.0;
+      if (crystalPulse <= 0) {
+        clickedCrystal = -1;
+        crystalPulse = 0;
+        crystalRingScale = 0;
+      }
+    }
+  });
 </script>
 
 <!-- ════════════════════════════════════════════
@@ -119,8 +201,10 @@
 {#each [
   [-10, -7], [-11, -5], [5, -10], [7, -11], [18, 2],
   [19, 4],  [-6, 14], [-4, 15],  [12, 9],
-] as [hx, hz]}
-  <T.Group position={[hx, 0, hz]}>
+] as [hx, hz], bi}
+  {@const bounceY = clickedBale === bi ? Math.sin(baleBounce * Math.PI) * 0.8 : 0}
+  {@const bounceRot = clickedBale === bi ? Math.sin(baleBounce * Math.PI * 3) * 0.3 : 0}
+  <T.Group position={[hx, bounceY, hz]} rotation.x={bounceRot} onclick={clickBale(bi)}>
     <!-- Bale cylinder (lying on side) -->
     <T.Mesh position={[0, 0.45, 0]} rotation.z={Math.PI / 2}>
       <T.CylinderGeometry args={[0.45, 0.45, 0.85, 8]} />
@@ -162,7 +246,7 @@
 <!-- ════════════════════════════════════════════
      MAGICAL WELL  (at [-8, 0, 8])
 ════════════════════════════════════════════ -->
-<T.Group position={[-8, 0, 8]}>
+<T.Group position={[-8, 0, 8]} onclick={clickWell}>
   <!-- Stone base ring -->
   <T.Mesh position={[0, 0.4, 0]} castShadow>
     <T.CylinderGeometry args={[0.9, 1.0, 0.8, 8]} />
@@ -208,6 +292,13 @@
     intensity={wellGlow * 3}
     distance={8}
   />
+  <!-- Well orb particles -->
+  {#each wellOrbs as orb}
+    <T.Mesh position={[orb.x, orb.y, orb.z]} scale={0.08 + orb.life * 0.1}>
+      <T.SphereGeometry args={[1, 4, 4]} />
+      <T.MeshBasicMaterial color={orb.color} transparent opacity={Math.min(orb.life, 1.0)} />
+    </T.Mesh>
+  {/each}
 </T.Group>
 
 <!-- ════════════════════════════════════════════
@@ -254,18 +345,35 @@
   {@const floatY = Math.sin(time * 1.2 + ci * 1.1) * 0.3 + 1.8}
   {@const rotY = time * 0.5 + ci * 1.3}
   {@const crystalColor = ['#88eeff', '#ff88ee', '#eeff88', '#88ffcc', '#cc88ff'][ci]}
-  <T.Mesh position={[cx, floatY, cz]} rotation.y={rotY}>
-    <T.OctahedronGeometry args={[0.4]} />
-    <T.MeshStandardMaterial
-      color={crystalColor}
-      emissive={crystalColor}
-      emissiveIntensity={0.9}
-      transparent
-      opacity={0.85}
-      metalness={0.4}
-      roughness={0.1}
-    />
-  </T.Mesh>
+  {@const isPulsing = clickedCrystal === ci}
+  {@const pulseScale = isPulsing ? 1 + crystalPulse * 0.6 : 1}
+  {@const pulseEmissive = isPulsing ? 0.9 + crystalPulse * 4.0 : 0.9}
+  <T.Group position={[cx, floatY, cz]}>
+    <T.Mesh rotation.y={rotY} scale={pulseScale} onclick={clickCrystal(ci)}>
+      <T.OctahedronGeometry args={[0.4]} />
+      <T.MeshStandardMaterial
+        color={crystalColor}
+        emissive={crystalColor}
+        emissiveIntensity={pulseEmissive}
+        transparent
+        opacity={0.85}
+        metalness={0.4}
+        roughness={0.1}
+      />
+    </T.Mesh>
+    <!-- Light ring on pulse -->
+    {#if isPulsing}
+      <T.Mesh rotation.x={-Math.PI / 2} scale={crystalRingScale}>
+        <T.TorusGeometry args={[1, 0.06, 4, 12]} />
+        <T.MeshBasicMaterial color={crystalColor} transparent opacity={crystalPulse * 0.8} />
+      </T.Mesh>
+      <T.PointLight
+        color={crystalColor}
+        intensity={crystalPulse * 8}
+        distance={6}
+      />
+    {/if}
+  </T.Group>
 {/each}
 
 <!-- ════════════════════════════════════════════
