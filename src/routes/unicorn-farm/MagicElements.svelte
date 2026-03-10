@@ -5,6 +5,7 @@
   let time = $state(0);
   let clickedFlower = $state(-1);
   let flowerBloom = $state(0);
+  let rainbowWobble = $state(0);
   let petalParticles: Array<{ id: number; x: number; y: number; z: number; life: number; vx: number; vy: number; vz: number; color: string }> = $state([]);
 
   // --- Shared geometries (created once) ---
@@ -142,6 +143,11 @@
       }
     }
     if (anyActive) rainbowPool = rainbowPool;
+
+    // Rainbow wobble decay
+    if (rainbowWobble > 0) {
+      rainbowWobble = Math.max(0, rainbowWobble - delta / 0.6);
+    }
   });
 
   function bloomFlower(idx: number) {
@@ -192,6 +198,7 @@
       nextPoolIdx = (nextPoolIdx + 1) % POOL_SIZE;
     }
     rainbowPool = rainbowPool;
+    rainbowWobble = 1.0;
   }
 </script>
 
@@ -260,7 +267,7 @@
 {/each}
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<T.Group position={[-5, 0, -5]} onclick={clickRainbow}>
+<T.Group position={[-5, 0, -5]} rotation.z={rainbowWobble * Math.sin(time * 30) * 0.12} onclick={clickRainbow}>
   {#each rainbowColors as color, i}
     {#each Array.from({ length: 10 }, (_, j) => j) as j}
       {@const angle  = (j / 9) * Math.PI}
