@@ -247,7 +247,7 @@
 
 <!-- Rainbow particles (pooled, shared geometries) -->
 {#each rainbowPool as rp}
-  {@const s = 0.08 + rp.life * 0.1}
+  {@const s = 0.28 + rp.life * 0.35}
   <T.Mesh
     visible={rp.active}
     geometry={rp.shape === 'heart' ? heartGeo : starGeo}
