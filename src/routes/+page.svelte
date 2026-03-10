@@ -19,6 +19,12 @@
       <a href="/unicorn-farm" class="card-link">Visit the Farm</a>
     </article>
 
+    <article role="article" data-testid="demo-card" class="card">
+      <h2 data-testid="card-title">Digest</h2>
+      <p class="card-desc">Weekly signal from the noise — AI, 3D, and the tools that matter.</p>
+      <a href="/digest" class="card-link">Read the Digest</a>
+    </article>
+
   </div>
 </div>
 
