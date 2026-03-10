@@ -1,25 +1,116 @@
 <script lang="ts">
-  import { T } from '@threlte/core';
+  import { T, useTask } from '@threlte/core';
 
-  const hills: Array<{ pos: [number, number, number]; geo: [number, number, number, number]; color: string }> = [
-    { pos: [-22, -2.0, -18], geo: [12, 14, 4,   8], color: '#4aab3e' },
-    { pos: [ 24, -1.8,  20], geo: [10, 12, 3.6, 8], color: '#4aab3e' },
-    { pos: [ -5, -2.2,  28], geo: [ 8, 10, 4.4, 8], color: '#50b842' },
-    { pos: [ 30, -2.5, -15], geo: [14, 16, 5,   8], color: '#488a40' },
+  const walls = [
+    { wx: -8, wz: -12, len: 6, ry: 0 },
+    { wx:  8, wz: -14, len: 5, ry: 0.1 },
+    { wx:-16, wz:   5, len: 4, ry: Math.PI / 2 },
+    { wx: 14, wz:  12, len: 7, ry: 0.05 },
   ];
+
+  interface StoneState {
+    vx: number; vy: number; vz: number;
+    ox: number; oy: number; oz: number;
+    sx: number; sy: number; sz: number;
+  }
+
+  interface WallState {
+    phase: 'idle' | 'crumbling' | 'reassembling';
+    time: number;
+    stones: StoneState[];
+  }
+
+  let wallStates: WallState[] = $state(
+    walls.map(w => ({
+      phase: 'idle' as const,
+      time: 0,
+      stones: Array.from({ length: w.len * 2 }, () => ({
+        vx: 0, vy: 0, vz: 0,
+        ox: 0, oy: 0, oz: 0,
+        sx: 0, sy: 0, sz: 0,
+      })),
+    }))
+  );
+
+  function crumbleWall(wallIdx: number) {
+    const ws = wallStates[wallIdx];
+    if (ws.phase !== 'idle') return;
+    ws.phase = 'crumbling';
+    ws.time = 0;
+    for (const stone of ws.stones) {
+      stone.vx = (Math.random() - 0.5) * 5;
+      stone.vy = Math.random() * 4 + 2;
+      stone.vz = (Math.random() - 0.5) * 5;
+      stone.ox = 0;
+      stone.oy = 0;
+      stone.oz = 0;
+    }
+  }
+
+  const GRAVITY = 9.8;
+  const CRUMBLE_DURATION = 3.0;
+  const REASSEMBLE_DURATION = 1.0;
+
+  useTask((delta) => {
+    for (const ws of wallStates) {
+      if (ws.phase === 'idle') continue;
+
+      ws.time += delta;
+
+      if (ws.phase === 'crumbling') {
+        if (ws.time >= CRUMBLE_DURATION) {
+          ws.phase = 'reassembling';
+          ws.time = 0;
+          for (const stone of ws.stones) {
+            stone.sx = stone.ox;
+            stone.sy = stone.oy;
+            stone.sz = stone.oz;
+          }
+        } else {
+          for (const stone of ws.stones) {
+            stone.ox += stone.vx * delta;
+            stone.oy += stone.vy * delta;
+            stone.oz += stone.vz * delta;
+            stone.vy -= GRAVITY * delta;
+            if (stone.oy < -0.3) {
+              stone.oy = -0.3;
+              stone.vy *= -0.3;
+            }
+          }
+        }
+      } else if (ws.phase === 'reassembling') {
+        if (ws.time >= REASSEMBLE_DURATION) {
+          ws.phase = 'idle';
+          for (const stone of ws.stones) {
+            stone.ox = 0;
+            stone.oy = 0;
+            stone.oz = 0;
+          }
+        } else {
+          const t = ws.time / REASSEMBLE_DURATION;
+          const ease = t * t * (3 - 2 * t);
+          for (const stone of ws.stones) {
+            stone.ox = stone.sx * (1 - ease);
+            stone.oy = stone.sy * (1 - ease);
+            stone.oz = stone.sz * (1 - ease);
+          }
+        }
+      }
+    }
+  });
 </script>
 
-<!-- Main grass ground 120x120 -->
+<!-- Main grass ground (reduced from 120x120) -->
 <T.Mesh rotation.x={-Math.PI / 2} position.y={-0.05} receiveShadow>
-  <T.PlaneGeometry args={[120, 120]} />
+  <T.PlaneGeometry args={[50, 50]} />
   <T.MeshLambertMaterial color="#52b045" />
 </T.Mesh>
 
-<!-- Darker grass patches -->
+<!-- Darker grass patches (filtered to farm bounds) -->
 {#each [
   [-4, 3], [5, -2], [-2, -5], [7, 6], [-6, 1],
-  [14, 5], [-12, 9], [8, -12], [-18, -4], [20, 12],
-  [2, 18], [-8, -15], [15, -10], [-22, 6], [10, 20],
+  [14, 5], [-12, 9], [8, -12], [2, 18], [15, -10],
+  [10, 20],
 ] as [x, z]}
   <T.Mesh rotation.x={-Math.PI / 2} position={[x, -0.04, z]}>
     <T.CircleGeometry args={[3.0 + Math.abs(x % 3), 8]} />
@@ -53,33 +144,41 @@
   </T.Mesh>
 {/each}
 
-<!-- Rolling hills -->
-{#each hills as hill}
+<!-- Gentle terrain edge mounds (smaller, closer than old rolling hills) -->
+{#each [
+  { pos: [-18, -1.5, -14] as [number, number, number], geo: [6, 7, 2.5, 8] as [number, number, number, number], color: '#4aab3e' },
+  { pos: [ 18, -1.5,  16] as [number, number, number], geo: [5, 6, 2.0, 8] as [number, number, number, number], color: '#4aab3e' },
+] as hill}
   <T.Mesh position={hill.pos} receiveShadow>
     <T.CylinderGeometry args={hill.geo} />
     <T.MeshLambertMaterial color={hill.color} />
   </T.Mesh>
 {/each}
 
-<!-- Stone wall sections -->
-{#each (
-  [
-    { wx: -8, wz: -12, len: 6, ry: 0 },
-    { wx:  8, wz: -14, len: 5, ry: 0.1 },
-    { wx:-16, wz:   5, len: 4, ry: Math.PI / 2 },
-    { wx: 14, wz:  12, len: 7, ry: 0.05 },
-  ] as Array<{ wx: number; wz: number; len: number; ry: number }>
-) as wall}
+<!-- Stone wall sections (clickable — crumble on click) -->
+{#each walls as wall, wallIdx}
   {#each Array.from({ length: wall.len }, (_, i) => i) as i}
+    {@const bottom = wallStates[wallIdx].stones[i * 2]}
+    {@const top = wallStates[wallIdx].stones[i * 2 + 1]}
     <T.Mesh
-      position={[wall.wx + Math.cos(wall.ry) * i * 1.2, 0.3, wall.wz + Math.sin(wall.ry) * i * 1.2]}
+      position={[
+        wall.wx + Math.cos(wall.ry) * i * 1.2 + bottom.ox,
+        0.3 + bottom.oy,
+        wall.wz + Math.sin(wall.ry) * i * 1.2 + bottom.oz,
+      ]}
       castShadow
+      onclick={() => crumbleWall(wallIdx)}
     >
       <T.BoxGeometry args={[1.0, 0.6, 0.5]} />
       <T.MeshLambertMaterial color="#888077" />
     </T.Mesh>
     <T.Mesh
-      position={[wall.wx + Math.cos(wall.ry) * (i * 1.2 + 0.6), 0.65, wall.wz + Math.sin(wall.ry) * (i * 1.2 + 0.6)]}
+      position={[
+        wall.wx + Math.cos(wall.ry) * (i * 1.2 + 0.6) + top.ox,
+        0.65 + top.oy,
+        wall.wz + Math.sin(wall.ry) * (i * 1.2 + 0.6) + top.oz,
+      ]}
+      onclick={() => crumbleWall(wallIdx)}
     >
       <T.BoxGeometry args={[0.95, 0.55, 0.45]} />
       <T.MeshLambertMaterial color="#7a7570" />
