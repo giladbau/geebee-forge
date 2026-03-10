@@ -3,9 +3,36 @@
 
 	let { data } = $props<{ data: { digests: Digest[] } }>();
 
+	let activeTag = $state<string | null>(null);
+
 	const digests = $derived(data.digests);
 	const latest = $derived(digests[0]);
 	const archive = $derived(digests);
+
+	// Collect all unique tags across all digests
+	const allTags = $derived(() => {
+		const tags = new Set<string>();
+		for (const d of digests) {
+			for (const t of d.hero_topics) t.tags.forEach((tag: string) => tags.add(tag));
+			for (const n of d.notable) n.tags.forEach((tag: string) => tags.add(tag));
+		}
+		return [...tags].sort();
+	});
+
+	// Filter entries by active tag
+	function heroMatchesTag(topic: any): boolean {
+		return !activeTag || topic.tags.includes(activeTag);
+	}
+	function notableMatchesTag(item: any): boolean {
+		return !activeTag || item.tags.includes(activeTag);
+	}
+	function digestHasMatches(digest: any): boolean {
+		return digest.hero_topics.some(heroMatchesTag) || digest.notable.some(notableMatchesTag);
+	}
+
+	function toggleTag(tag: string) {
+		activeTag = activeTag === tag ? null : tag;
+	}
 
 	function formatDate(iso: string): string {
 		return new Date(iso).toLocaleDateString('en-US', {
@@ -37,6 +64,13 @@
 		<p class="tagline">Weekly signal from the noise — AI, 3D, and the tools that matter.</p>
 	</header>
 
+	{#if activeTag}
+		<div class="tag-filter-bar">
+			<span class="filter-label">Filtered by:</span>
+			<button class="tag-pill active" onclick={() => toggleTag(activeTag!)}>{activeTag} ✕</button>
+		</div>
+	{/if}
+
 	{#if latest}
 		<article class="digest-post" id="digest-{latest.filename}">
 			<div class="post-header">
@@ -47,8 +81,13 @@
 			<!-- Hero Topics -->
 			<section class="heroes">
 				{#each latest.hero_topics as topic}
-					<div class="hero-card" id={topic.slug}>
+					<div class="hero-card" id={topic.slug} class:hidden-by-filter={!heroMatchesTag(topic)}>
 						<h2 class="hero-title">{topic.title}</h2>
+						{#if topic.image_url}
+							<div class="hero-image">
+								<img src={topic.image_url} alt={topic.title} loading="lazy" />
+							</div>
+						{/if}
 						<p class="hero-summary">{topic.summary}</p>
 
 						<div class="insight-box">
@@ -72,7 +111,7 @@
 							</div>
 							<div class="tags">
 								{#each topic.tags as tag}
-									<span class="tag-pill">{tag}</span>
+									<button class="tag-pill" class:active={activeTag === tag} onclick={() => toggleTag(tag)}>{tag}</button>
 								{/each}
 							</div>
 						</div>
@@ -86,7 +125,7 @@
 					<h3 class="section-heading">Also Notable</h3>
 					<div class="notable-list">
 						{#each latest.notable as item}
-							<div class="notable-item">
+							<div class="notable-item" class:hidden-by-filter={!notableMatchesTag(item)}>
 								<div class="notable-main">
 									<h4 class="notable-title">{item.title}</h4>
 									<p class="notable-summary">{item.summary}</p>
@@ -107,7 +146,7 @@
 									</div>
 									<div class="tags">
 										{#each item.tags as tag}
-											<span class="tag-pill">{tag}</span>
+											<button class="tag-pill" class:active={activeTag === tag} onclick={() => toggleTag(tag)}>{tag}</button>
 										{/each}
 									</div>
 								</div>
@@ -120,6 +159,7 @@
 
 		<!-- Remaining digests (archive posts) -->
 		{#each digests.slice(1) as digest}
+			{#if !activeTag || digestHasMatches(digest)}
 			<article class="digest-post" id="digest-{digest.filename}">
 				<div class="post-header">
 					<span class="week-label">Week of {digest.week}</span>
@@ -128,8 +168,13 @@
 
 				<section class="heroes">
 					{#each digest.hero_topics as topic}
-						<div class="hero-card" id={topic.slug}>
+						<div class="hero-card" id={topic.slug} class:hidden-by-filter={!heroMatchesTag(topic)}>
 							<h2 class="hero-title">{topic.title}</h2>
+							{#if topic.image_url}
+								<div class="hero-image">
+									<img src={topic.image_url} alt={topic.title} loading="lazy" />
+								</div>
+							{/if}
 							<p class="hero-summary">{topic.summary}</p>
 
 							<div class="insight-box">
@@ -153,7 +198,7 @@
 								</div>
 								<div class="tags">
 									{#each topic.tags as tag}
-										<span class="tag-pill">{tag}</span>
+										<button class="tag-pill" class:active={activeTag === tag} onclick={() => toggleTag(tag)}>{tag}</button>
 									{/each}
 								</div>
 							</div>
@@ -166,7 +211,7 @@
 						<h3 class="section-heading">Also Notable</h3>
 						<div class="notable-list">
 							{#each digest.notable as item}
-								<div class="notable-item">
+								<div class="notable-item" class:hidden-by-filter={!notableMatchesTag(item)}>
 									<div class="notable-main">
 										<h4 class="notable-title">{item.title}</h4>
 										<p class="notable-summary">{item.summary}</p>
@@ -187,7 +232,7 @@
 										</div>
 										<div class="tags">
 											{#each item.tags as tag}
-												<span class="tag-pill">{tag}</span>
+												<button class="tag-pill" class:active={activeTag === tag} onclick={() => toggleTag(tag)}>{tag}</button>
 											{/each}
 										</div>
 									</div>
@@ -197,6 +242,7 @@
 					</section>
 				{/if}
 			</article>
+			{/if}
 		{/each}
 	{/if}
 
@@ -355,6 +401,22 @@
 		font-style: italic;
 	}
 
+	/* Hero Image */
+	.hero-image {
+		margin: 0.75rem 0 1rem;
+		border-radius: 8px;
+		overflow: hidden;
+		border: 1px solid #1e1e1e;
+	}
+
+	.hero-image img {
+		width: 100%;
+		height: auto;
+		display: block;
+		max-height: 400px;
+		object-fit: cover;
+	}
+
 	/* Meta Row */
 	.meta-row {
 		display: flex;
@@ -421,6 +483,45 @@
 		border: 1px solid #222;
 		border-radius: 12px;
 		white-space: nowrap;
+		background: transparent;
+		cursor: pointer;
+		transition: all 0.15s;
+		font-family: inherit;
+	}
+
+	.tag-pill:hover {
+		color: #aaa;
+		border-color: #444;
+	}
+
+	.tag-pill.active {
+		color: #6ba3ff;
+		border-color: #6ba3ff;
+		background: rgba(107, 163, 255, 0.1);
+	}
+
+	/* Tag Filter Bar */
+	.tag-filter-bar {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		margin-bottom: 1.5rem;
+		padding: 0.6rem 1rem;
+		background: #111;
+		border: 1px solid #1e1e1e;
+		border-radius: 8px;
+	}
+
+	.filter-label {
+		font-size: 0.75rem;
+		color: #555;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	/* Hidden by filter */
+	.hidden-by-filter {
+		display: none !important;
 	}
 
 	/* Section Heading */
