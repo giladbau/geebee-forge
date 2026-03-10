@@ -7,7 +7,7 @@
       "slug": "karpathy-autoresearch",
       "summary": "Andrej Karpathy released 'autoresearch' — a minimal framework where an RL agent iterates on neural architecture and hyperparameter research autonomously. A ~630-line nanochat LLM training core runs on a single GPU, and the agent proposes code modifications, observes validation loss, and updates via PPO. Separately, a formal paper (AutoResearch-RL) demonstrates the same concept with convergence guarantees.",
       "insight": "This is the 'AI does AI research' loop getting real and accessible. The fact that Karpathy stripped it to a single-file, single-GPU setup means anyone can experiment. The bigger implication: if a small RL agent can discover architecture improvements that humans missed, the compound effect over many iterations could be significant. Watch for this pattern to spread beyond LLM training into CV and graphics architectures.",
-      "image_url": null,
+      "image_url": "/digest-images/karpathy-autoresearch-progress.png",
       "sources": [
         {
           "title": "Karpathy's tweet + repo",
@@ -37,7 +37,7 @@
       "slug": "holi-spatial-3dgs-vlm",
       "summary": "Top HF paper this week (53 upvotes). Holi-Spatial builds a scalable pipeline that evolves raw video streams into holistic 3D spatial intelligence by combining 3D Gaussian Splatting with vision-language models. Unlike prior work that reuses small hand-annotated datasets, this approach systematically annotates large-scale 3D scenes from web video data, producing spatial QA pairs with geometric accuracy and relational semantics.",
       "insight": "This bridges two hot areas — 3DGS and VLMs — in a way that could actually scale. The key insight is using 3DGS as the spatial backbone for generating training data rather than as a rendering endpoint. For Spin Master's work on onboarding/tiny stories, this kind of spatial understanding could be relevant for scene comprehension in interactive content. The data pipeline approach (auto-annotate 3D from video) is more interesting than the model itself.",
-      "image_url": null,
+      "image_url": "/digest-images/holi-spatial-preview.jpg",
       "sources": [
         {
           "title": "Holi-Spatial (HuggingFace)",
