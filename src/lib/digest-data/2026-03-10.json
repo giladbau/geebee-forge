@@ -1,0 +1,260 @@
+{
+  "week": "2026-03-10 to 2026-03-10",
+  "published_at": "2026-03-10T10:00:00Z",
+  "hero_topics": [
+    {
+      "title": "Karpathy's AutoResearch: RL Agents That Do Their Own ML Research",
+      "slug": "karpathy-autoresearch",
+      "summary": "Andrej Karpathy released 'autoresearch' — a minimal framework where an RL agent iterates on neural architecture and hyperparameter research autonomously. A ~630-line nanochat LLM training core runs on a single GPU, and the agent proposes code modifications, observes validation loss, and updates via PPO. Separately, a formal paper (AutoResearch-RL) demonstrates the same concept with convergence guarantees.",
+      "insight": "This is the 'AI does AI research' loop getting real and accessible. The fact that Karpathy stripped it to a single-file, single-GPU setup means anyone can experiment. The bigger implication: if a small RL agent can discover architecture improvements that humans missed, the compound effect over many iterations could be significant. Watch for this pattern to spread beyond LLM training into CV and graphics architectures.",
+      "image_url": "/digest-images/2026-03-10_2026-03-10_karpathy-autoresearch_fe7c1b43.png",
+      "sources": [
+        {
+          "title": "Karpathy's tweet + repo",
+          "url": "https://x.com/karpathy/status/2030371219518931079",
+          "type": "twitter"
+        },
+        {
+          "title": "r/LocalLLaMA discussion",
+          "url": "https://reddit.com/r/LocalLLaMA/comments/1rowp28/karpathy_autoresearch/",
+          "type": "reddit"
+        },
+        {
+          "title": "AutoResearch-RL paper",
+          "url": "https://arxiv.org/abs/2603.07300",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "reinforcement-learning",
+        "neural-architecture-search",
+        "llm-training",
+        "meta-learning"
+      ]
+    },
+    {
+      "title": "Holi-Spatial: 3D Gaussian Splatting Meets Vision-Language Models at Scale",
+      "slug": "holi-spatial-3dgs-vlm",
+      "summary": "Top HF paper this week (53 upvotes). Holi-Spatial builds a scalable pipeline that evolves raw video streams into holistic 3D spatial intelligence by combining 3D Gaussian Splatting with vision-language models. Unlike prior work that reuses small hand-annotated datasets, this approach systematically annotates large-scale 3D scenes from web video data, producing spatial QA pairs with geometric accuracy and relational semantics.",
+      "insight": "This bridges two hot areas — 3DGS and VLMs — in a way that could actually scale. The key insight is using 3DGS as the spatial backbone for generating training data rather than as a rendering endpoint. For Spin Master's work on onboarding/tiny stories, this kind of spatial understanding could be relevant for scene comprehension in interactive content. The data pipeline approach (auto-annotate 3D from video) is more interesting than the model itself.",
+      "image_url": "/digest-images/2026-03-10_2026-03-10_holi-spatial-3dgs-vlm_8c5db1c8.png",
+      "sources": [
+        {
+          "title": "Holi-Spatial (HuggingFace)",
+          "url": "https://huggingface.co/papers/2603.07660",
+          "type": "paper"
+        },
+        {
+          "title": "arXiv",
+          "url": "https://arxiv.org/abs/2603.07660",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "gaussian-splatting",
+        "vision-language-models",
+        "3d-reconstruction",
+        "spatial-intelligence"
+      ]
+    },
+    {
+      "title": "Claude Code Gets Multi-Agent Code Review",
+      "slug": "claude-code-review",
+      "summary": "Anthropic shipped Code Review for Claude Code — a team of agents runs deep reviews on every PR. Boris Cherny (Anthropic) says engineering output is up 200% this year and reviews were the bottleneck. The system uses separate context windows per agent, leveraging test-time compute across isolated contexts rather than one large window.",
+      "insight": "The architecture detail matters: separate context windows per review agent, not one shared context. This matches what we've seen with Claude Code subagents — isolated contexts catch things a single pass misses. The 200% productivity claim is bold but tracks with what I've observed: the bottleneck has genuinely shifted from writing to reviewing. We should try this on the next CC spawn.",
+      "image_url": "/digest-images/2026-03-10_2026-03-10_claude-code-review_6b8e64e7.png",
+      "sources": [
+        {
+          "title": "Boris Cherny announcement",
+          "url": "https://x.com/bcherny/status/2031089411820228645",
+          "type": "twitter"
+        },
+        {
+          "title": "Architecture explanation",
+          "url": "https://x.com/bcherny/status/2031151689219321886",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "claude",
+        "code-review",
+        "coding-agents",
+        "developer-tools"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "LoGeR: Long-Context 3D Reconstruction from Video Without Post-Optimization",
+      "summary": "Scales dense 3D reconstruction to extremely long video sequences using hybrid memory — bidirectional priors within chunks, sliding window attention across chunks. No post-optimization needed.",
+      "sources": [
+        {
+          "title": "arXiv",
+          "url": "https://arxiv.org/abs/2603.03269",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "3d-reconstruction",
+        "video",
+        "long-context"
+      ]
+    },
+    {
+      "title": "Planning in 8 Tokens: Ultra-Compact World Model Tokenizer",
+      "summary": "Encodes observations into just 8 discrete tokens for latent world models, making real-time planning computationally feasible. Conventional tokenizers use hundreds of tokens per frame.",
+      "sources": [
+        {
+          "title": "arXiv",
+          "url": "https://arxiv.org/abs/2603.05438",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "world-models",
+        "tokenization",
+        "planning"
+      ]
+    },
+    {
+      "title": "Fine-Tuned Qwen3 SLMs (0.6-8B) Beat Frontier Models on Narrow Tasks",
+      "summary": "Systematic comparison shows distilled small Qwen3 models outperform GPT-5, Claude Opus, and Gemini Flash on specific classification and function-calling tasks. The small model advantage is real for focused use cases.",
+      "sources": [
+        {
+          "title": "r/LocalLLaMA",
+          "url": "https://reddit.com/r/LocalLLaMA/comments/1rozrmn/finetuned_qwen3_slms_068b_beat_frontier_llms_on/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "llm",
+        "fine-tuning",
+        "small-models"
+      ]
+    },
+    {
+      "title": "VeridisQuo: Open-Source Deepfake Detector (Spatial + Frequency Analysis)",
+      "summary": "Combines spatial and frequency-domain analysis to detect deepfakes and show exactly where the face was manipulated. Open-source, with visual heatmap output.",
+      "sources": [
+        {
+          "title": "r/MachineLearning",
+          "url": "https://reddit.com/r/MachineLearning/comments/1rnajac/p_veridisquo_opensource_deepfake_detector_that/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "deepfakes",
+        "computer-vision",
+        "open-source"
+      ]
+    },
+    {
+      "title": "Microsoft Copilot Cowork: Multi-Step Office Agent Built on Claude",
+      "summary": "Microsoft launched Copilot Cowork — an agent that executes multi-step workflows across Outlook, Teams, Excel, and PowerPoint autonomously. Notably built on Anthropic's Claude, not OpenAI.",
+      "sources": [
+        {
+          "title": "r/OpenAI",
+          "url": "https://reddit.com/r/OpenAI/comments/1rp7ehp/microsoft_just_launched_an_ai_that_does_your/",
+          "type": "reddit"
+        },
+        {
+          "title": "r/ChatGPT",
+          "url": "https://reddit.com/r/ChatGPT/comments/1rp78zu/microsoft_just_launched_an_ai_that_does_your/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "microsoft",
+        "claude",
+        "agents",
+        "productivity"
+      ]
+    },
+    {
+      "title": "WildActor: Identity-Preserving Human Video Generation",
+      "summary": "Actor-18M dataset + asymmetric identity-preserving attention for consistent full-body identity across dynamic shots and viewpoints. Addresses the copy-paste artifact problem in human video gen.",
+      "sources": [
+        {
+          "title": "arXiv",
+          "url": "https://arxiv.org/abs/2603.00586",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "video-generation",
+        "identity-preservation",
+        "generative-ai"
+      ]
+    },
+    {
+      "title": "AgentCraft: Control AI Agents Like an RTS Game",
+      "summary": "Ido Salomon released AgentCraft v1 — an RTS-style interface for controlling coding agents. Early but fun concept: `npx @idosal/agentcraft`.",
+      "sources": [
+        {
+          "title": "@idosal1",
+          "url": "https://x.com/idosal1/status/2021661861163544818",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "coding-agents",
+        "developer-tools",
+        "ui"
+      ]
+    },
+    {
+      "title": "LTX 2.3: Open Video Generation Getting Serious",
+      "summary": "Multiple impressive LTX 2.3 text-to-video generations on r/StableDiffusion showing significant quality jumps in open-source video models.",
+      "sources": [
+        {
+          "title": "Tony Soprano demo",
+          "url": "https://reddit.com/r/StableDiffusion/comments/1row8lu/tony_soprano_unlocked_ltx_23_t2v/",
+          "type": "reddit"
+        },
+        {
+          "title": "ComfyUI workflow",
+          "url": "https://reddit.com/r/StableDiffusion/comments/1rpjqns/ltx_23_i_love_comfyui_but_sometimes/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "video-generation",
+        "open-source",
+        "stable-diffusion"
+      ]
+    },
+    {
+      "title": "Depth Perception Blender Add-on via Head Tracking",
+      "summary": "CS student built a Blender add-on using real-time webcam head tracking to create natural depth perception while navigating 3D scenes. Free and open-source.",
+      "sources": [
+        {
+          "title": "r/ComputerVision",
+          "url": "https://reddit.com/r/computervision/comments/1ropx3s/depth_perception_blender_addon/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "blender",
+        "computer-vision",
+        "3d",
+        "head-tracking"
+      ]
+    },
+    {
+      "title": "Unreal Blueprint to C++ Translator",
+      "summary": "Open-source tool that translates Unreal Engine Blueprints to C++ code. Useful for performance-critical game dev workflows.",
+      "sources": [
+        {
+          "title": "@tom_doerr",
+          "url": "https://x.com/tom_doerr/status/2027412296448741628",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "unreal-engine",
+        "game-dev",
+        "tools"
+      ]
+    }
+  ]
+}
