@@ -1,11 +1,59 @@
 <script lang="ts">
   import { T, useTask } from '@threlte/core';
+  import * as THREE from 'three';
 
   let time = $state(0);
   let clickedFlower = $state(-1);
   let flowerBloom = $state(0);
   let petalParticles: Array<{ id: number; x: number; y: number; z: number; life: number; vx: number; vy: number; vz: number; color: string }> = $state([]);
-  let rainbowParticles: Array<{ id: number; x: number; y: number; z: number; life: number; vx: number; vy: number; vz: number; color: string; shape: 'heart' | 'star'; spin: number }> = $state([]);
+
+  // --- Shared geometries (created once) ---
+  const heartShape = new THREE.Shape();
+  heartShape.moveTo(0, 0.3);
+  heartShape.bezierCurveTo(0, 0.5, 0.35, 0.5, 0.35, 0.3);
+  heartShape.bezierCurveTo(0.35, 0.1, 0, -0.1, 0, -0.35);
+  heartShape.bezierCurveTo(0, -0.1, -0.35, 0.1, -0.35, 0.3);
+  heartShape.bezierCurveTo(-0.35, 0.5, 0, 0.5, 0, 0.3);
+  const heartGeo = new THREE.ExtrudeGeometry(heartShape, { depth: 0.1, bevelEnabled: false });
+
+  const starShape = new THREE.Shape();
+  for (let i = 0; i < 10; i++) {
+    const angle = (i / 10) * Math.PI * 2 - Math.PI / 2;
+    const r = i % 2 === 0 ? 0.4 : 0.18;
+    const sx = Math.cos(angle) * r;
+    const sy = Math.sin(angle) * r;
+    if (i === 0) starShape.moveTo(sx, sy);
+    else starShape.lineTo(sx, sy);
+  }
+  starShape.closePath();
+  const starGeo = new THREE.ExtrudeGeometry(starShape, { depth: 0.1, bevelEnabled: false });
+
+  // --- Rainbow particle pool ---
+  const POOL_SIZE = 60;
+
+  interface PoolParticle {
+    active: boolean;
+    x: number; y: number; z: number;
+    vx: number; vy: number; vz: number;
+    life: number;
+    color: string;
+    shape: 'heart' | 'star';
+    spin: number;
+  }
+
+  let rainbowPool: PoolParticle[] = $state(
+    Array.from({ length: POOL_SIZE }, () => ({
+      active: false,
+      x: 0, y: -100, z: 0,
+      vx: 0, vy: 0, vz: 0,
+      life: 0,
+      color: '#ff0000',
+      shape: 'heart' as const,
+      spin: 0,
+    }))
+  );
+
+  let nextPoolIdx = 0;
 
   const fireflyCount = 35;
   let fireflies = $state(
@@ -76,18 +124,24 @@
     }
     if (petalParticles.length) petalParticles = petalParticles;
 
-    // Rainbow particle physics
-    for (let i = rainbowParticles.length - 1; i >= 0; i--) {
-      const p = rainbowParticles[i];
+    // Rainbow pool physics
+    let anyActive = false;
+    for (let i = 0; i < POOL_SIZE; i++) {
+      const p = rainbowPool[i];
+      if (!p.active) continue;
+      anyActive = true;
       p.x += p.vx * delta;
       p.y += p.vy * delta;
       p.z += p.vz * delta;
-      p.vy -= delta * 3.5; // gravity
+      p.vy -= delta * 3.5;
       p.spin += delta * 4.0;
       p.life -= delta * 0.5;
-      if (p.life <= 0) rainbowParticles.splice(i, 1);
+      if (p.life <= 0) {
+        p.active = false;
+        p.y = -100;
+      }
     }
-    if (rainbowParticles.length) rainbowParticles = rainbowParticles;
+    if (anyActive) rainbowPool = rainbowPool;
   });
 
   function bloomFlower(idx: number) {
@@ -117,28 +171,27 @@
 
   function clickRainbow(e: any) {
     e?.stopPropagation?.();
-    // Rainbow center is at [-5, ~4, -5] (midpoint of arc)
     const cx = -5, cy = 4, cz = -5;
     const count = 28;
-    const burst = Array.from({ length: count }, (_, i) => {
+    for (let i = 0; i < count; i++) {
       const a = (i / count) * Math.PI * 2 + Math.random() * 0.4;
       const upAngle = Math.random() * Math.PI * 0.6;
       const speed = 2.5 + Math.random() * 3.0;
-      return {
-        id: Math.random(),
-        x: cx + (Math.random() - 0.5) * 2,
-        y: cy + Math.random() * 2,
-        z: cz + (Math.random() - 0.5) * 2,
-        life: 1.0 + Math.random() * 1.0,
-        vx: Math.cos(a) * Math.cos(upAngle) * speed,
-        vy: Math.sin(upAngle) * speed + 1.5,
-        vz: Math.sin(a) * Math.cos(upAngle) * speed,
-        color: rainbowColors[Math.floor(Math.random() * rainbowColors.length)],
-        shape: (i % 2 === 0 ? 'heart' : 'star') as 'heart' | 'star',
-        spin: Math.random() * Math.PI * 2,
-      };
-    });
-    rainbowParticles = [...rainbowParticles, ...burst];
+      const p = rainbowPool[nextPoolIdx];
+      p.active = true;
+      p.x = cx + (Math.random() - 0.5) * 2;
+      p.y = cy + Math.random() * 2;
+      p.z = cz + (Math.random() - 0.5) * 2;
+      p.life = 1.0 + Math.random() * 1.0;
+      p.vx = Math.cos(a) * Math.cos(upAngle) * speed;
+      p.vy = Math.sin(upAngle) * speed + 1.5;
+      p.vz = Math.sin(a) * Math.cos(upAngle) * speed;
+      p.color = rainbowColors[Math.floor(Math.random() * rainbowColors.length)];
+      p.shape = i % 2 === 0 ? 'heart' : 'star';
+      p.spin = Math.random() * Math.PI * 2;
+      nextPoolIdx = (nextPoolIdx + 1) % POOL_SIZE;
+    }
+    rainbowPool = rainbowPool;
   }
 </script>
 
@@ -192,37 +245,18 @@
   </T.Mesh>
 {/each}
 
-<!-- Rainbow particles -->
-{#each rainbowParticles as rp}
+<!-- Rainbow particles (pooled, shared geometries) -->
+{#each rainbowPool as rp}
   {@const s = 0.08 + rp.life * 0.1}
-  {@const opacity = Math.min(rp.life, 1.0)}
-  {#if rp.shape === 'heart'}
-    <!-- Heart: two round tops + triangle body via 3 boxes -->
-    <T.Group position={[rp.x, rp.y, rp.z]} rotation.y={rp.spin} scale={s}>
-      <T.Mesh position={[-0.3, 0.25, 0]}>
-        <T.BoxGeometry args={[0.6, 0.6, 0.5]} />
-        <T.MeshBasicMaterial color={rp.color} transparent {opacity} />
-      </T.Mesh>
-      <T.Mesh position={[0.3, 0.25, 0]}>
-        <T.BoxGeometry args={[0.6, 0.6, 0.5]} />
-        <T.MeshBasicMaterial color={rp.color} transparent {opacity} />
-      </T.Mesh>
-      <T.Mesh position={[0, -0.2, 0]}>
-        <T.BoxGeometry args={[0.9, 0.6, 0.5]} />
-        <T.MeshBasicMaterial color={rp.color} transparent {opacity} />
-      </T.Mesh>
-    </T.Group>
-  {:else}
-    <!-- Star: 3-line cross pattern -->
-    <T.Group position={[rp.x, rp.y, rp.z]} rotation.y={rp.spin} scale={s}>
-      {#each [0, Math.PI / 3, Math.PI * 2/3] as ra}
-        <T.Mesh rotation.y={ra}>
-          <T.BoxGeometry args={[1.2, 0.2, 0.2]} />
-          <T.MeshBasicMaterial color={rp.color} transparent {opacity} />
-        </T.Mesh>
-      {/each}
-    </T.Group>
-  {/if}
+  <T.Mesh
+    visible={rp.active}
+    geometry={rp.shape === 'heart' ? heartGeo : starGeo}
+    position={[rp.x, rp.y, rp.z]}
+    rotation.y={rp.spin}
+    scale={s}
+  >
+    <T.MeshBasicMaterial color={rp.color} transparent opacity={Math.min(rp.life, 1.0)} />
+  </T.Mesh>
 {/each}
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
