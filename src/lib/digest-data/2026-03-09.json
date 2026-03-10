@@ -6,87 +6,204 @@
       "title": "Gaussian Splatting Breaks Into Real-Time Video",
       "slug": "gaussian-splatting-realtime-video",
       "summary": "Two independent teams demonstrated real-time 4D Gaussian splatting for dynamic scenes, achieving 60fps rendering of complex video sequences. SplatFlow from ETH Zurich uses flow-guided deformation fields, while DynaSplat from Google DeepMind introduces temporal attention mechanisms. Both show dramatic quality improvements over prior dynamic NeRF approaches.",
-      "insight": "This is the missing piece for production use of 3DGS in film/VFX. Static scene reconstruction was already competitive — now dynamic scenes are catching up. The Google approach is particularly interesting because it could integrate with their existing NeRF-to-mesh pipeline.",
+      "insight": "This is the missing piece for production use of 3DGS in film/VFX. Static scene reconstruction was already competitive \u2014 now dynamic scenes are catching up. The Google approach is particularly interesting because it could integrate with their existing NeRF-to-mesh pipeline.",
       "sources": [
-        {"title": "SplatFlow: Real-Time Dynamic Gaussian Splatting", "url": "https://arxiv.org/abs/2603.01234", "type": "paper"},
-        {"title": "DynaSplat: Temporally Coherent 4D Gaussians", "url": "https://arxiv.org/abs/2603.01567", "type": "paper"},
-        {"title": "Discussion on r/gaussiansplatting", "url": "https://reddit.com/r/gaussiansplatting/comments/example1", "type": "reddit"}
+        {
+          "title": "SplatFlow: Real-Time Dynamic Gaussian Splatting",
+          "url": "https://arxiv.org/abs/2603.01234",
+          "type": "paper"
+        },
+        {
+          "title": "DynaSplat: Temporally Coherent 4D Gaussians",
+          "url": "https://arxiv.org/abs/2603.01567",
+          "type": "paper"
+        },
+        {
+          "title": "Discussion on r/gaussiansplatting",
+          "url": "https://reddit.com/r/gaussiansplatting/comments/example1",
+          "type": "reddit"
+        }
       ],
-      "image_url": null,
-      "tags": ["gaussian-splatting", "real-time-rendering", "3d-reconstruction"]
+      "image_url": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=800&h=400&fit=crop",
+      "tags": [
+        "gaussian-splatting",
+        "real-time-rendering",
+        "3d-reconstruction"
+      ]
     },
     {
       "title": "Claude 3.5 Opus Released with Native Tool Use",
       "slug": "claude-35-opus-native-tools",
-      "summary": "Anthropic released Claude 3.5 Opus with deeply integrated tool use — the model can now plan multi-step tool chains internally rather than requiring external orchestration. Early benchmarks show 40% fewer API round-trips for complex agent workflows. Coding benchmarks jump significantly, with SWE-bench scores reaching 62%.",
-      "insight": "The real story isn't the benchmark numbers — it's the architecture shift. Moving tool planning inside the model eliminates the brittle prompt-engineering layer that made agent frameworks fragile. This is what OpenClaw and similar systems have been working around. Expect the orchestration layer to thin out significantly.",
+      "summary": "Anthropic released Claude 3.5 Opus with deeply integrated tool use \u2014 the model can now plan multi-step tool chains internally rather than requiring external orchestration. Early benchmarks show 40% fewer API round-trips for complex agent workflows. Coding benchmarks jump significantly, with SWE-bench scores reaching 62%.",
+      "insight": "The real story isn't the benchmark numbers \u2014 it's the architecture shift. Moving tool planning inside the model eliminates the brittle prompt-engineering layer that made agent frameworks fragile. This is what OpenClaw and similar systems have been working around. Expect the orchestration layer to thin out significantly.",
       "sources": [
-        {"title": "Anthropic Blog: Claude 3.5 Opus", "url": "https://www.anthropic.com/news/claude-3-5-opus", "type": "blog"},
-        {"title": "@AnthropicAI announcement", "url": "https://x.com/AnthropicAI/status/example1", "type": "twitter"},
-        {"title": "r/Claude discussion", "url": "https://reddit.com/r/Claude/comments/example2", "type": "reddit"},
-        {"title": "r/LocalLLaMA analysis", "url": "https://reddit.com/r/LocalLLaMA/comments/example3", "type": "reddit"}
+        {
+          "title": "Anthropic Blog: Claude 3.5 Opus",
+          "url": "https://www.anthropic.com/news/claude-3-5-opus",
+          "type": "blog"
+        },
+        {
+          "title": "@AnthropicAI announcement",
+          "url": "https://x.com/AnthropicAI/status/example1",
+          "type": "twitter"
+        },
+        {
+          "title": "r/Claude discussion",
+          "url": "https://reddit.com/r/Claude/comments/example2",
+          "type": "reddit"
+        },
+        {
+          "title": "r/LocalLLaMA analysis",
+          "url": "https://reddit.com/r/LocalLLaMA/comments/example3",
+          "type": "reddit"
+        }
       ],
-      "image_url": null,
-      "tags": ["llm", "claude", "tool-use", "coding-agents"]
+      "image_url": "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=400&fit=crop",
+      "tags": [
+        "llm",
+        "claude",
+        "tool-use",
+        "coding-agents"
+      ]
     },
     {
       "title": "World Models Get Spatial Awareness",
       "slug": "world-models-spatial-awareness",
       "summary": "NVIDIA's GameGen-2 introduces a world model that understands 3D spatial relationships, enabling consistent physics when generating interactive environments. Unlike prior work that treated video generation as 2D sequence prediction, GameGen-2 maintains an implicit 3D representation that prevents the \"impossible geometry\" artifacts common in generated worlds.",
-      "insight": "This bridges the gap between world models and actual game engines. The implicit 3D representation is key — previous approaches could generate visually convincing frames but fell apart when you needed consistent spatial reasoning (walk around a corner and back, the scene should be the same). Still far from production game quality, but the direction is right.",
+      "insight": "This bridges the gap between world models and actual game engines. The implicit 3D representation is key \u2014 previous approaches could generate visually convincing frames but fell apart when you needed consistent spatial reasoning (walk around a corner and back, the scene should be the same). Still far from production game quality, but the direction is right.",
       "sources": [
-        {"title": "GameGen-2: Spatially-Aware World Models", "url": "https://arxiv.org/abs/2603.02345", "type": "paper"},
-        {"title": "@JimFan thread", "url": "https://x.com/DrJimFan/status/example2", "type": "twitter"}
+        {
+          "title": "GameGen-2: Spatially-Aware World Models",
+          "url": "https://arxiv.org/abs/2603.02345",
+          "type": "paper"
+        },
+        {
+          "title": "@JimFan thread",
+          "url": "https://x.com/DrJimFan/status/example2",
+          "type": "twitter"
+        }
       ],
-      "image_url": null,
-      "tags": ["world-models", "3d", "nvidia", "game-generation"]
+      "image_url": "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?w=800&h=400&fit=crop",
+      "tags": [
+        "world-models",
+        "3d",
+        "nvidia",
+        "game-generation"
+      ]
     }
   ],
   "notable": [
     {
       "title": "Stable Diffusion 4 Preview Leaks Show Major Architecture Change",
       "summary": "Early access users report SD4 moves to a DiT-based architecture with native video support. Quality appears to match DALL-E 3 in initial comparisons.",
-      "sources": [{"title": "r/StableDiffusion thread", "url": "https://reddit.com/r/StableDiffusion/comments/example4", "type": "reddit"}],
-      "tags": ["stable-diffusion", "image-generation"]
+      "sources": [
+        {
+          "title": "r/StableDiffusion thread",
+          "url": "https://reddit.com/r/StableDiffusion/comments/example4",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "stable-diffusion",
+        "image-generation"
+      ]
     },
     {
       "title": "Codex CLI Gets Multi-File Context Window",
       "summary": "OpenAI's Codex CLI now supports loading entire project directories into context, with smart chunking that preserves cross-file references.",
-      "sources": [{"title": "@OpenAI tweet", "url": "https://x.com/OpenAI/status/example3", "type": "twitter"}],
-      "tags": ["codex", "coding-tools"]
+      "sources": [
+        {
+          "title": "@OpenAI tweet",
+          "url": "https://x.com/OpenAI/status/example3",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "codex",
+        "coding-tools"
+      ]
     },
     {
       "title": "NeRF-to-Mesh Pipeline Achieves Sub-Second Export",
-      "summary": "New paper from Meta demonstrates instant mesh extraction from trained NeRFs, making the NeRF→production pipeline viable for real-time applications.",
-      "sources": [{"title": "InstaMesh: Instant Neural Mesh Extraction", "url": "https://arxiv.org/abs/2603.03456", "type": "paper"}],
-      "tags": ["nerf", "3d-reconstruction", "mesh"]
+      "summary": "New paper from Meta demonstrates instant mesh extraction from trained NeRFs, making the NeRF\u2192production pipeline viable for real-time applications.",
+      "sources": [
+        {
+          "title": "InstaMesh: Instant Neural Mesh Extraction",
+          "url": "https://arxiv.org/abs/2603.03456",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "nerf",
+        "3d-reconstruction",
+        "mesh"
+      ]
     },
     {
       "title": "GPT-5 Rumored for Q2 2026 with Native Multimodal Generation",
       "summary": "Multiple sources suggest GPT-5 will unify text, image, video, and audio generation in a single model. No official confirmation from OpenAI.",
       "sources": [
-        {"title": "r/OpenAI speculation thread", "url": "https://reddit.com/r/OpenAI/comments/example5", "type": "reddit"},
-        {"title": "@sama hint", "url": "https://x.com/sama/status/example4", "type": "twitter"}
+        {
+          "title": "r/OpenAI speculation thread",
+          "url": "https://reddit.com/r/OpenAI/comments/example5",
+          "type": "reddit"
+        },
+        {
+          "title": "@sama hint",
+          "url": "https://x.com/sama/status/example4",
+          "type": "twitter"
+        }
       ],
-      "tags": ["gpt", "multimodal"]
+      "tags": [
+        "gpt",
+        "multimodal"
+      ]
     },
     {
       "title": "Real-Time Neural Rendering Benchmark Published",
       "summary": "New standardized benchmark for neural rendering methods covers speed, quality, and memory across 50 scenes. 3DGS variants dominate speed; NeRF variants win on quality.",
-      "sources": [{"title": "NeuralRenderBench", "url": "https://arxiv.org/abs/2603.04567", "type": "paper"}],
-      "tags": ["neural-rendering", "benchmarks"]
+      "sources": [
+        {
+          "title": "NeuralRenderBench",
+          "url": "https://arxiv.org/abs/2603.04567",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "neural-rendering",
+        "benchmarks"
+      ]
     },
     {
       "title": "Cursor Adds AI-Powered Git Conflict Resolution",
       "summary": "Cursor 0.45 introduces automatic merge conflict resolution that understands both sides' intent. Early reports say it handles 80%+ of conflicts correctly.",
-      "sources": [{"title": "r/ChatGPT discussion", "url": "https://reddit.com/r/ChatGPT/comments/example6", "type": "reddit"}],
-      "tags": ["cursor", "coding-tools", "git"]
+      "sources": [
+        {
+          "title": "r/ChatGPT discussion",
+          "url": "https://reddit.com/r/ChatGPT/comments/example6",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "cursor",
+        "coding-tools",
+        "git"
+      ]
     },
     {
       "title": "Diffusion Models Learn to Count",
       "summary": "Paper shows a training technique that gives diffusion models accurate object counting, solving one of the oldest failure modes in image generation.",
-      "sources": [{"title": "CountDiffusion paper", "url": "https://arxiv.org/abs/2603.05678", "type": "paper"}],
-      "tags": ["diffusion-models", "image-generation"]
+      "sources": [
+        {
+          "title": "CountDiffusion paper",
+          "url": "https://arxiv.org/abs/2603.05678",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "diffusion-models",
+        "image-generation"
+      ]
     }
   ]
 }
