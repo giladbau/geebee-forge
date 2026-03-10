@@ -85,7 +85,9 @@
 						<h2 class="hero-title">{topic.title}</h2>
 						{#if topic.image_url}
 							<div class="hero-image">
-								<img src={topic.image_url} alt={topic.title} loading="lazy" />
+								<a href={topic.image_url} target="_blank" rel="noopener noreferrer">
+									<img src={topic.image_url} alt={topic.title} loading="lazy" />
+								</a>
 							</div>
 						{/if}
 						<p class="hero-summary">{topic.summary}</p>
@@ -172,7 +174,9 @@
 							<h2 class="hero-title">{topic.title}</h2>
 							{#if topic.image_url}
 								<div class="hero-image">
-									<img src={topic.image_url} alt={topic.title} loading="lazy" />
+									<a href={topic.image_url} target="_blank" rel="noopener noreferrer">
+										<img src={topic.image_url} alt={topic.title} loading="lazy" />
+									</a>
 								</div>
 							{/if}
 							<p class="hero-summary">{topic.summary}</p>
