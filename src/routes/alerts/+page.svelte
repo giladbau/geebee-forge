@@ -64,11 +64,16 @@
 	async function loadAllData() {
 		loading = true;
 		try {
+			// When a zone is selected, use zone-specific endpoints that do server-side filtering
+			const useZone = !!selectedZone;
+			const summaryBase = useZone ? '/api/alerts/zone-summary' : '/api/alerts/summary';
+			const distBase = useZone ? '/api/alerts/zone-distribution' : '/api/alerts/distribution';
+
 			const [summaryData, hourlyData, distData, catDistData] = await Promise.all([
-				fetchJSON(`/api/alerts/summary?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
-				fetchJSON(`/api/alerts/summary?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`),
-				fetchJSON(`/api/alerts/distribution?${buildParams({ groupBy: 'origin' })}`),
-				fetchJSON(`/api/alerts/distribution?${buildParams({ groupBy: 'category' })}`)
+				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
+				fetchJSON(`${summaryBase}?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`),
+				fetchJSON(`${distBase}?${buildParams({ groupBy: 'origin' })}`),
+				fetchJSON(`${distBase}?${buildParams({ groupBy: 'category' })}`)
 			]);
 			summary = summaryData;
 			hourlyTimeline = hourlyData?.timeline || [];
