@@ -14,10 +14,18 @@
 
 	// --- Data ---
 	let summary: any = $state(null);
-	let timeline: any[] = $state([]);
+	let hourlyTimeline: any[] = $state([]);
 	let distribution: any[] = $state([]);
 	let zones: string[] = $state([]);
 	let loading = $state(true);
+
+	// --- Time-of-day config ---
+	const TOD_PERIODS = [
+		{ label: 'Night (00–06)', min: 0, max: 5, color: 'rgba(148, 103, 189, 0.7)', border: 'rgba(148, 103, 189, 1)' },
+		{ label: 'Morning (06–12)', min: 6, max: 11, color: 'rgba(255, 193, 7, 0.7)', border: 'rgba(255, 193, 7, 1)' },
+		{ label: 'Noon (12–18)', min: 12, max: 17, color: 'rgba(255, 127, 14, 0.7)', border: 'rgba(255, 127, 14, 1)' },
+		{ label: 'Evening (18–24)', min: 18, max: 23, color: 'rgba(107, 163, 255, 0.7)', border: 'rgba(107, 163, 255, 1)' }
+	] as const;
 
 	// --- Charts ---
 	let timelineCanvas: HTMLCanvasElement;
@@ -50,13 +58,13 @@
 	async function loadAllData() {
 		loading = true;
 		try {
-			const [summaryData, timelineData, distData] = await Promise.all([
+			const [summaryData, hourlyData, distData] = await Promise.all([
 				fetchJSON(`/api/alerts/summary?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
-				fetchJSON(`/api/alerts/summary?${buildParams({ include: 'timeline', timelineGroup })}`),
+				fetchJSON(`/api/alerts/summary?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`),
 				fetchJSON(`/api/alerts/distribution?${buildParams({ groupBy: 'origin' })}`)
 			]);
 			summary = summaryData;
-			timeline = timelineData?.timeline || [];
+			hourlyTimeline = hourlyData?.timeline || [];
 			distribution = Array.isArray(distData) ? distData : distData?.distribution || [];
 			renderTimelineChart();
 			renderDistributionChart();
@@ -81,37 +89,89 @@
 		}
 	}
 
+	function getBucketKey(dateStr: string, granularity: 'day' | 'week' | 'month'): string {
+		const d = new Date(dateStr);
+		if (granularity === 'month') {
+			return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+		}
+		if (granularity === 'week') {
+			// Round down to Monday
+			const day = d.getDay();
+			const diff = (day === 0 ? -6 : 1) - day;
+			const monday = new Date(d);
+			monday.setDate(d.getDate() + diff);
+			return monday.toISOString().slice(0, 10);
+		}
+		return d.toISOString().slice(0, 10);
+	}
+
+	function getTodPeriodIndex(hour: number): number {
+		if (hour < 6) return 0;
+		if (hour < 12) return 1;
+		if (hour < 18) return 2;
+		return 3;
+	}
+
+	function buildStackedData() {
+		// Aggregate hourly entries into buckets keyed by granularity + time-of-day period
+		const bucketMap = new Map<string, [number, number, number, number]>();
+
+		for (const entry of hourlyTimeline) {
+			const period = entry.date || entry.label || entry.period;
+			const count = entry.count || entry.total || entry.alerts || 0;
+			const hour = new Date(period).getHours();
+			const key = getBucketKey(period, timelineGroup);
+			const todIdx = getTodPeriodIndex(hour);
+
+			if (!bucketMap.has(key)) {
+				bucketMap.set(key, [0, 0, 0, 0]);
+			}
+			bucketMap.get(key)![todIdx] += count;
+		}
+
+		const sortedKeys = [...bucketMap.keys()].sort();
+		const stacks: [number[], number[], number[], number[]] = [[], [], [], []];
+		for (const key of sortedKeys) {
+			const vals = bucketMap.get(key)!;
+			for (let i = 0; i < 4; i++) stacks[i].push(vals[i]);
+		}
+
+		return { labels: sortedKeys, stacks };
+	}
+
 	function renderTimelineChart() {
-		if (!timelineCanvas || !timeline.length) return;
+		if (!timelineCanvas || !hourlyTimeline.length) return;
 		if (timelineChart) timelineChart.destroy();
 
-		const labels = timeline.map((t: any) => t.date || t.label || t.period);
-		const values = timeline.map((t: any) => t.count || t.total || t.alerts || 0);
+		const { labels, stacks } = buildStackedData();
 
 		timelineChart = new Chart(timelineCanvas, {
 			type: 'bar',
 			data: {
 				labels,
-				datasets: [{
-					label: 'Alerts',
-					data: values,
-					backgroundColor: 'rgba(239, 68, 68, 0.7)',
-					borderColor: 'rgba(239, 68, 68, 1)',
+				datasets: TOD_PERIODS.map((p, i) => ({
+					label: p.label,
+					data: stacks[i],
+					backgroundColor: p.color,
+					borderColor: p.border,
 					borderWidth: 1
-				}]
+				}))
 			},
 			options: {
 				responsive: true,
 				maintainAspectRatio: false,
 				plugins: {
-					legend: { labels: { color: '#e0e0e0' } }
+					legend: { labels: { color: '#e0e0e0' } },
+					tooltip: { mode: 'index' as const }
 				},
 				scales: {
 					x: {
+						stacked: true,
 						ticks: { color: '#999', maxRotation: 45 },
 						grid: { color: 'rgba(255,255,255,0.05)' }
 					},
 					y: {
+						stacked: true,
 						ticks: { color: '#999' },
 						grid: { color: 'rgba(255,255,255,0.05)' }
 					}
