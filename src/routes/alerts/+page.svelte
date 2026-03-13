@@ -123,23 +123,47 @@
 		return d.toISOString().slice(0, 10);
 	}
 
-	// Bar chart data
+	// Time-of-day periods
+	const timePeriods = ['Morning', 'Noon', 'Evening', 'Night'] as const;
+	type TimePeriod = (typeof timePeriods)[number];
+
+	const timePeriodColors: Record<TimePeriod, { bg: string; border: string }> = {
+		Morning: { bg: 'rgba(255, 193, 7, 0.7)', border: '#ffc107' },
+		Noon: { bg: 'rgba(255, 127, 14, 0.7)', border: '#ff7f0e' },
+		Evening: { bg: 'rgba(107, 163, 255, 0.7)', border: '#6ba3ff' },
+		Night: { bg: 'rgba(148, 103, 189, 0.7)', border: '#9467bd' }
+	};
+
+	function getTimePeriod(date: Date): TimePeriod {
+		const h = date.getHours();
+		if (h >= 6 && h < 12) return 'Morning';
+		if (h >= 12 && h < 18) return 'Noon';
+		if (h >= 18) return 'Evening';
+		return 'Night';
+	}
+
+	// Bar chart data — stacked by time of day
 	let barChartData = $derived.by(() => {
-		const buckets = new Map<string, Set<string>>();
+		const buckets = new Map<string, Record<TimePeriod, Set<string>>>();
 		for (const r of filteredRows) {
 			const key = getBucketKey(r.dateStr, r.time, granularity);
 			let bucket = buckets.get(key);
 			if (!bucket) {
-				bucket = new Set();
+				bucket = { Morning: new Set(), Noon: new Set(), Evening: new Set(), Night: new Set() };
 				buckets.set(key, bucket);
 			}
-			bucket.add(r.id);
+			bucket[getTimePeriod(r.time)].add(r.id);
 		}
 		const sorted = [...buckets.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-		return {
-			labels: sorted.map(([k]) => k),
-			data: sorted.map(([, ids]) => ids.size)
-		};
+		const labels = sorted.map(([k]) => k);
+		const datasets = timePeriods.map((period) => ({
+			label: `${period} (${period === 'Morning' ? '06–12' : period === 'Noon' ? '12–18' : period === 'Evening' ? '18–00' : '00–06'})`,
+			data: sorted.map(([, b]) => b[period].size),
+			backgroundColor: timePeriodColors[period].bg,
+			borderColor: timePeriodColors[period].border,
+			borderWidth: 1
+		}));
+		return { labels, datasets };
 	});
 
 	// Chart instances
@@ -171,27 +195,31 @@
 
 		if (barChart) {
 			barChart.data.labels = bd.labels;
-			barChart.data.datasets![0].data = bd.data;
+			barChart.data.datasets = bd.datasets;
 			barChart.update('none');
 		} else {
 			barChart = new Chart(barCanvas, {
 				type: 'bar',
 				data: {
 					labels: bd.labels,
-					datasets: [
-						{
-							label: 'Alerts',
-							data: bd.data,
-							backgroundColor: chartColors.bar,
-							borderColor: chartColors.barBorder,
-							borderWidth: 1
-						}
-					]
+					datasets: bd.datasets
 				},
 				options: {
 					responsive: true,
 					maintainAspectRatio: false,
-					scales: commonScaleOpts,
+					scales: {
+						x: {
+							stacked: true,
+							ticks: { color: chartColors.tick, maxRotation: 45, autoSkip: true, maxTicksLimit: 30 },
+							grid: { color: chartColors.grid }
+						},
+						y: {
+							stacked: true,
+							ticks: { color: chartColors.tick },
+							grid: { color: chartColors.grid },
+							beginAtZero: true
+						}
+					},
 					plugins: { legend: { labels: { color: chartColors.text } } }
 				}
 			});
