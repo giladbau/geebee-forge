@@ -5,15 +5,16 @@ const PAGE_SIZE = 100;
 const BATCH_SIZE = 3;
 
 interface AlertCity {
-	city: string;
+	id: number;
+	name: string;
 	zone: string;
 }
 
 interface Alert {
-	date: string;
+	timestamp: string;
+	type?: string;
 	cities: AlertCity[];
-	origin?: string;
-	category?: string;
+	origin?: string | null;
 	[key: string]: unknown;
 }
 
@@ -135,7 +136,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		const hourlyBuckets = new Map<string, number>();
 
 		for (const alert of filtered) {
-			const ts = new Date(alert.date).getTime();
+			const ts = new Date(alert.timestamp).getTime();
 			const age = now - ts;
 			if (age <= ms24h) last24h++;
 			if (age <= ms7d) last7d++;
@@ -144,16 +145,16 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			// Count cities within the zone
 			for (const c of alert.cities || []) {
 				if (c.zone === zone) {
-					cityCount.set(c.city, (cityCount.get(c.city) || 0) + 1);
+					cityCount.set(c.name, (cityCount.get(c.name) || 0) + 1);
 				}
 			}
 
 			// Timeline bucketing
-			const bucketKey = getBucketKey(alert.date, timelineGroup);
+			const bucketKey = getBucketKey(alert.timestamp, timelineGroup);
 			timelineBuckets.set(bucketKey, (timelineBuckets.get(bucketKey) || 0) + 1);
 
 			// Hourly bucketing (always compute for peak)
-			const hourKey = alert.date;
+			const hourKey = alert.timestamp;
 			hourlyBuckets.set(hourKey, (hourlyBuckets.get(hourKey) || 0) + 1);
 		}
 
@@ -180,12 +181,15 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		const peakHour = peakPeriod ? new Date(peakPeriod).getUTCHours() : null;
 
 		const result: Record<string, unknown> = {
-			totalAlerts: filtered.length,
-			last24Hours: last24h,
-			last7Days: last7d,
-			last30Days: last30d,
+			totals: {
+				range: filtered.length,
+				last24h,
+				last7d,
+				last30d
+			},
 			uniqueCities: cityCount.size,
-			uniqueZones: 1
+			uniqueZones: 1,
+			uniqueOrigins: new Set(filtered.map(a => a.origin).filter(Boolean)).size
 		};
 
 		const includes = include.split(',');
@@ -210,8 +214,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			result.timeline = timeline;
 		}
 		if (includes.includes('peak')) {
-			result.peak = peakHour !== null
-				? { hour: `${String(peakHour).padStart(2, '0')}:00`, count: peakCount }
+			result.peak = peakPeriod
+				? { period: peakPeriod, count: peakCount }
 				: null;
 		}
 

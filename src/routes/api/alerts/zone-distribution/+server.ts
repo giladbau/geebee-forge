@@ -5,15 +5,16 @@ const PAGE_SIZE = 100;
 const BATCH_SIZE = 3;
 
 interface AlertCity {
-	city: string;
+	id: number;
+	name: string;
 	zone: string;
 }
 
 interface Alert {
-	date: string;
+	timestamp: string;
+	type?: string;
 	cities: AlertCity[];
-	origin?: string;
-	category?: string;
+	origin?: string | null;
 	[key: string]: unknown;
 }
 
@@ -94,7 +95,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 		const counts = new Map<string, number>();
 		for (const alert of filtered) {
-			const key = (groupBy === 'category' ? alert.category : alert.origin) || 'Unknown';
+			const key = (groupBy === 'category' ? (alert.type || 'Unknown') : (alert.origin || 'Unknown'));
 			counts.set(key, (counts.get(key) || 0) + 1);
 		}
 
@@ -102,7 +103,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			.sort((a, b) => b[1] - a[1])
 			.map(([label, count]) => ({ label, count }));
 
-		return new Response(JSON.stringify(data), {
+		const totalAlerts = filtered.length;
+
+		return new Response(JSON.stringify({ data, totalAlerts, pagination: { total: data.length, limit: data.length, offset: 0, hasMore: false } }), {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	} catch (e) {
