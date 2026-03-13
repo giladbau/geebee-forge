@@ -22,15 +22,14 @@
 	let cityFilter = $state('');
 	let citySearch = $state('');
 	let showCityDropdown = $state(false);
-	let startDate = $state('2023-10-07');
+	let startDate = $state('2026-02-28');
 	let endDate = $state(new Date().toISOString().slice(0, 10));
 	let originFilter = $state('');
 	let threatFilter = $state('');
-	let granularity = $state<'day' | 'week' | 'month'>('month');
+	let granularity = $state<'day' | 'week' | 'month'>('day');
 
 	// Canvas refs
 	let barCanvas = $state<HTMLCanvasElement>();
-	let lineCanvas = $state<HTMLCanvasElement>();
 
 	// Unique values for dropdowns
 	let uniqueOrigins = $derived(
@@ -143,41 +142,12 @@
 		};
 	});
 
-	// Line chart data (cumulative unique alerts)
-	let lineChartData = $derived.by(() => {
-		const dayIds = new Map<string, Set<string>>();
-		for (const r of filteredRows) {
-			let daySet = dayIds.get(r.dateStr);
-			if (!daySet) {
-				daySet = new Set();
-				dayIds.set(r.dateStr, daySet);
-			}
-			daySet.add(r.id);
-		}
-
-		const sortedDays = [...dayIds.entries()].sort((a, b) => a[0].localeCompare(b[0]));
-		const seenIds = new Set<string>();
-		const labels: string[] = [];
-		const data: number[] = [];
-
-		for (const [day, ids] of sortedDays) {
-			for (const id of ids) seenIds.add(id);
-			labels.push(day);
-			data.push(seenIds.size);
-		}
-
-		return { labels, data };
-	});
-
 	// Chart instances
 	let barChart: Chart | null = null;
-	let lineChart: Chart | null = null;
 
 	const chartColors = {
 		bar: 'rgba(107, 163, 255, 0.7)',
 		barBorder: '#6ba3ff',
-		line: '#6ba3ff',
-		lineFill: 'rgba(107, 163, 255, 0.1)',
 		text: '#e0e0e0',
 		tick: '#888',
 		grid: '#1a1a1a'
@@ -215,41 +185,6 @@
 							backgroundColor: chartColors.bar,
 							borderColor: chartColors.barBorder,
 							borderWidth: 1
-						}
-					]
-				},
-				options: {
-					responsive: true,
-					maintainAspectRatio: false,
-					scales: commonScaleOpts,
-					plugins: { legend: { labels: { color: chartColors.text } } }
-				}
-			});
-		}
-	});
-
-	$effect(() => {
-		if (!lineCanvas || loading) return;
-		const ld = lineChartData;
-
-		if (lineChart) {
-			lineChart.data.labels = ld.labels;
-			lineChart.data.datasets![0].data = ld.data;
-			lineChart.update('none');
-		} else {
-			lineChart = new Chart(lineCanvas, {
-				type: 'line',
-				data: {
-					labels: ld.labels,
-					datasets: [
-						{
-							label: 'Cumulative Alerts',
-							data: ld.data,
-							borderColor: chartColors.line,
-							backgroundColor: chartColors.lineFill,
-							fill: true,
-							tension: 0.1,
-							pointRadius: 0
 						}
 					]
 				},
@@ -333,7 +268,6 @@
 
 		return () => {
 			barChart?.destroy();
-			lineChart?.destroy();
 		};
 	});
 
@@ -486,12 +420,6 @@
 			</div>
 		</div>
 
-		<div class="chart-section">
-			<h2>Cumulative Alert Count</h2>
-			<div class="chart-container">
-				<canvas bind:this={lineCanvas}></canvas>
-			</div>
-		</div>
 	{/if}
 </div>
 
