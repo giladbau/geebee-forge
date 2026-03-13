@@ -10,13 +10,18 @@
 	let selectedZone = $state('');
 	let selectedOrigin = $state('');
 	let selectedCategory = $state('');
+	let selectedCity = $state('');
+	let citySearch = $state('');
+	let citySearchOpen = $state(false);
 	let timelineGroup = $state<'day' | 'week' | 'month'>('day');
 
 	// --- Data ---
 	let summary: any = $state(null);
 	let hourlyTimeline: any[] = $state([]);
 	let distribution: any[] = $state([]);
+	let categoryDistribution: any[] = $state([]);
 	let zones: string[] = $state([]);
+	let citiesList: any[] = $state([]);
 	let loading = $state(true);
 
 	// --- Time-of-day config ---
@@ -46,6 +51,7 @@
 		if (selectedZone) p.set('zone', selectedZone);
 		if (selectedOrigin) p.set('origin', selectedOrigin);
 		if (selectedCategory) p.set('category', selectedCategory);
+		if (selectedCity) p.set('cityName', selectedCity);
 		return p.toString();
 	}
 
@@ -58,14 +64,16 @@
 	async function loadAllData() {
 		loading = true;
 		try {
-			const [summaryData, hourlyData, distData] = await Promise.all([
+			const [summaryData, hourlyData, distData, catDistData] = await Promise.all([
 				fetchJSON(`/api/alerts/summary?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
 				fetchJSON(`/api/alerts/summary?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`),
-				fetchJSON(`/api/alerts/distribution?${buildParams({ groupBy: 'origin' })}`)
+				fetchJSON(`/api/alerts/distribution?${buildParams({ groupBy: 'origin' })}`),
+				fetchJSON(`/api/alerts/distribution?${buildParams({ groupBy: 'category' })}`)
 			]);
 			summary = summaryData;
 			hourlyTimeline = hourlyData?.timeline || [];
-			distribution = Array.isArray(distData) ? distData : distData?.distribution || [];
+			distribution = Array.isArray(distData) ? distData : distData?.data || [];
+			categoryDistribution = Array.isArray(catDistData) ? catDistData : catDistData?.data || [];
 			renderTimelineChart();
 			renderDistributionChart();
 		} catch (e) {
@@ -77,10 +85,18 @@
 
 	async function loadZones() {
 		try {
-			const data = await fetchJSON('/api/alerts/cities?limit=500');
-			const cities = Array.isArray(data) ? data : data?.cities || [];
+			let allCities: any[] = [];
+			let offset = 0;
+			while (true) {
+				const page = await fetchJSON(`/api/alerts/cities?limit=500&offset=${offset}`);
+				const cities = page?.data || [];
+				allCities = allCities.concat(cities);
+				if (!page?.pagination?.hasMore) break;
+				offset += 500;
+			}
+			citiesList = allCities;
 			const zoneSet = new Set<string>();
-			for (const c of cities) {
+			for (const c of allCities) {
 				if (c.zone) zoneSet.add(c.zone);
 			}
 			zones = [...zoneSet].sort();
@@ -89,13 +105,38 @@
 		}
 	}
 
+	// --- City search ---
+	let filteredCities = $derived(
+		citySearch.length >= 1
+			? citiesList
+					.filter((c: any) => c.city?.toLowerCase().includes(citySearch.toLowerCase()))
+					.slice(0, 15)
+			: []
+	);
+
+	function selectCity(cityName: string) {
+		selectedCity = cityName;
+		citySearch = cityName;
+		citySearchOpen = false;
+	}
+
+	function clearCity() {
+		selectedCity = '';
+		citySearch = '';
+		citySearchOpen = false;
+	}
+
+	function handleCityBlur() {
+		// Delay to allow click on dropdown item
+		setTimeout(() => { citySearchOpen = false; }, 200);
+	}
+
 	function getBucketKey(dateStr: string, granularity: 'day' | 'week' | 'month'): string {
 		const d = new Date(dateStr);
 		if (granularity === 'month') {
 			return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 		}
 		if (granularity === 'week') {
-			// Round down to Monday
 			const day = d.getDay();
 			const diff = (day === 0 ? -6 : 1) - day;
 			const monday = new Date(d);
@@ -113,7 +154,6 @@
 	}
 
 	function buildStackedData() {
-		// Aggregate hourly entries into buckets keyed by granularity + time-of-day period
 		const bucketMap = new Map<string, [number, number, number, number]>();
 
 		for (const entry of hourlyTimeline) {
@@ -184,7 +224,7 @@
 		if (!distributionCanvas || !distribution.length) return;
 		if (distributionChart) distributionChart.destroy();
 
-		const labels = distribution.map((d: any) => d.origin || d.name || d.label);
+		const labels = distribution.map((d: any) => d.label || d.origin || d.name);
 		const values = distribution.map((d: any) => d.count || d.total || d.alerts || 0);
 		const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
 
@@ -218,29 +258,16 @@
 	});
 
 	$effect(() => {
-		// Track reactive dependencies
-		startDate; endDate; selectedZone; selectedOrigin; selectedCategory; timelineGroup;
-		// Skip initial mount (handled by onMount)
+		startDate; endDate; selectedZone; selectedOrigin; selectedCategory; selectedCity; timelineGroup;
 		if (!timelineCanvas) return;
 		loadAllData();
 	});
 
-	// Derived data
-	let topCities = $derived<any[]>(summary?.topCities || []);
-	let topZones = $derived<any[]>(summary?.topZones || []);
-	let categories = $derived<string[]>(() => {
-		const cats = new Set<string>();
-		if (distribution) {
-			for (const d of distribution) {
-				if (d.category) cats.add(d.category);
-			}
-		}
-		return [...cats];
-	});
-	let origins = $derived<string[]>(() => {
-		if (!distribution) return [];
-		return distribution.map((d: any) => d.origin || d.name).filter(Boolean);
-	});
+	// Derived data (Svelte 5 syntax — no generic params, no function wrappers)
+	let topCities = $derived(summary?.topCities || []);
+	let topZones = $derived(summary?.topZones || []);
+	let origins = $derived(distribution.map((d: any) => d.label).filter(Boolean));
+	let categories = $derived(categoryDistribution.map((d: any) => d.label).filter(Boolean));
 </script>
 
 <svelte:head>
@@ -249,9 +276,9 @@
 
 <div class="alerts-page">
 	<header>
-		<a href="/" class="back-link">← Home</a>
+		<a href="/" class="back-link">&larr; Home</a>
 		<h1>Rocket Alert Dashboard</h1>
-		<p class="subtitle">Israel rocket alert statistics — powered by RedAlert API</p>
+		<p class="subtitle">Israel rocket alert statistics &mdash; powered by RedAlert API</p>
 	</header>
 
 	<!-- Filters -->
@@ -273,11 +300,39 @@
 				{/each}
 			</select>
 		</div>
+		<div class="filter-group city-search">
+			<label for="city-input">City</label>
+			<div class="search-wrapper">
+				<input
+					id="city-input"
+					type="text"
+					placeholder="Search cities..."
+					bind:value={citySearch}
+					onfocus={() => { citySearchOpen = true; }}
+					oninput={() => { citySearchOpen = true; if (selectedCity && citySearch !== selectedCity) selectedCity = ''; }}
+					onblur={handleCityBlur}
+					autocomplete="off"
+				/>
+				{#if selectedCity}
+					<button class="clear-btn" onclick={clearCity}>&times;</button>
+				{/if}
+				{#if citySearchOpen && filteredCities.length > 0 && !selectedCity}
+					<div class="search-dropdown">
+						{#each filteredCities as c}
+							<button class="search-option" onmousedown={() => selectCity(c.city)}>
+								<span>{c.city}</span>
+								<span class="zone-tag">{c.zone}</span>
+							</button>
+						{/each}
+					</div>
+				{/if}
+			</div>
+		</div>
 		<div class="filter-group">
 			<label for="origin-select">Origin</label>
 			<select id="origin-select" bind:value={selectedOrigin}>
 				<option value="">All Origins</option>
-				{#each (typeof origins === 'function' ? origins() : origins) as origin}
+				{#each origins as origin}
 					<option value={origin}>{origin}</option>
 				{/each}
 			</select>
@@ -286,7 +341,7 @@
 			<label for="category-select">Category</label>
 			<select id="category-select" bind:value={selectedCategory}>
 				<option value="">All Categories</option>
-				{#each (typeof categories === 'function' ? categories() : categories) as cat}
+				{#each categories as cat}
 					<option value={cat}>{cat}</option>
 				{/each}
 			</select>
@@ -473,6 +528,79 @@
 	.filter-group select:focus {
 		outline: none;
 		border-color: #6ba3ff;
+	}
+
+	/* City Search */
+	.city-search {
+		position: relative;
+	}
+
+	.search-wrapper {
+		position: relative;
+	}
+
+	.search-wrapper input {
+		width: 100%;
+		box-sizing: border-box;
+		padding-right: 2rem;
+	}
+
+	.clear-btn {
+		position: absolute;
+		right: 0.4rem;
+		top: 50%;
+		transform: translateY(-50%);
+		background: none;
+		border: none;
+		color: #888;
+		font-size: 1.1rem;
+		cursor: pointer;
+		padding: 0 0.25rem;
+		line-height: 1;
+	}
+
+	.clear-btn:hover {
+		color: #e0e0e0;
+	}
+
+	.search-dropdown {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background: #0a0a0a;
+		border: 1px solid #333;
+		border-top: none;
+		border-radius: 0 0 6px 6px;
+		max-height: 200px;
+		overflow-y: auto;
+		z-index: 100;
+	}
+
+	.search-option {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		width: 100%;
+		padding: 0.45rem 0.6rem;
+		background: none;
+		border: none;
+		border-bottom: 1px solid #1a1a1a;
+		color: #e0e0e0;
+		font-size: 0.82rem;
+		cursor: pointer;
+		text-align: left;
+	}
+
+	.search-option:hover {
+		background: #1a1a1a;
+	}
+
+	.zone-tag {
+		font-size: 0.7rem;
+		color: #666;
+		margin-left: 0.5rem;
+		white-space: nowrap;
 	}
 
 	/* Loading */
