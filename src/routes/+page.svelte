@@ -25,6 +25,12 @@
       <a href="/digest" class="card-link">Read the Digest</a>
     </article>
 
+    <article role="article" data-testid="demo-card" class="card">
+      <h2 data-testid="card-title">Rocket Alerts</h2>
+      <p class="card-desc">Israel rocket alert statistics — filterable charts and real-time data.</p>
+      <a href="/alerts" class="card-link">View Dashboard</a>
+    </article>
+
   </div>
 </div>
 
