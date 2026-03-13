@@ -26,7 +26,11 @@
 	let endDate = $state(new Date().toISOString().slice(0, 10));
 	let originFilter = $state('');
 	let threatFilter = $state('');
+	let zoneFilter = $state('');
 	let granularity = $state<'day' | 'week' | 'month'>('day');
+
+	// City coordinates for zone mapping
+	let cityCoords = $state<Map<string, { lat: number; lng: number }>>(new Map());
 
 	// Canvas refs
 	let barCanvas = $state<HTMLCanvasElement>();
@@ -40,15 +44,35 @@
 	);
 	let allCities = $derived([...new Set(allRows.map((r) => r.city).filter(Boolean))].sort());
 
+	// Zone mapping: city -> zone id
+	let cityZoneMap = $derived.by(() => {
+		const map = new Map<string, string>();
+		for (const [city, coord] of cityCoords) {
+			if (coord.lat === 0) continue;
+			if (coord.lat < 31.2) map.set(city, 'south');
+			else if (coord.lat < 32.0) map.set(city, 'center');
+			else if (coord.lat < 32.8) map.set(city, 'haifa');
+			else map.set(city, 'north');
+		}
+		return map;
+	});
+
+	// Cities filtered by zone
+	let zoneCities = $derived.by(() => {
+		if (!zoneFilter) return allCities;
+		return allCities.filter((c) => cityZoneMap.get(c) === zoneFilter);
+	});
+
 	// City search suggestions
 	let citySuggestions = $derived(
-		citySearch ? allCities.filter((c) => c.includes(citySearch)).slice(0, 20) : []
+		citySearch ? zoneCities.filter((c) => c.includes(citySearch)).slice(0, 20) : []
 	);
 
 	// Filtered data
 	let filteredRows = $derived.by(() => {
 		let rows = allRows;
 		if (cityFilter) rows = rows.filter((r) => r.city === cityFilter);
+		if (zoneFilter) rows = rows.filter((r) => cityZoneMap.get(r.city) === zoneFilter);
 		if (originFilter) rows = rows.filter((r) => r.origin === originFilter);
 		if (threatFilter) rows = rows.filter((r) => r.description === threatFilter);
 
@@ -59,23 +83,29 @@
 		return rows;
 	});
 
-	// Stats (single pass)
+	// Filtered data excluding city filter (for most-hit-city stat)
+	let filteredRowsExCity = $derived.by(() => {
+		let rows = allRows;
+		if (zoneFilter) rows = rows.filter((r) => cityZoneMap.get(r.city) === zoneFilter);
+		if (originFilter) rows = rows.filter((r) => r.origin === originFilter);
+		if (threatFilter) rows = rows.filter((r) => r.description === threatFilter);
+
+		const start = new Date(startDate + 'T00:00:00');
+		const end = new Date(endDate + 'T23:59:59');
+		rows = rows.filter((r) => r.time >= start && r.time <= end);
+
+		return rows;
+	});
+
+	// Stats
 	let stats = $derived.by(() => {
 		const uniqueIds = new Set<string>();
 		const uniqueCities = new Set<string>();
-		const cityIdSets = new Map<string, Set<string>>();
 		const dayIdSets = new Map<string, Set<string>>();
 
 		for (const r of filteredRows) {
 			uniqueIds.add(r.id);
 			uniqueCities.add(r.city);
-
-			let citySet = cityIdSets.get(r.city);
-			if (!citySet) {
-				citySet = new Set();
-				cityIdSets.set(r.city, citySet);
-			}
-			citySet.add(r.id);
 
 			let daySet = dayIdSets.get(r.dateStr);
 			if (!daySet) {
@@ -83,6 +113,18 @@
 				dayIdSets.set(r.dateStr, daySet);
 			}
 			daySet.add(r.id);
+		}
+
+		// Most-hit city: computed excluding city filter so it doesn't trivially
+		// show whichever city is selected
+		const cityIdSets = new Map<string, Set<string>>();
+		for (const r of filteredRowsExCity) {
+			let citySet = cityIdSets.get(r.city);
+			if (!citySet) {
+				citySet = new Set();
+				cityIdSets.set(r.city, citySet);
+			}
+			citySet.add(r.id);
 		}
 
 		let mostHitCity = '';
@@ -280,14 +322,38 @@
 		return rows;
 	}
 
+	function parseCoordCSV(text: string): Map<string, { lat: number; lng: number }> {
+		const coords = new Map<string, { lat: number; lng: number }>();
+		const lines = text.split('\n');
+		for (let i = 1; i < lines.length; i++) {
+			const line = lines[i].trim();
+			if (!line) continue;
+			const parts = line.split(',');
+			if (parts.length >= 3) {
+				const loc = parts[0];
+				const lat = parseFloat(parts[1]);
+				const lng = parseFloat(parts[2]);
+				if (!isNaN(lat) && !isNaN(lng)) {
+					coords.set(loc, { lat, lng });
+				}
+			}
+		}
+		return coords;
+	}
+
 	onMount(async () => {
 		try {
-			const res = await fetch(
-				'https://raw.githubusercontent.com/yuval-harpaz/alarms/master/data/alarms.csv'
-			);
-			if (!res.ok) throw new Error(`Failed to fetch data: HTTP ${res.status}`);
-			const text = await res.text();
+			const [alarmsRes, coordRes] = await Promise.all([
+				fetch('https://raw.githubusercontent.com/yuval-harpaz/alarms/master/data/alarms.csv'),
+				fetch('https://raw.githubusercontent.com/yuval-harpaz/alarms/master/data/coord.csv')
+			]);
+			if (!alarmsRes.ok) throw new Error(`Failed to fetch data: HTTP ${alarmsRes.status}`);
+			const text = await alarmsRes.text();
 			allRows = parseCSV(text);
+
+			if (coordRes.ok) {
+				cityCoords = parseCoordCSV(await coordRes.text());
+			}
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Unknown error';
 		} finally {
@@ -306,6 +372,11 @@
 	}
 
 	function clearCityFilter() {
+		cityFilter = '';
+		citySearch = '';
+	}
+
+	function handleZoneChange() {
 		cityFilter = '';
 		citySearch = '';
 	}
@@ -369,6 +440,17 @@
 		</div>
 
 		<div class="filters">
+			<div class="filter-group">
+				<label for="zone-select">Zone</label>
+				<select id="zone-select" bind:value={zoneFilter} onchange={handleZoneChange}>
+					<option value="">All</option>
+					<option value="south">דרום (South)</option>
+					<option value="center">מרכז (Center)</option>
+					<option value="haifa">חיפה (Haifa)</option>
+					<option value="north">צפון (North)</option>
+				</select>
+			</div>
+
 			<div class="filter-group">
 				<label for="city-search">City</label>
 				<div class="city-search">
