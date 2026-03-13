@@ -229,8 +229,10 @@
 		if (!distributionCanvas || !distribution.length) return;
 		if (distributionChart) distributionChart.destroy();
 
-		const labels = distribution.map((d: any) => d.label || d.origin || d.name);
-		const values = distribution.map((d: any) => d.count || d.total || d.alerts || 0);
+		// Filter out null/empty/undefined labels
+		const filtered = distribution.filter((d: any) => d.label && d.label !== 'null');
+		const labels = filtered.map((d: any) => d.label);
+		const values = filtered.map((d: any) => d.count || 0);
 		const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
 
 		distributionChart = new Chart(distributionCanvas, {
