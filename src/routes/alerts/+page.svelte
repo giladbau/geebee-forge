@@ -83,10 +83,8 @@
 			]);
 			summary = summaryData;
 			hourlyTimeline = hourlyData?.timeline || [];
-			distribution = Array.isArray(distData) ? distData : distData?.data || [];
-			categoryDistribution = Array.isArray(catDistData) ? catDistData : catDistData?.data || [];
-			renderTimelineChart();
-			renderDistributionChart();
+			distribution = distData?.data || [];
+			categoryDistribution = catDistData?.data || [];
 		} catch (e) {
 			console.error('Failed to load alert data:', e);
 		} finally {
@@ -98,7 +96,8 @@
 		try {
 			let allCities: any[] = [];
 			let offset = 0;
-			while (true) {
+			const MAX_PAGES = 20;
+			for (let page_i = 0; page_i < MAX_PAGES; page_i++) {
 				const page = await fetchJSON(`/api/alerts/cities?limit=500&offset=${offset}`);
 				const cities = page?.data || [];
 				allCities = allCities.concat(cities);
@@ -168,8 +167,8 @@
 		const bucketMap = new Map<string, [number, number, number, number]>();
 
 		for (const entry of hourlyTimeline) {
-			const period = entry.date || entry.label || entry.period;
-			const count = entry.count || entry.total || entry.alerts || 0;
+			const period = entry.period;
+			const count = entry.count ?? 0;
 			const hour = new Date(period).getHours();
 			const key = getBucketKey(period, timelineGroup);
 			const todIdx = getTodPeriodIndex(hour);
@@ -267,13 +266,28 @@
 
 	onMount(() => {
 		loadZones();
+		return () => {
+			if (timelineChart) timelineChart.destroy();
+			if (distributionChart) distributionChart.destroy();
+		};
+	});
+
+	// Re-fetch data when filters change (not timelineGroup — that's display-only)
+	$effect(() => {
+		startDate; endDate; selectedZone; selectedOrigin; selectedCategory; selectedCity;
+		if (!timelineCanvas) return;
 		loadAllData();
 	});
 
+	// Re-render timeline chart when grouping or data changes (no re-fetch)
 	$effect(() => {
-		startDate; endDate; selectedZone; selectedOrigin; selectedCategory; selectedCity; timelineGroup;
-		if (!timelineCanvas) return;
-		loadAllData();
+		timelineGroup;
+		if (hourlyTimeline.length && timelineCanvas) renderTimelineChart();
+	});
+
+	// Re-render distribution chart when data changes
+	$effect(() => {
+		if (distribution.length && distributionCanvas) renderDistributionChart();
 	});
 
 	// Derived data (Svelte 5 syntax — no generic params, no function wrappers)
@@ -427,8 +441,8 @@
 					{#each topCities.slice(0, 10) as city, i}
 						<div class="table-row">
 							<span class="rank">{i + 1}</span>
-							<span class="name">{city.city || city.name}</span>
-							<span class="count">{(city.count || city.total || city.alerts || 0).toLocaleString()}</span>
+							<span class="name">{city.city}</span>
+							<span class="count">{(city.count ?? 0).toLocaleString()}</span>
 						</div>
 					{/each}
 				</div>
@@ -450,8 +464,8 @@
 					{#each topZones.slice(0, 10) as zone, i}
 						<div class="table-row">
 							<span class="rank">{i + 1}</span>
-							<span class="name">{zone.zone || zone.name}</span>
-							<span class="count">{(zone.count || zone.total || zone.alerts || 0).toLocaleString()}</span>
+							<span class="name">{zone.zone}</span>
+							<span class="count">{(zone.count ?? 0).toLocaleString()}</span>
 						</div>
 					{/each}
 				</div>
