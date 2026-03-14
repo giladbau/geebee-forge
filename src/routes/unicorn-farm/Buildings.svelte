@@ -266,28 +266,28 @@
     <T.CircleGeometry args={[0.62, 8]} />
     <T.MeshBasicMaterial color="#aa44ff" transparent opacity={wellGlow * 0.9} />
   </T.Mesh>
-  <!-- Well posts -->
-  {#each [[-0.65, -0.65], [0.65, -0.65]] as [px, pz]}
+  <!-- Well posts (opposite sides, straddling center) -->
+  {#each [[-0.75, 0], [0.75, 0]] as [px, pz]}
     <T.Mesh position={[px, 1.2, pz]}>
       <T.CylinderGeometry args={[0.08, 0.10, 1.6, 4]} />
       <T.MeshLambertMaterial color="#5a3a20" />
     </T.Mesh>
   {/each}
-  <!-- Crossbeam -->
-  <T.Mesh position={[0, 2.1, -0.65]}>
-    <T.BoxGeometry args={[1.5, 0.12, 0.12]} />
+  <!-- Crossbeam (centered above well) -->
+  <T.Mesh position={[0, 2.1, 0]}>
+    <T.BoxGeometry args={[1.7, 0.12, 0.12]} />
     <T.MeshLambertMaterial color="#5a3a20" />
   </T.Mesh>
-  <!-- Rope (stretches from crossbeam to bucket) -->
+  <!-- Rope (centered, stretches from crossbeam to bucket) -->
   {@const ropeTopY = 2.1}
   {@const ropeMidY = (ropeTopY + bucketY) / 2}
   {@const ropeLen = ropeTopY - bucketY}
-  <T.Mesh position={[0, ropeMidY, -0.65]}>
+  <T.Mesh position={[0, ropeMidY, 0]}>
     <T.BoxGeometry args={[0.04, ropeLen, 0.04]} />
     <T.MeshLambertMaterial color="#c8a058" />
   </T.Mesh>
-  <!-- Bucket -->
-  <T.Mesh position={[0, bucketY, -0.65]}>
+  <!-- Bucket (centered above well opening) -->
+  <T.Mesh position={[0, bucketY, 0]}>
     <T.CylinderGeometry args={[0.14, 0.10, 0.28, 6]} />
     <T.MeshLambertMaterial color="#4a3a28" />
   </T.Mesh>
