@@ -38,14 +38,14 @@
 	let timelineChart: Chart | null = null;
 	let distributionChart: Chart | null = null;
 
-	function toISO(date: string) {
-		return `${date}T00:00:00Z`;
+	function toISO(date: string, endOfDay = false) {
+		return endOfDay ? `${date}T23:59:59Z` : `${date}T00:00:00Z`;
 	}
 
 	function buildParams(extra: Record<string, string> = {}) {
 		const p = new URLSearchParams({
 			startDate: toISO(startDate),
-			endDate: toISO(endDate),
+			endDate: toISO(endDate, true),
 			...extra
 		});
 		if (selectedZone) p.set('zone', selectedZone);
@@ -114,7 +114,7 @@
 	let filteredCities = $derived(
 		citySearch.length >= 1
 			? citiesList
-					.filter((c: any) => c.city?.toLowerCase().includes(citySearch.toLowerCase()))
+					.filter((c: any) => c.name?.toLowerCase().includes(citySearch.toLowerCase()))
 					.slice(0, 15)
 			: []
 	);
@@ -296,7 +296,10 @@
 		</div>
 		<div class="filter-group">
 			<label for="end-date">To</label>
-			<input id="end-date" type="date" bind:value={endDate} />
+			<div class="date-with-now">
+				<input id="end-date" type="date" bind:value={endDate} />
+				<button class="now-btn" onclick={() => endDate = new Date().toISOString().slice(0, 10)}>Now</button>
+			</div>
 		</div>
 		<div class="filter-group">
 			<label for="zone-select">Zone</label>
@@ -326,8 +329,8 @@
 				{#if citySearchOpen && filteredCities.length > 0 && !selectedCity}
 					<div class="search-dropdown">
 						{#each filteredCities as c}
-							<button class="search-option" onmousedown={() => selectCity(c.city)}>
-								<span>{c.city}</span>
+							<button class="search-option" onmousedown={() => selectCity(c.name)}>
+								<span>{c.name}</span>
 								<span class="zone-tag">{c.zone}</span>
 							</button>
 						{/each}
@@ -534,6 +537,35 @@
 	.filter-group input:focus,
 	.filter-group select:focus {
 		outline: none;
+		border-color: #6ba3ff;
+	}
+
+	/* Date with Now button */
+	.date-with-now {
+		display: flex;
+		gap: 0.35rem;
+		align-items: stretch;
+	}
+
+	.date-with-now input {
+		flex: 1;
+		min-width: 0;
+	}
+
+	.now-btn {
+		background: #0a0a0a;
+		border: 1px solid #333;
+		border-radius: 6px;
+		color: #6ba3ff;
+		font-size: 0.75rem;
+		padding: 0 0.6rem;
+		cursor: pointer;
+		white-space: nowrap;
+		transition: all 0.15s;
+	}
+
+	.now-btn:hover {
+		background: #1a1a1a;
 		border-color: #6ba3ff;
 	}
 
