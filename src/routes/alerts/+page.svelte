@@ -70,10 +70,9 @@
 	async function loadAllData() {
 		loading = true;
 		try {
-			// Use history-based endpoints when a city or zone is selected (upstream API doesn't support cityName filtering)
-			const useHistoryEndpoints = !!selectedZone || !!selectedCity;
-			const summaryBase = useHistoryEndpoints ? '/api/alerts/zone-summary' : '/api/alerts/summary';
-			const distBase = useHistoryEndpoints ? '/api/alerts/zone-distribution' : '/api/alerts/distribution';
+			// Always use history-based endpoints for consistent data
+			const summaryBase = '/api/alerts/zone-summary';
+			const distBase = '/api/alerts/zone-distribution';
 
 			const [summaryData, hourlyData, distData, catDistData] = await Promise.all([
 				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
