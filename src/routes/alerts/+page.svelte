@@ -39,7 +39,13 @@
 	let distributionChart: Chart | null = null;
 
 	function toISO(date: string, endOfDay = false) {
-		return endOfDay ? `${date}T23:59:59Z` : `${date}T00:00:00Z`;
+		if (endOfDay) {
+			// Use start of next day for inclusive end date
+			const d = new Date(date + 'T00:00:00Z');
+			d.setUTCDate(d.getUTCDate() + 1);
+			return d.toISOString().slice(0, 19) + 'Z';
+		}
+		return `${date}T00:00:00Z`;
 	}
 
 	function buildParams(extra: Record<string, string> = {}) {
@@ -366,15 +372,15 @@
 	{#if summary}
 		<section class="summary-cards">
 			<div class="stat-card">
-				<div class="stat-value">{summary.totalAlerts?.toLocaleString() ?? '—'}</div>
+				<div class="stat-value">{summary.totals?.range?.toLocaleString() ?? '—'}</div>
 				<div class="stat-label">Total Alerts</div>
 			</div>
 			<div class="stat-card">
-				<div class="stat-value">{summary.last24Hours?.toLocaleString() ?? '—'}</div>
+				<div class="stat-value">{summary.totals?.last24h?.toLocaleString() ?? '—'}</div>
 				<div class="stat-label">Last 24h</div>
 			</div>
 			<div class="stat-card">
-				<div class="stat-value">{summary.last7Days?.toLocaleString() ?? '—'}</div>
+				<div class="stat-value">{summary.totals?.last7d?.toLocaleString() ?? '—'}</div>
 				<div class="stat-label">Last 7 Days</div>
 			</div>
 			<div class="stat-card">
@@ -386,7 +392,7 @@
 				<div class="stat-label">Unique Zones</div>
 			</div>
 			<div class="stat-card">
-				<div class="stat-value">{summary.peak?.hour ?? '—'}</div>
+				<div class="stat-value">{summary.peak?.period ? `${String(new Date(summary.peak.period).getUTCHours()).padStart(2, '0')}:00` : '—'}</div>
 				<div class="stat-label">Peak Hour</div>
 			</div>
 		</section>
