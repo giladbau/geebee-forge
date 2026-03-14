@@ -94,12 +94,6 @@ function getBucketKey(
 
 export const GET: RequestHandler = async ({ url, platform }) => {
 	const zone = url.searchParams.get('zone');
-	if (!zone) {
-		return new Response(JSON.stringify({ error: 'zone parameter required' }), {
-			status: 400,
-			headers: { 'Content-Type': 'application/json' }
-		});
-	}
 
 	const apiKey = platform?.env.REDALERT_API_KEY || '';
 	const timelineGroup = url.searchParams.get('timelineGroup') || 'day';
@@ -121,7 +115,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 	try {
 		const allAlerts = await fetchAllHistory(historyParams, apiKey);
-		const filtered = filterByZone(allAlerts, zone);
+		const filtered = zone ? filterByZone(allAlerts, zone) : allAlerts;
 
 		const now = Date.now();
 		const ms24h = 24 * 60 * 60 * 1000;
@@ -132,6 +126,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		let last7d = 0;
 		let last30d = 0;
 		const cityCount = new Map<string, number>();
+		const zoneCount = new Map<string, number>();
 		const timelineBuckets = new Map<string, number>();
 		const hourlyBuckets = new Map<string, number>();
 
@@ -142,10 +137,13 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			if (age <= ms7d) last7d++;
 			if (age <= ms30d) last30d++;
 
-			// Count cities within the zone
+			// Count cities (and zones when no zone filter)
 			for (const c of alert.cities || []) {
-				if (c.zone === zone) {
+				if (!zone || c.zone === zone) {
 					cityCount.set(c.name, (cityCount.get(c.name) || 0) + 1);
+				}
+				if (!zone && c.zone) {
+					zoneCount.set(c.zone, (zoneCount.get(c.zone) || 0) + 1);
 				}
 			}
 
@@ -162,7 +160,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		const topCities = [...cityCount.entries()]
 			.sort((a, b) => b[1] - a[1])
 			.slice(0, topLimit)
-			.map(([city, count]) => ({ city, zone, count }));
+			.map(([city, count]) => ({ city, zone: zone || '', count }));
 
 		// Build timeline
 		const timeline = [...timelineBuckets.entries()]
@@ -178,7 +176,6 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 				peakPeriod = period;
 			}
 		}
-		const peakHour = peakPeriod ? new Date(peakPeriod).getUTCHours() : null;
 
 		const result: Record<string, unknown> = {
 			totals: {
@@ -188,7 +185,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 				last30d
 			},
 			uniqueCities: cityCount.size,
-			uniqueZones: 1,
+			uniqueZones: zone ? 1 : zoneCount.size,
 			uniqueOrigins: new Set(filtered.map(a => a.origin).filter(Boolean)).size
 		};
 
@@ -197,7 +194,14 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			result.topCities = topCities;
 		}
 		if (includes.includes('topZones')) {
-			result.topZones = [{ zone, count: filtered.length }];
+			if (zone) {
+				result.topZones = [{ zone, count: filtered.length }];
+			} else {
+				result.topZones = [...zoneCount.entries()]
+					.sort((a, b) => b[1] - a[1])
+					.slice(0, topLimit)
+					.map(([z, count]) => ({ zone: z, count }));
+			}
 		}
 		if (includes.includes('topOrigins')) {
 			const originCounts = new Map<string, number>();

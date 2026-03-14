@@ -65,12 +65,6 @@ async function fetchAllHistory(
 
 export const GET: RequestHandler = async ({ url, platform }) => {
 	const zone = url.searchParams.get('zone');
-	if (!zone) {
-		return new Response(JSON.stringify({ error: 'zone parameter required' }), {
-			status: 400,
-			headers: { 'Content-Type': 'application/json' }
-		});
-	}
 
 	const apiKey = platform?.env.REDALERT_API_KEY || '';
 	const groupBy = url.searchParams.get('groupBy') || 'origin';
@@ -89,9 +83,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 	try {
 		const allAlerts = await fetchAllHistory(historyParams, apiKey);
-		const filtered = allAlerts.filter((a) =>
-			a.cities?.some((c) => c.zone === zone)
-		);
+		const filtered = zone
+			? allAlerts.filter((a) => a.cities?.some((c) => c.zone === zone))
+			: allAlerts;
 
 		const counts = new Map<string, number>();
 		for (const alert of filtered) {
