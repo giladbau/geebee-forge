@@ -89,7 +89,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 		const counts = new Map<string, number>();
 		for (const alert of filtered) {
-			const key = (groupBy === 'category' ? (alert.type || 'Unknown') : (alert.origin || 'Unknown'));
+			const key = groupBy === 'category' ? alert.type : alert.origin;
+			if (!key) continue; // skip alerts with null/empty origin or category
 			counts.set(key, (counts.get(key) || 0) + 1);
 		}
 

@@ -206,8 +206,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		if (includes.includes('topOrigins')) {
 			const originCounts = new Map<string, number>();
 			for (const alert of filtered) {
-				const o = alert.origin || 'Unknown';
-				originCounts.set(o, (originCounts.get(o) || 0) + 1);
+				if (!alert.origin) continue; // skip alerts with null/empty origin
+				originCounts.set(alert.origin, (originCounts.get(alert.origin) || 0) + 1);
 			}
 			result.topOrigins = [...originCounts.entries()]
 				.sort((a, b) => b[1] - a[1])
