@@ -84,6 +84,8 @@
 			hourlyTimeline = hourlyData?.timeline || [];
 			distribution = distData?.data || [];
 			categoryDistribution = catDistData?.data || [];
+			renderTimelineChart();
+			renderDistributionChart(distribution);
 		} catch (e) {
 			console.error('Failed to load alert data:', e);
 		} finally {
@@ -229,15 +231,15 @@
 		});
 	}
 
-	function renderDistributionChart() {
-		if (!distributionCanvas || !distribution.length) return;
+	function renderDistributionChart(data: any[] = distribution) {
+		if (!distributionCanvas || !data.length) return;
 		if (distributionChart) distributionChart.destroy();
 
 		// Filter out null/empty/undefined labels
-		const filtered = distribution.filter((d: any) => d.label && d.label !== 'null');
+		const filtered = data.filter((d: any) => d.label && d.label !== 'null');
 		const labels = filtered.map((d: any) => d.label);
-		const values = filtered.map((d: any) => d.count || 0);
-		const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899'];
+		const values = filtered.map((d: any) => d.count ?? 0);
+		const colors = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#a855f7', '#e11d48'];
 
 		distributionChart = new Chart(distributionCanvas, {
 			type: 'doughnut',
@@ -282,11 +284,6 @@
 	$effect(() => {
 		timelineGroup;
 		if (hourlyTimeline.length && timelineCanvas) renderTimelineChart();
-	});
-
-	// Re-render distribution chart when data changes
-	$effect(() => {
-		if (distribution.length && distributionCanvas) renderDistributionChart();
 	});
 
 	// Derived data (Svelte 5 syntax — no generic params, no function wrappers)
