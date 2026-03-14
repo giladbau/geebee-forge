@@ -18,11 +18,13 @@
   let time = $state(0);
   let jumping = $state(false);
   let jumpProgress = $state(0);
-  let sparkles: Array<{
-    id: number; x: number; y: number; z: number;
-    life: number; vx: number; vz: number;
-    color: string;
-  }> = $state([]);
+  const MAX_SPARKLES = 16;
+  let sparkles = $state(
+    Array.from({ length: MAX_SPARKLES }, () => ({
+      active: false, x: 0, y: 0, z: 0,
+      life: 0, vx: 0, vz: 0, color: '#fff'
+    }))
+  );
 
   function hslToHex(h: number, s: number, l: number): string {
     h = ((h % 1) + 1) % 1;
@@ -185,16 +187,14 @@
       }
     }
 
-    if (sparkles.length > 0) {
-      for (let i = sparkles.length - 1; i >= 0; i--) {
-        const s = sparkles[i];
-        s.x += s.vx * delta;
-        s.y += delta * 2.2;
-        s.z += s.vz * delta;
-        s.life -= delta * 1.6;
-        if (s.life <= 0) sparkles.splice(i, 1);
-      }
-      sparkles = sparkles;
+    for (let i = 0; i < MAX_SPARKLES; i++) {
+      const s = sparkles[i];
+      if (!s.active) continue;
+      s.x += s.vx * delta;
+      s.y += delta * 2.2;
+      s.z += s.vz * delta;
+      s.life -= delta * 1.6;
+      if (s.life <= 0) s.active = false;
     }
   });
 
@@ -204,20 +204,21 @@
     jumping      = true;
     jumpProgress = 0;
     const count = rainbow ? 12 : 8;
-    const burst = Array.from({ length: count }, (_, i) => {
-      const a = (i / count) * Math.PI * 2;
-      return {
-        id:   Math.random(),
-        x:    Math.cos(a) * 0.25,
-        y:    0.8 + Math.random() * 0.4,
-        z:    Math.sin(a) * 0.25,
-        life: 1.1,
-        vx:   Math.cos(a) * (1.5 + Math.random()),
-        vz:   Math.sin(a) * (1.5 + Math.random()),
-        color: rainbow ? RAINBOW_SPARKLE_COLORS[i % RAINBOW_SPARKLE_COLORS.length] : hornColor,
-      };
-    });
-    sparkles = [...sparkles, ...burst];
+    let poolIdx = 0;
+    for (let si = 0; si < MAX_SPARKLES && poolIdx < count; si++) {
+      if (sparkles[si].active) continue;
+      const a = (poolIdx / count) * Math.PI * 2;
+      const s = sparkles[si];
+      s.active = true;
+      s.x = Math.cos(a) * 0.25;
+      s.y = 0.8 + Math.random() * 0.4;
+      s.z = Math.sin(a) * 0.25;
+      s.life = 1.1;
+      s.vx = Math.cos(a) * (1.5 + Math.random());
+      s.vz = Math.sin(a) * (1.5 + Math.random());
+      s.color = rainbow ? RAINBOW_SPARKLE_COLORS[poolIdx % RAINBOW_SPARKLE_COLORS.length] : hornColor;
+      poolIdx++;
+    }
   }
 
   let trotBob  = $derived(
@@ -336,8 +337,8 @@
   </T.Mesh>
 
   <!-- Click sparkles — multicolored when rainbow -->
-  {#each sparkles as sp (sp.id)}
-    <T.Mesh position={[sp.x, sp.y, sp.z]}>
+  {#each sparkles as sp, i (i)}
+    <T.Mesh position={[sp.x, sp.y, sp.z]} visible={sp.active}>
       <T.BoxGeometry args={[0.17, 0.17, 0.17]} />
       <T.MeshBasicMaterial color={sp.color} transparent opacity={sp.life} />
     </T.Mesh>

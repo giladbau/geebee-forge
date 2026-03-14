@@ -349,7 +349,7 @@
   [-15, 6, 5],
   [20, 4, 4],
 ] as [rx, rz, count]}
-  {#each Array.from({ length: count }, (_, i) => i) as i}
+  {#each { length: count } as _, i}
     {@const angle = (i / count) * Math.PI * 2}
     {@const radius = 1.8}
     {@const mx = rx + Math.cos(angle) * radius}
@@ -402,17 +402,16 @@
       />
     </T.Mesh>
     <!-- Light ring on pulse -->
-    {#if isPulsing}
-      <T.Mesh rotation.x={-Math.PI / 2} scale={crystalRingScale}>
-        <T.TorusGeometry args={[1, 0.06, 4, 12]} />
-        <T.MeshBasicMaterial color={crystalColor} transparent opacity={crystalPulse * 0.8} />
-      </T.Mesh>
-      <T.PointLight
-        color={crystalColor}
-        intensity={crystalPulse * 8}
-        distance={6}
-      />
-    {/if}
+    <T.Mesh rotation.x={-Math.PI / 2} scale={crystalRingScale} visible={isPulsing}>
+      <T.TorusGeometry args={[1, 0.06, 4, 12]} />
+      <T.MeshBasicMaterial color={crystalColor} transparent opacity={crystalPulse * 0.8} />
+    </T.Mesh>
+    <T.PointLight
+      color={crystalColor}
+      intensity={crystalPulse * 8}
+      distance={6}
+      visible={isPulsing}
+    />
   </T.Group>
 {/each}
 
