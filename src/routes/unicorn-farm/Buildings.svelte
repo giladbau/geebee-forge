@@ -30,6 +30,22 @@
     };
   }
 
+  // ── Roof click state ──
+  let clickedRoof = $state(-1);
+  let roofPhase = $state(0);
+  let roofY = $state(0);
+  const ROOF_POP_HEIGHT = 2.5;
+
+  function clickRoof(idx: number) {
+    return (e: any) => {
+      e?.stopPropagation?.();
+      if (clickedRoof >= 0) return;
+      clickedRoof = idx;
+      roofPhase = 0;
+      roofY = 0;
+    };
+  }
+
   // ── Crystal click state ──
   let clickedCrystal = $state(-1);
   let crystalPulse = $state(0);
@@ -68,6 +84,24 @@
       }
     }
 
+    // Roof pop animation: rise → pause → ease down
+    if (clickedRoof >= 0) {
+      roofPhase += delta;
+      if (roofPhase < 0.3) {
+        const t = roofPhase / 0.3;
+        roofY = ROOF_POP_HEIGHT * (1 - (1 - t) * (1 - t));
+      } else if (roofPhase < 0.8) {
+        roofY = ROOF_POP_HEIGHT;
+      } else if (roofPhase < 1.3) {
+        const t = (roofPhase - 0.8) / 0.5;
+        roofY = ROOF_POP_HEIGHT * (1 - t * t);
+      } else {
+        roofY = 0;
+        clickedRoof = -1;
+        roofPhase = 0;
+      }
+    }
+
     // Hay bale bounce
     if (clickedBale >= 0) {
       baleBounce -= delta * 3.0;
@@ -93,7 +127,7 @@
 <!-- ════════════════════════════════════════════
      FARMHOUSE  (at [8, 0, -16])
 ════════════════════════════════════════════ -->
-<T.Group position={[8, 0, -16]}>
+<T.Group position={[8, 0, -16]} onclick={clickRoof(0)}>
   <!-- Foundation -->
   <T.Mesh position={[0, 0.12, 0]} receiveShadow>
     <T.BoxGeometry args={[6.5, 0.24, 5.0]} />
@@ -104,16 +138,31 @@
     <T.BoxGeometry args={[6, 3.2, 4.6]} />
     <T.MeshStandardMaterial color="#e8d8b8" roughness={0.8} />
   </T.Mesh>
-  <!-- Roof left slope -->
-  <T.Mesh position={[0, 3.6, 0]} rotation.z={Math.PI / 4.5} castShadow>
-    <T.BoxGeometry args={[3.2, 3.2, 5.2]} />
-    <T.MeshStandardMaterial color="#7a3030" roughness={0.7} />
-  </T.Mesh>
-  <!-- Roof ridge -->
-  <T.Mesh position={[0, 5.0, 0]}>
-    <T.BoxGeometry args={[0.3, 0.5, 5.3]} />
-    <T.MeshLambertMaterial color="#5c2020" />
-  </T.Mesh>
+  <!-- Roof group (animated) -->
+  <T.Group position.y={clickedRoof === 0 ? roofY : 0}>
+    <!-- Roof left slope -->
+    <T.Mesh position={[0, 3.6, 0]} rotation.z={Math.PI / 4.5} castShadow>
+      <T.BoxGeometry args={[3.2, 3.2, 5.2]} />
+      <T.MeshStandardMaterial color="#7a3030" roughness={0.7} />
+    </T.Mesh>
+    <!-- Roof ridge -->
+    <T.Mesh position={[0, 5.0, 0]}>
+      <T.BoxGeometry args={[0.3, 0.5, 5.3]} />
+      <T.MeshLambertMaterial color="#5c2020" />
+    </T.Mesh>
+    <!-- Chimney -->
+    <T.Mesh position={[2.2, 4.0, 1.0]} castShadow>
+      <T.BoxGeometry args={[0.7, 2.5, 0.7]} />
+      <T.MeshLambertMaterial color="#7a6858" />
+    </T.Mesh>
+    <!-- Smoke (thin cylinders rising) -->
+    {#each [0, 0.8, 1.6] as sy}
+      <T.Mesh position={[2.2, 5.5 + sy, 1.0]}>
+        <T.CylinderGeometry args={[0.06 + sy * 0.04, 0.3, 0.5, 4]} />
+        <T.MeshBasicMaterial color="#c0b8b0" transparent opacity={0.4 - sy * 0.1} />
+      </T.Mesh>
+    {/each}
+  </T.Group>
   <!-- Porch columns -->
   {#each [-1.2, 1.2] as cx}
     <T.Mesh position={[cx, 1.2, -2.42]}>
@@ -151,34 +200,25 @@
       <T.MeshLambertMaterial color="#f0e8d0" />
     </T.Mesh>
   {/each}
-  <!-- Chimney -->
-  <T.Mesh position={[2.2, 4.0, 1.0]} castShadow>
-    <T.BoxGeometry args={[0.7, 2.5, 0.7]} />
-    <T.MeshLambertMaterial color="#7a6858" />
-  </T.Mesh>
-  <!-- Smoke (thin cylinders rising) -->
-  {#each [0, 0.8, 1.6] as sy}
-    <T.Mesh position={[2.2, 5.5 + sy, 1.0]}>
-      <T.CylinderGeometry args={[0.06 + sy * 0.04, 0.3, 0.5, 4]} />
-      <T.MeshBasicMaterial color="#c0b8b0" transparent opacity={0.4 - sy * 0.1} />
-    </T.Mesh>
-  {/each}
 </T.Group>
 
 <!-- ════════════════════════════════════════════
      SECOND BARN (at [16, 0, -14])
 ════════════════════════════════════════════ -->
-<T.Group position={[16, 0, -14]}>
+<T.Group position={[16, 0, -14]} onclick={clickRoof(1)}>
   <!-- Body -->
   <T.Mesh position={[0, 1.4, 0]} castShadow receiveShadow>
     <T.BoxGeometry args={[4.5, 2.8, 3.6]} />
     <T.MeshStandardMaterial color="#8B4513" />
   </T.Mesh>
-  <!-- Roof -->
-  <T.Mesh position={[0, 3.2, 0]} rotation.z={Math.PI / 4} castShadow>
-    <T.BoxGeometry args={[2.4, 2.4, 3.8]} />
-    <T.MeshStandardMaterial color="#902020" />
-  </T.Mesh>
+  <!-- Roof group (animated) -->
+  <T.Group position.y={clickedRoof === 1 ? roofY : 0}>
+    <!-- Roof -->
+    <T.Mesh position={[0, 3.2, 0]} rotation.z={Math.PI / 4} castShadow>
+      <T.BoxGeometry args={[2.4, 2.4, 3.8]} />
+      <T.MeshStandardMaterial color="#902020" />
+    </T.Mesh>
+  </T.Group>
   <!-- White trim -->
   {#each [2.27, -2.27] as tx}
     <T.Mesh position={[tx, 1.4, 0]}>
