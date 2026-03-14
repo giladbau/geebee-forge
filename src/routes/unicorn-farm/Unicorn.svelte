@@ -37,20 +37,39 @@
 
   const RAINBOW_SPARKLE_COLORS = ['#ff0000', '#ff8800', '#ffff00', '#00cc00', '#0066ff', '#4400cc', '#8800aa'];
 
+  // ── Obstacle zones: [x, z, radius] ──
+  // Sourced from actual component positions with padding for unicorn body
   const OBSTACLES: Array<[number, number, number]> = [
-    [-14, -10, 4.8],
-    [  8, -16, 3.8],
-    [ 16, -14, 3.8],
-    [ 18,  -6, 3.2],
-    [-18,   8, 3.2],
-    [ 10,   8, 3.8],
-    [-15,  12, 3.8],
-    [ -8,   8, 2.8],
-    [  8,   0, 2.0],
+    // Barn (body 5×4)
+    [-14, -10, 3.5],
+    // Ponds (CircleGeometry r=3 + edge ring)
+    [10, 8, 4.0],   [-15, 12, 4.0],
+    // Farmhouse (body 6×4.6)
+    [8, -16, 4.0],
+    // Second barn in Buildings (body 4.5×3.6)
+    [16, -14, 3.0],
+    // Well (cylinder r=1.0 + posts)
+    [-8, 8, 2.0],
+    // Water trough (box 2.2×0.8)
+    [-2, -8, 1.5],
+    // Windmills (base cylinder r=1.2)
+    [18, -6, 2.2],  [-18, 8, 2.2],
+    // Bridge / stream
+    [6, 0, 2.5],
+    // Trees (trunk + crown footprint)
+    [-8, 3, 1.0],  [-6, 7, 0.9],  [3, -7, 0.9],
+    [8, 3, 0.9],   [-3, 8, 0.8],  [6, -8, 1.2],
+    [-12, 8, 1.3], [14, 6, 1.0],  [-10, -12, 1.4],
+    [12, -12, 1.0],[0, 16, 1.1],  [-16, 0, 1.5],
+    [18, 0, 1.2],  [10, 16, 0.9], [-14, 14, 1.2],
+    // Hay bales
+    [-10, -7, 0.8], [-11, -5, 0.8], [5, -10, 0.8],
+    [7, -11, 0.8],  [18, 2, 0.8],   [19, 4, 0.8],
+    [-6, 14, 0.8],  [-4, 15, 0.8],  [12, 9, 0.8],
   ];
   const FARM_LIMIT = 17.0;
 
-  function isBlocked(x: number, z: number): boolean {
+  function isPointBlocked(x: number, z: number): boolean {
     if (Math.abs(x) > FARM_LIMIT || Math.abs(z) > FARM_LIMIT) return true;
     for (const [ox, oz, r] of OBSTACLES) {
       const dx = x - ox, dz = z - oz;
@@ -59,34 +78,65 @@
     return false;
   }
 
-  const ALL_WAYPOINTS: Array<Array<[number, number]>> = [
-    [[-8, -6], [-3, -2], [6,  5], [-5,  4]],
-    [[ 4,  4], [ 6,  6], [5,  2], [ 3,  5], [7,  3]],
-    [[-16, -5], [-16,  2], [-14, 5], [-10, 14], [0, 14]],
-    [[ 7, -4], [12, -6], [6, -12], [0, -8], [4, -2]],
-    [[12,  5], [15,  2], [13, 10], [ 7, 12], [10,  4]],
-    [[-12, -3], [-8, -8], [-10, 3], [-5, -2], [-2, -6]],
-    [[ 2, 14], [ 8, 14], [-2, 16], [-8, 10], [ 0,  8]],
-    [[-14,  4], [-12, -4], [-8, -10], [-6, -6], [-10,  6]],
-    [[15, -8], [10, -10], [6, -8], [12, -4], [15, -5]],
-  ];
+  function segmentHitsCircle(
+    x1: number, z1: number, x2: number, z2: number,
+    cx: number, cz: number, r: number
+  ): boolean {
+    const dx = x2 - x1, dz = z2 - z1;
+    const fx = x1 - cx, fz = z1 - cz;
+    const a = dx * dx + dz * dz;
+    if (a < 1e-8) return false;
+    const b = 2 * (fx * dx + fz * dz);
+    const c = fx * fx + fz * fz - r * r;
+    const disc = b * b - 4 * a * c;
+    if (disc < 0) return false;
+    const sq = Math.sqrt(disc);
+    const t1 = (-b - sq) / (2 * a);
+    const t2 = (-b + sq) / (2 * a);
+    return t1 <= 1 && t2 >= 0;
+  }
+
+  function isPathBlocked(x1: number, z1: number, x2: number, z2: number): boolean {
+    for (const [ox, oz, r] of OBSTACLES) {
+      if (segmentHitsCircle(x1, z1, x2, z2, ox, oz, r)) return true;
+    }
+    return false;
+  }
+
+  function pickTarget(fromX: number, fromZ: number): [number, number] {
+    for (let i = 0; i < 20; i++) {
+      const x = (Math.random() - 0.5) * 2 * FARM_LIMIT;
+      const z = (Math.random() - 0.5) * 2 * FARM_LIMIT;
+      if (!isPointBlocked(x, z) && !isPathBlocked(fromX, fromZ, x, z)) {
+        return [x, z];
+      }
+    }
+    // Fallback: try 36 directions with a short step
+    for (let i = 0; i < 36; i++) {
+      const a = (i / 36) * Math.PI * 2;
+      const x = fromX + Math.cos(a) * 3;
+      const z = fromZ + Math.sin(a) * 3;
+      if (!isPointBlocked(x, z) && !isPathBlocked(fromX, fromZ, x, z)) {
+        return [x, z];
+      }
+    }
+    return [fromX, fromZ];
+  }
 
   const WALK_SPEEDS    = [2.5, 1.2, 2.8, 2.3, 2.6, 2.4, 2.0, 2.7, 2.9];
   const PAUSE_DURATIONS = [1.2, 2.5, 0.8, 1.0, 1.5, 1.2, 1.8, 1.0, 0.8];
+  const walkSpeed     = WALK_SPEEDS[idx]     ?? 2.0;
+  const pauseDuration = PAUSE_DURATIONS[idx] ?? 1.0;
 
-  const myWaypoints   = ALL_WAYPOINTS[idx]    ?? ALL_WAYPOINTS[0];
-  const walkSpeed     = WALK_SPEEDS[idx]       ?? 2.0;
-  const pauseDuration = PAUSE_DURATIONS[idx]   ?? 1.0;
-
-  const _startWp = idx % myWaypoints.length;
-
-  let wpIdx     = $state(_startWp);
-  let isPausing = $state(false);
+  let isPausing  = $state(false);
   let pauseTimer = $state(0);
-
-  let posX   = $state(myWaypoints[_startWp][0]);
-  let posZ   = $state(myWaypoints[_startWp][1]);
+  let posX   = $state(position[0]);
+  let posZ   = $state(position[2]);
   let facing = $state(0);
+
+  const _initTarget = pickTarget(position[0], position[2]);
+  let targetX = $state(_initTarget[0]);
+  let targetZ = $state(_initTarget[1]);
 
   const HIP_Y     = 0.50;
   const LEG_HALF  = 0.22;
@@ -104,18 +154,9 @@
       pauseTimer -= delta;
       if (pauseTimer <= 0) {
         isPausing = false;
-        let attempts = 0;
-        do {
-          wpIdx = (wpIdx + 1) % myWaypoints.length;
-          attempts++;
-        } while (
-          isBlocked(myWaypoints[wpIdx][0], myWaypoints[wpIdx][1]) &&
-          attempts < myWaypoints.length
-        );
+        [targetX, targetZ] = pickTarget(posX, posZ);
       }
     } else {
-      const targetX = myWaypoints[wpIdx][0];
-      const targetZ = myWaypoints[wpIdx][1];
       const dx = targetX - posX;
       const dz = targetZ - posZ;
       const dist = Math.sqrt(dx * dx + dz * dz);
