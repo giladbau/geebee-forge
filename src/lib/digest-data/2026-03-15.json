@@ -1,0 +1,347 @@
+{
+  "week": "2026-03-09 to 2026-03-15",
+  "published_at": "2026-03-15T12:00:00Z",
+  "hero_topics": [
+    {
+      "title": "Streaming Spatial Intelligence: Three Papers Converge on Video-to-3D",
+      "slug": "streaming-spatial-intelligence",
+      "summary": "Three independent papers this week tackle the same core problem: building persistent spatial understanding from continuous video streams. Spatial-TTT (70 upvotes) uses test-time training with fast weights as compressed spatial memory over unbounded video. Holi-Spatial (53 upvotes) builds a scalable 3DGS-based pipeline to curate spatial QA data from raw web video. LoGeR (31 upvotes) achieves dense 3D reconstruction from minutes-long video in a single feedforward pass — no post-optimization.",
+      "insight": "The convergence here is striking: all three papers independently identify that the bottleneck for spatial AI is not model capacity but how spatial information is retained over time. Spatial-TTT's use of fast weights to compress spatial evidence into network parameters is the most architecturally novel — it bypasses context windows entirely. LoGeR's elimination of post-optimization (bundle adjustment, global alignment) is the practical breakthrough: it makes phone-scan-to-3D-model workflows viable in real-time. For CG/CV pipelines, this means 3D capture tooling will soon be constrained by sensor quality, not compute. Combined with Holi-Spatial's data flywheel from web video, training data for spatial reasoning scales automatically.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Spatial-TTT: Streaming Spatial Intelligence with Test-Time Training",
+          "url": "https://huggingface.co/papers/2603.12255",
+          "type": "paper"
+        },
+        {
+          "title": "Holi-Spatial: Video Streams to Holistic 3D Spatial Intelligence",
+          "url": "https://huggingface.co/papers/2603.07660",
+          "type": "paper"
+        },
+        {
+          "title": "LoGeR: Long-Context Geometric Reconstruction",
+          "url": "https://huggingface.co/papers/2603.03269",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "spatial-intelligence",
+        "3d-reconstruction",
+        "test-time-training",
+        "gaussian-splatting",
+        "video-understanding"
+      ]
+    },
+    {
+      "title": "Video Generation Gets Cinematic: Camera Control, Identity Lock, Infinite Length",
+      "slug": "video-gen-cinematic-control",
+      "summary": "Four papers push video generation from single-clip demos toward production-grade film tools. ShotVerse (28 upvotes) learns cinematic multi-shot camera control from naturally aligned (caption, trajectory, video) triplets. WildActor (26 upvotes) introduces a massive 18M-clip dataset for full-body identity consistency across viewpoints. DreamVideo-Omni (26 upvotes) solves multi-subject + multi-granularity motion control with identity reward learning. HiAR (21 upvotes) breaks the error-accumulation barrier for infinite-length AR video via hierarchical denoising.",
+      "insight": "The shift is from 'generate a cool clip' to 'direct a sequence.' ShotVerse's data-centric approach — learning camera language from real film data rather than manual trajectory specification — is the right paradigm. WildActor addresses the ugly truth that prior identity-preserving methods were really face-preserving: body-level consistency across dynamic shots requires a fundamentally different dataset and architecture. For content production pipelines (toys, animation, marketing), multi-shot identity consistency with controllable camera is the unlock. HiAR's hierarchical denoising for infinite-length video solves the quality degradation problem that made AR video generation impractical beyond ~10 seconds. These pieces are assembling toward AI-directed video production.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "ShotVerse: Cinematic Camera Control for Multi-Shot Video",
+          "url": "https://huggingface.co/papers/2603.11421",
+          "type": "paper"
+        },
+        {
+          "title": "WildActor: Identity-Preserving Video Generation",
+          "url": "https://huggingface.co/papers/2603.00586",
+          "type": "paper"
+        },
+        {
+          "title": "DreamVideo-Omni: Multi-Subject Video Customization",
+          "url": "https://huggingface.co/papers/2603.12257",
+          "type": "paper"
+        },
+        {
+          "title": "HiAR: Hierarchical Autoregressive Long Video Generation",
+          "url": "https://huggingface.co/papers/2603.08703",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "video-generation",
+        "camera-control",
+        "identity-preservation",
+        "diffusion-models",
+        "autoregressive"
+      ]
+    },
+    {
+      "title": "Coding Agents Hit Production: Claude Code Review, Autoresearch, and Agent Orchestration",
+      "slug": "coding-agents-go-production",
+      "summary": "The coding agent stack crosses from demos to production infrastructure. Anthropic ships multi-agent code review in Claude Code — Boris Cherny reports 200% code output per engineer, with review being the bottleneck now addressed by agent teams. Karpathy releases his 'autoresearch' setup: a minimal 630-line LLM training loop where agents iterate on training code while humans steer research direction. Varun Mathur's Autoskill extends this to distributed skill factories. AgentCraft by Ido Salomon lets you orchestrate agents via an RTS-game interface.",
+      "insight": "The signal here is that Anthropic dogfoods agent-driven code review internally — this isn't a product demo, it's their actual engineering workflow. When your AI company's own engineers use agents to review agent-written code, the loop is closed. Karpathy's autoresearch is the minimal viable version of this for ML research: human picks the hypothesis, agent grinds through training iterations. The practical implication for teams using Claude Code: adopt the review agent now, it's already battle-tested at scale. For research teams: the autoresearch pattern (630 lines of training code + agent iteration) is immediately replicable.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Claude Code Review launch (Boris Cherny)",
+          "url": "https://x.com/bcherny/status/2031089411820228645",
+          "type": "twitter"
+        },
+        {
+          "title": "Karpathy's autoresearch repo",
+          "url": "https://x.com/karpathy/status/2030371219518931079",
+          "type": "twitter"
+        },
+        {
+          "title": "Autoskill: distributed skill factory (Varun Mathur)",
+          "url": "https://x.com/varun_mathur/status/2032224933837684932",
+          "type": "twitter"
+        },
+        {
+          "title": "AgentCraft: RTS-style agent orchestration",
+          "url": "https://x.com/idosal1/status/2021661861163544818",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "coding-agents",
+        "claude-code",
+        "code-review",
+        "developer-tools",
+        "autoresearch"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "SuperSplat: Walk Mode + Streamed LOD for Gaussian Splats",
+      "summary": "SuperSplat ships first-person walk mode with WASD controls, streamed LOD, and easy upload — making Gaussian Splat scenes navigable and shareable like Google Street View.",
+      "sources": [
+        {
+          "title": "r/GaussianSplatting",
+          "url": "https://reddit.com/r/GaussianSplatting/comments/1rr0t9k/new_in_supersplat_walk_mode_streamed_lod_and_easy/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "gaussian-splatting",
+        "tooling"
+      ]
+    },
+    {
+      "title": "DVD: Deterministic Video Depth from Diffusion Priors",
+      "summary": "First framework to deterministically convert pre-trained video diffusion models into single-pass depth regressors — eliminates stochastic sampling and scale drift.",
+      "sources": [
+        {
+          "title": "DVD paper",
+          "url": "https://huggingface.co/papers/2603.12250",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "depth-estimation",
+        "diffusion-models",
+        "3d-reconstruction"
+      ]
+    },
+    {
+      "title": "CARE-Edit: Dynamic Expert Routing for Image Editing",
+      "summary": "Replaces static conditioning concatenation in ControlNet with a latent-attention router that dynamically selects expert pathways per diffusion timestep — reduces artifacts from conflicting modalities.",
+      "sources": [
+        {
+          "title": "CARE-Edit paper",
+          "url": "https://huggingface.co/papers/2603.08589",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "image-editing",
+        "diffusion-models",
+        "mixture-of-experts"
+      ]
+    },
+    {
+      "title": "CoCo: Code-as-Chain-of-Thought for Structured Image Generation",
+      "summary": "Uses executable code as the reasoning step before image generation — produces structured drafts via code then renders, excelling at complex spatial layouts and embedded text.",
+      "sources": [
+        {
+          "title": "CoCo paper",
+          "url": "https://huggingface.co/papers/2603.08652",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "text-to-image",
+        "chain-of-thought",
+        "structured-generation"
+      ]
+    },
+    {
+      "title": "ELIT: Variable-Length Latent Tokens Decouple DiT Compute from Resolution",
+      "summary": "Drop-in DiT mechanism that inserts a learnable variable-length latent interface, enabling runtime quality-speed tradeoffs without retraining.",
+      "sources": [
+        {
+          "title": "ELIT paper",
+          "url": "https://huggingface.co/papers/2603.12245",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "diffusion-transformers",
+        "efficiency"
+      ]
+    },
+    {
+      "title": "SVG-EAR: Training-Free Sparse Attention Speedup for Video DiTs",
+      "summary": "Parameter-free linear compensation for dropped attention blocks in video generation via error-aware routing — ~2x speedup with minimal quality loss.",
+      "sources": [
+        {
+          "title": "SVG-EAR paper",
+          "url": "https://huggingface.co/papers/2603.08982",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "video-generation",
+        "efficiency",
+        "sparse-attention"
+      ]
+    },
+    {
+      "title": "Planning in 8 Tokens: Ultra-Compact World Model Tokenizer",
+      "summary": "Compresses visual observations to just 8 discrete tokens for action-conditioned world models, making real-time planning computationally feasible.",
+      "sources": [
+        {
+          "title": "Planning in 8 Tokens",
+          "url": "https://huggingface.co/papers/2603.05438",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "world-models",
+        "tokenization",
+        "planning"
+      ]
+    },
+    {
+      "title": "IndexCache: Cross-Layer Attention Index Reuse for LLM Speedup",
+      "summary": "Exploits cross-layer redundancy in sparse attention indexers — reuses top-k token selections across layers, cutting prefill latency 2-3x with negligible quality loss.",
+      "sources": [
+        {
+          "title": "IndexCache paper",
+          "url": "https://huggingface.co/papers/2603.12201",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "llm-inference",
+        "sparse-attention",
+        "efficiency"
+      ]
+    },
+    {
+      "title": "FIRM: Robust Reward Models for Faithful Image Editing",
+      "summary": "Tackles reward model hallucinations in RL-guided image editing with curated data, base-and-bonus reward strategy, and new FIRM-Bench benchmark.",
+      "sources": [
+        {
+          "title": "FIRM paper",
+          "url": "https://huggingface.co/papers/2603.12247",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "image-editing",
+        "reward-modeling",
+        "reinforcement-learning"
+      ]
+    },
+    {
+      "title": "Claude Generative UI Reverse-Engineered",
+      "summary": "Michael Livs extracted Anthropic's generative UI design system from conversation exports, rebuilt it with live-streaming HTML via morphdom DOM diffing into native macOS windows.",
+      "sources": [
+        {
+          "title": "Michael Livs tweet + article",
+          "url": "https://x.com/micLivs/status/2032244251464188184",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "claude",
+        "generative-ui",
+        "reverse-engineering"
+      ]
+    },
+    {
+      "title": "NodeToCode: Unreal Engine Blueprints to C++",
+      "summary": "Open-source tool that translates UE Blueprint visual scripts to C++ — useful for game dev teams migrating visual prototypes to production code.",
+      "sources": [
+        {
+          "title": "NodeToCode on GitHub",
+          "url": "https://github.com/protospatial/NodeToCode",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "unreal-engine",
+        "game-dev",
+        "code-generation"
+      ]
+    },
+    {
+      "title": "Nvidia Nemotron 3 Super",
+      "summary": "Nvidia's new open model punches significantly above its weight class — r/LocalLLaMA calls it a bigger deal than the marketing suggests, with 152 comments of analysis.",
+      "sources": [
+        {
+          "title": "r/LocalLLaMA discussion",
+          "url": "https://reddit.com/r/LocalLLaMA/comments/1rtp0og/nvidias_nemotron_3_super_is_a_bigger_deal_than/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "llm",
+        "open-models",
+        "nvidia"
+      ]
+    },
+    {
+      "title": "VeridisQuo: Open-Source Deepfake Detector",
+      "summary": "Combines spatial and frequency-domain analysis for deepfake detection with manipulation heatmaps — open-sourced university project on r/MachineLearning.",
+      "sources": [
+        {
+          "title": "r/MachineLearning",
+          "url": "https://reddit.com/r/MachineLearning/comments/1rnajac/p_veridisquo_opensource_deepfake_detector_that/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "deepfake-detection",
+        "computer-vision"
+      ]
+    },
+    {
+      "title": "MLX Circle-Splatting Renderer for Dimensionality Reduction",
+      "summary": "Han Xiao built pure MLX implementations of UMAP/t-SNE/PaCMAP with a scatter-add alpha-blending splatting renderer on Metal — 70K points from raw data to rendered video in seconds.",
+      "sources": [
+        {
+          "title": "Han Xiao tweet",
+          "url": "https://x.com/hxiao/status/2029540168693387613",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "visualization",
+        "apple-silicon",
+        "splatting"
+      ]
+    },
+    {
+      "title": "PufferLib 3.0: Petabyte-Scale RL Training on One Server",
+      "summary": "Trained RL agents on 1 petabyte / 12,000 years of data on a single server — algorithmic breakthroughs, massively faster training, 10 new environments.",
+      "sources": [
+        {
+          "title": "PufferLib 3.0 announcement",
+          "url": "https://x.com/jsuarez/status/1937192456451158196",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "reinforcement-learning",
+        "training-infrastructure"
+      ]
+    }
+  ]
+}
