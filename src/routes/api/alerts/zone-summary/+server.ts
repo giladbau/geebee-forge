@@ -3,6 +3,7 @@ import type { RequestHandler } from './$types';
 const REDALERT_BASE = 'https://redalert.orielhaim.com/api/stats/history';
 const PAGE_SIZE = 100;
 const BATCH_SIZE = 3;
+const ACTIVE_ALERT_TYPES = ['missiles', 'hostileAircraftIntrusion', 'terroristInfiltration'];
 
 interface AlertCity {
 	id: number;
@@ -115,7 +116,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 	try {
 		const allAlerts = await fetchAllHistory(historyParams, apiKey);
-		const filtered = zone ? filterByZone(allAlerts, zone) : allAlerts;
+		const activeAlerts = allAlerts.filter(a => ACTIVE_ALERT_TYPES.includes(a.type || ''));
+		const filtered = zone ? filterByZone(activeAlerts, zone) : activeAlerts;
 
 		const now = Date.now();
 		const ms24h = 24 * 60 * 60 * 1000;
