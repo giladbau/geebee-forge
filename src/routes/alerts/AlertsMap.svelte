@@ -18,9 +18,6 @@
 	let markersLayer: any = null;
 	let L: any = null;
 
-	// Track previous city data to avoid unnecessary updates
-	let prevCityKeys = '';
-
 	async function initMap() {
 		// Dynamic import — Leaflet has no SSR support
 		const leaflet = await import('leaflet');
@@ -58,11 +55,6 @@
 			markersLayer.clearLayers();
 			return;
 		}
-
-		// Dedupe check
-		const key = cities.map((c) => `${c.city}:${c.count}`).join('|');
-		if (key === prevCityKeys) return;
-		prevCityKeys = key;
 
 		// Geocode cities
 		const cityNames = cities.map((c) => c.city);
@@ -138,6 +130,18 @@
 
 			marker.bindPopup(popupHtml);
 			marker.addTo(markersLayer);
+		}
+
+		// Auto-fit map bounds to visible markers
+		const validCoords = cities
+			.map((c) => coords[c.city])
+			.filter((loc): loc is { lat: number; lng: number } => loc !== null);
+
+		if (validCoords.length > 0) {
+			const bounds = L.latLngBounds(validCoords.map((c: { lat: number; lng: number }) => [c.lat, c.lng]));
+			map.fitBounds(bounds, { padding: [30, 30], maxZoom: 12 });
+		} else {
+			map.setView([31.5, 34.8], 8);
 		}
 	}
 
