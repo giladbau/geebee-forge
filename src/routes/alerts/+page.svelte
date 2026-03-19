@@ -79,18 +79,31 @@
 			const summaryBase = '/api/alerts/zone-summary';
 			const distBase = '/api/alerts/zone-distribution';
 
+			const mapPromise = selectedCity
+				? Promise.resolve(null)
+				: fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '100', categories: SIREN_CATEGORIES })}`);
+
 			const [summaryData, hourlyData, distData, catDistData, mapData] = await Promise.all([
 				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
 				fetchJSON(`${summaryBase}?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`),
 				fetchJSON(`${distBase}?${buildParams({ groupBy: 'origin' })}`),
 				fetchJSON(`${distBase}?${buildParams({ groupBy: 'category' })}`),
-				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '100', categories: SIREN_CATEGORIES })}`)
+				mapPromise
 			]);
 			summary = summaryData;
 			hourlyTimeline = hourlyData?.timeline || [];
 			distribution = distData?.data || [];
 			categoryDistribution = catDistData?.data || [];
-			mapCities = mapData?.topCities || [];
+
+			if (selectedCity) {
+				mapCities = [{
+					city: selectedCity,
+					zone: selectedZone || '',
+					count: summaryData?.totals?.range ?? 0
+				}];
+			} else {
+				mapCities = mapData?.topCities || [];
+			}
 			renderTimelineChart();
 			renderDistributionChart(distribution);
 		} catch (e) {

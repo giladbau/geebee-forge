@@ -137,7 +137,9 @@
 			.map((c) => coords[c.city])
 			.filter((loc): loc is { lat: number; lng: number } => loc !== null);
 
-		if (validCoords.length > 0) {
+		if (validCoords.length === 1) {
+			map.setView([validCoords[0].lat, validCoords[0].lng], 13);
+		} else if (validCoords.length > 1) {
 			const bounds = L.latLngBounds(validCoords.map((c: { lat: number; lng: number }) => [c.lat, c.lng]));
 			map.fitBounds(bounds, { padding: [30, 30], maxZoom: 12 });
 		} else {
