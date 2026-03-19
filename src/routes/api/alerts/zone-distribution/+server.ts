@@ -21,7 +21,8 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 	try {
 		const allAlerts = await fetchAllHistory(historyParams, apiKey);
-		const activeAlerts = allAlerts.filter(a => ACTIVE_ALERT_TYPES.includes(a.type || ''));
+		const activeTypes = new Set(ACTIVE_ALERT_TYPES);
+		const activeAlerts = allAlerts.filter(a => a.type && activeTypes.has(a.type));
 		const filtered = zone
 			? activeAlerts.filter((a) => a.cities?.some((c) => c.zone === zone))
 			: activeAlerts;
@@ -39,7 +40,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 
 		const totalAlerts = filtered.length;
 
-		return new Response(JSON.stringify({ data, totalAlerts, pagination: { total: data.length, limit: data.length, offset: 0, hasMore: false } }), {
+		return new Response(JSON.stringify({ data, totalAlerts }), {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	} catch (e) {

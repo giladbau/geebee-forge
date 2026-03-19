@@ -37,7 +37,17 @@ export const GET: RequestHandler = async ({ url }) => {
 };
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { cities } = await request.json();
+	let body: unknown;
+	try {
+		body = await request.json();
+	} catch {
+		return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+			status: 400,
+			headers: { 'Content-Type': 'application/json' }
+		});
+	}
+
+	const cities = (body as Record<string, unknown>)?.cities;
 	if (!Array.isArray(cities) || cities.length === 0) {
 		return new Response(JSON.stringify({ error: 'Missing cities array' }), {
 			status: 400,

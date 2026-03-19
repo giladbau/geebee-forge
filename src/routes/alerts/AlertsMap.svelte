@@ -83,6 +83,7 @@
 		if (polygonLayer) {
 			polygonLayer.clearLayers();
 			map.removeLayer(polygonLayer);
+			polygonLayer = null;
 		}
 
 		// Aggregate counts by normalized base city name (for polygon matching)
@@ -173,7 +174,7 @@
 		// Auto-fit map bounds to visible markers + polygons
 		const validCoords = cities
 			.map((c) => coords[c.city])
-			.filter((loc): loc is { lat: number; lng: number } => loc !== null);
+			.filter((loc): loc is { lat: number; lng: number } => loc != null);
 
 		let bounds: any = null;
 		if (validCoords.length > 0) {
