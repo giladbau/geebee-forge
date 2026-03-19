@@ -113,9 +113,20 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 	if (category) historyParams.set('category', category);
 	if (cityName) historyParams.set('cityName', cityName);
 
+	// Multi-category filter (comma-separated alert types)
+	const categoriesFilter = url.searchParams.get('categories');
+	const allowedTypes = categoriesFilter
+		? new Set(categoriesFilter.split(',').map((c) => c.trim()))
+		: null;
+
 	try {
 		const allAlerts = await fetchAllHistory(historyParams, apiKey);
-		const filtered = zone ? filterByZone(allAlerts, zone) : allAlerts;
+		let filtered = zone ? filterByZone(allAlerts, zone) : allAlerts;
+
+		// Filter by allowed alert types if specified
+		if (allowedTypes) {
+			filtered = filtered.filter((a) => a.type && allowedTypes.has(a.type));
+		}
 
 		const now = Date.now();
 		const ms24h = 24 * 60 * 60 * 1000;
@@ -126,6 +137,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		let last7d = 0;
 		let last30d = 0;
 		const cityCount = new Map<string, number>();
+		const cityZoneMap = new Map<string, string>();
 		const zoneCount = new Map<string, number>();
 		const timelineBuckets = new Map<string, number>();
 		const hourlyBuckets = new Map<string, number>();
@@ -141,6 +153,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			for (const c of alert.cities || []) {
 				if (!zone || c.zone === zone) {
 					cityCount.set(c.name, (cityCount.get(c.name) || 0) + 1);
+					if (c.zone && !cityZoneMap.has(c.name)) {
+						cityZoneMap.set(c.name, c.zone);
+					}
 				}
 				if (!zone && c.zone) {
 					zoneCount.set(c.zone, (zoneCount.get(c.zone) || 0) + 1);
@@ -160,7 +175,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		const topCities = [...cityCount.entries()]
 			.sort((a, b) => b[1] - a[1])
 			.slice(0, topLimit)
-			.map(([city, count]) => ({ city, zone: zone || '', count }));
+			.map(([city, count]) => ({ city, zone: cityZoneMap.get(city) || zone || '', count }));
 
 		// Build timeline
 		const timeline = [...timelineBuckets.entries()]
