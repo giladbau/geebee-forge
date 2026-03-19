@@ -384,6 +384,7 @@
 			<div class="stat-card">
 				<div class="stat-value">{summary.totals?.range?.toLocaleString() ?? '—'}</div>
 				<div class="stat-label">Total Alerts</div>
+				<div class="stat-badge">Active alerts only</div>
 			</div>
 			<div class="stat-card">
 				<div class="stat-value">{summary.totals?.last24h?.toLocaleString() ?? '—'}</div>
@@ -693,6 +694,13 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		margin-top: 0.35rem;
+	}
+
+	.stat-badge {
+		font-size: 0.65rem;
+		color: #10b981;
+		margin-top: 0.35rem;
+		opacity: 0.8;
 	}
 
 	/* Charts */
