@@ -3,6 +3,13 @@ import coordsData from '$lib/data/israel-cities-coords.json';
 
 const staticCoords: Record<string, { lat: number; lng: number }> = coordsData;
 
+// Strip neighborhood/area suffixes: "באר שבע - מזרח" → "באר שבע"
+function normalizeCity(name: string): string {
+	let base = name.split(' - ')[0].trim();
+	base = base.split(', ')[0].trim();
+	return base;
+}
+
 // In-memory cache for Nominatim lookups (persists within a single CF worker instance)
 const nominatimCache = new Map<string, { lat: number; lng: number } | null>();
 
@@ -47,19 +54,19 @@ async function geocodeViaNominatim(
 async function geocodeCity(
 	city: string
 ): Promise<{ lat: number; lng: number } | null> {
-	// 1. Check static coords
-	if (staticCoords[city]) {
-		return staticCoords[city];
-	}
+	const normalized = normalizeCity(city);
 
-	// 2. Check in-memory cache
-	if (nominatimCache.has(city)) {
-		return nominatimCache.get(city) ?? null;
-	}
+	// 1. Check static coords (exact, then normalized)
+	if (staticCoords[city]) return staticCoords[city];
+	if (normalized !== city && staticCoords[normalized]) return staticCoords[normalized];
 
-	// 3. Fallback to Nominatim
-	const result = await geocodeViaNominatim(city);
-	nominatimCache.set(city, result);
+	// 2. Check in-memory cache (exact, then normalized)
+	if (nominatimCache.has(city)) return nominatimCache.get(city) ?? null;
+	if (normalized !== city && nominatimCache.has(normalized)) return nominatimCache.get(normalized) ?? null;
+
+	// 3. Fallback to Nominatim with normalized name
+	const result = await geocodeViaNominatim(normalized);
+	nominatimCache.set(normalized, result);
 	return result;
 }
 

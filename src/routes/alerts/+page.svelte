@@ -342,7 +342,7 @@
 					placeholder="Search cities..."
 					bind:value={citySearch}
 					onfocus={() => { citySearchOpen = true; }}
-					oninput={() => { citySearchOpen = true; if (selectedCity && citySearch !== selectedCity) selectedCity = ''; }}
+					oninput={() => { citySearchOpen = true; selectedCity = ''; }}
 					onblur={handleCityBlur}
 					autocomplete="off"
 				/>

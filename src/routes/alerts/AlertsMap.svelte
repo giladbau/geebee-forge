@@ -81,23 +81,34 @@
 
 		markersLayer.clearLayers();
 
-		const maxCount = Math.max(...cities.map((c) => c.count), 1);
-
+		// Aggregate cities that share the same coordinates (same base city after normalization)
+		const aggregated = new Map<string, { lat: number; lng: number; count: number; entries: CityData[] }>();
 		for (const city of cities) {
 			const loc = coords[city.city];
 			if (!loc) continue;
+			const key = `${loc.lat},${loc.lng}`;
+			if (!aggregated.has(key)) {
+				aggregated.set(key, { lat: loc.lat, lng: loc.lng, count: 0, entries: [] });
+			}
+			const agg = aggregated.get(key)!;
+			agg.count += city.count;
+			agg.entries.push(city);
+		}
 
+		const maxCount = Math.max(...[...aggregated.values()].map((a) => a.count), 1);
+
+		for (const agg of aggregated.values()) {
 			// Radius: log-scaled, 6–30px
-			const radius = Math.max(6, Math.min(30, 6 + Math.log(city.count + 1) * 4));
+			const radius = Math.max(6, Math.min(30, 6 + Math.log(agg.count + 1) * 4));
 
 			// Color: interpolate from orange to red based on intensity
-			const intensity = city.count / maxCount;
+			const intensity = agg.count / maxCount;
 			const r = 239;
 			const g = Math.round(160 * (1 - intensity) + 50 * intensity);
 			const b = Math.round(50 * (1 - intensity));
 			const color = `rgb(${r}, ${g}, ${b})`;
 
-			const marker = L.circleMarker([loc.lat, loc.lng], {
+			const marker = L.circleMarker([agg.lat, agg.lng], {
 				radius,
 				fillColor: color,
 				color: 'rgba(239, 68, 68, 0.6)',
@@ -105,14 +116,27 @@
 				fillOpacity: 0.7
 			});
 
-			marker.bindPopup(
-				`<div style="font-family: system-ui; font-size: 13px; color: #222;">
+			// Build popup: if multiple sub-areas, list them
+			let popupHtml: string;
+			if (agg.entries.length === 1) {
+				const city = agg.entries[0];
+				popupHtml = `<div style="font-family: system-ui; font-size: 13px; color: #222;">
 					<strong>${city.city}</strong>
 					${city.zone ? `<br><span style="color: #666; font-size: 11px;">${city.zone}</span>` : ''}
 					<br><span style="color: #ef4444; font-weight: 600;">${city.count.toLocaleString()} alerts</span>
-				</div>`
-			);
+				</div>`;
+			} else {
+				const subList = agg.entries
+					.map((e) => `<li>${e.city} — ${e.count.toLocaleString()}</li>`)
+					.join('');
+				popupHtml = `<div style="font-family: system-ui; font-size: 13px; color: #222;">
+					<strong>${agg.entries[0].city.split(' - ')[0].trim()}</strong>
+					<br><span style="color: #ef4444; font-weight: 600;">${agg.count.toLocaleString()} alerts total</span>
+					<ul style="margin: 4px 0 0; padding-left: 1.2em; font-size: 11px; color: #444;">${subList}</ul>
+				</div>`;
+			}
 
+			marker.bindPopup(popupHtml);
 			marker.addTo(markersLayer);
 		}
 	}
