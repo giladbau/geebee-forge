@@ -89,26 +89,16 @@
 			agg.entries.push(city);
 		}
 
-		const maxCount = Math.max(...[...aggregated.values()].map((a) => a.count), 1);
+		const pinIcon = L.divIcon({
+			className: 'alert-pin',
+			html: '<div class="pin"></div>',
+			iconSize: [12, 12],
+			iconAnchor: [6, 6],
+			popupAnchor: [0, -8]
+		});
 
 		for (const agg of aggregated.values()) {
-			// Radius: log-scaled, 6–30px
-			const radius = Math.max(6, Math.min(30, 6 + Math.log(agg.count + 1) * 4));
-
-			// Color: interpolate from orange to red based on intensity
-			const intensity = agg.count / maxCount;
-			const r = 239;
-			const g = Math.round(160 * (1 - intensity) + 50 * intensity);
-			const b = Math.round(50 * (1 - intensity));
-			const color = `rgb(${r}, ${g}, ${b})`;
-
-			const marker = L.circleMarker([agg.lat, agg.lng], {
-				radius,
-				fillColor: color,
-				color: 'rgba(239, 68, 68, 0.6)',
-				weight: 1,
-				fillOpacity: 0.7
-			});
+			const marker = L.marker([agg.lat, agg.lng], { icon: pinIcon });
 
 			// Build popup: if multiple sub-areas, list them
 			let popupHtml: string;
@@ -212,5 +202,14 @@
 
 	.map-container :global(.leaflet-control-attribution a) {
 		color: #6ba3ff !important;
+	}
+
+	.map-container :global(.alert-pin .pin) {
+		width: 10px;
+		height: 10px;
+		background: #ef4444;
+		border: 1.5px solid #991b1b;
+		border-radius: 50%;
+		box-shadow: 0 0 4px rgba(239, 68, 68, 0.5);
 	}
 </style>
