@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Chart, registerables } from 'chart.js';
 	import { onMount } from 'svelte';
+	import AlertsMap from './AlertsMap.svelte';
 
 	Chart.register(...registerables);
 
@@ -23,6 +24,10 @@
 	let zones: string[] = $state([]);
 	let citiesList: any[] = $state([]);
 	let loading = $state(true);
+	let mapCities: { city: string; zone: string; count: number }[] = $state([]);
+
+	// Only real siren alert types (exclude newsFlash, endAlert)
+	const SIREN_CATEGORIES = 'missiles,hostileAircraftIntrusion,terroristInfiltration';
 
 	// --- Time-of-day config ---
 	const TOD_PERIODS = [
@@ -74,16 +79,18 @@
 			const summaryBase = '/api/alerts/zone-summary';
 			const distBase = '/api/alerts/zone-distribution';
 
-			const [summaryData, hourlyData, distData, catDistData] = await Promise.all([
+			const [summaryData, hourlyData, distData, catDistData, mapData] = await Promise.all([
 				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
 				fetchJSON(`${summaryBase}?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`),
 				fetchJSON(`${distBase}?${buildParams({ groupBy: 'origin' })}`),
-				fetchJSON(`${distBase}?${buildParams({ groupBy: 'category' })}`)
+				fetchJSON(`${distBase}?${buildParams({ groupBy: 'category' })}`),
+				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '100', categories: SIREN_CATEGORIES })}`)
 			]);
 			summary = summaryData;
 			hourlyTimeline = hourlyData?.timeline || [];
 			distribution = distData?.data || [];
 			categoryDistribution = catDistData?.data || [];
+			mapCities = mapData?.topCities || [];
 			renderTimelineChart();
 			renderDistributionChart(distribution);
 		} catch (e) {
@@ -376,6 +383,11 @@
 
 	{#if loading}
 		<div class="loading">Loading alert data...</div>
+	{/if}
+
+	<!-- Alert Map -->
+	{#if mapCities.length > 0}
+		<AlertsMap topCities={mapCities} />
 	{/if}
 
 	<!-- Summary Cards -->
