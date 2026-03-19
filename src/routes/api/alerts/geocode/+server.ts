@@ -1,14 +1,8 @@
 import type { RequestHandler } from './$types';
 import coordsData from '$lib/data/israel-cities-coords.json';
+import { normalizeCity } from '$lib/utils/city-names';
 
 const staticCoords: Record<string, { lat: number; lng: number }> = coordsData;
-
-// Strip neighborhood/area suffixes: "באר שבע - מזרח" → "באר שבע"
-function normalizeCity(name: string): string {
-	let base = name.split(' - ')[0].trim();
-	base = base.split(', ')[0].trim();
-	return base;
-}
 
 function geocodeCity(city: string): { lat: number; lng: number } | null {
 	const normalized = normalizeCity(city);

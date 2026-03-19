@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import boundaryData from '$lib/data/israel-city-boundaries.json';
+	import { normalizeCity } from '$lib/utils/city-names';
 
 	interface CityData {
 		city: string;
@@ -84,13 +85,15 @@
 			map.removeLayer(polygonLayer);
 		}
 
-		const cityCountMap = new Map<string, number>();
+		// Aggregate counts by normalized base city name (for polygon matching)
+		const normalizedCountMap = new Map<string, number>();
 		for (const c of cities) {
-			cityCountMap.set(c.city, (cityCountMap.get(c.city) || 0) + c.count);
+			const base = normalizeCity(c.city);
+			normalizedCountMap.set(base, (normalizedCountMap.get(base) || 0) + c.count);
 		}
 
 		const matchingFeatures = (boundaryData as any).features.filter(
-			(f: any) => cityCountMap.has(f.properties.name)
+			(f: any) => normalizedCountMap.has(f.properties.name)
 		);
 
 		if (matchingFeatures.length > 0) {
@@ -106,7 +109,7 @@
 					},
 					onEachFeature: (feature: any, layer: any) => {
 						const name = feature.properties.name;
-						const count = cityCountMap.get(name) || 0;
+						const count = normalizedCountMap.get(name) || 0;
 						layer.bindPopup(
 							`<div style="font-family: system-ui; font-size: 13px; color: #222;">
 								<strong>${name}</strong>
