@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import boundaryData from '$lib/data/israel-city-boundaries.json';
 
 	interface CityData {
 		city: string;
@@ -16,6 +17,7 @@
 	let mapContainer: HTMLDivElement;
 	let map: any = null;
 	let markersLayer: any = null;
+	let polygonLayer: any = null;
 	let L: any = null;
 
 	async function initMap() {
@@ -53,6 +55,7 @@
 		if (!map || !L || !markersLayer) return;
 		if (!cities || cities.length === 0) {
 			markersLayer.clearLayers();
+			if (polygonLayer) polygonLayer.clearLayers();
 			return;
 		}
 
@@ -74,6 +77,46 @@
 		}
 
 		markersLayer.clearLayers();
+
+		// Add polygon boundaries for matching cities
+		if (polygonLayer) {
+			polygonLayer.clearLayers();
+			map.removeLayer(polygonLayer);
+		}
+
+		const cityCountMap = new Map<string, number>();
+		for (const c of cities) {
+			cityCountMap.set(c.city, (cityCountMap.get(c.city) || 0) + c.count);
+		}
+
+		const matchingFeatures = (boundaryData as any).features.filter(
+			(f: any) => cityCountMap.has(f.properties.name)
+		);
+
+		if (matchingFeatures.length > 0) {
+			polygonLayer = L.geoJSON(
+				{ type: 'FeatureCollection', features: matchingFeatures },
+				{
+					style: {
+						fillColor: '#ef4444',
+						fillOpacity: 0.15,
+						color: '#ef4444',
+						weight: 1,
+						opacity: 0.3
+					},
+					onEachFeature: (feature: any, layer: any) => {
+						const name = feature.properties.name;
+						const count = cityCountMap.get(name) || 0;
+						layer.bindPopup(
+							`<div style="font-family: system-ui; font-size: 13px; color: #222;">
+								<strong>${name}</strong>
+								<br><span style="color: #ef4444; font-weight: 600;">${count.toLocaleString()} alerts</span>
+							</div>`
+						);
+					}
+				}
+			).addTo(map);
+		}
 
 		// Aggregate cities that share the same coordinates (same base city after normalization)
 		const aggregated = new Map<string, { lat: number; lng: number; count: number; entries: CityData[] }>();
@@ -124,16 +167,28 @@
 			marker.addTo(markersLayer);
 		}
 
-		// Auto-fit map bounds to visible markers
+		// Auto-fit map bounds to visible markers + polygons
 		const validCoords = cities
 			.map((c) => coords[c.city])
 			.filter((loc): loc is { lat: number; lng: number } => loc !== null);
 
-		if (validCoords.length === 1) {
-			map.setView([validCoords[0].lat, validCoords[0].lng], 13);
-		} else if (validCoords.length > 1) {
-			const bounds = L.latLngBounds(validCoords.map((c: { lat: number; lng: number }) => [c.lat, c.lng]));
-			map.fitBounds(bounds, { padding: [30, 30], maxZoom: 12 });
+		let bounds: any = null;
+		if (validCoords.length > 0) {
+			bounds = L.latLngBounds(validCoords.map((c: { lat: number; lng: number }) => [c.lat, c.lng]));
+		}
+		if (polygonLayer) {
+			const polyBounds = polygonLayer.getBounds();
+			if (polyBounds.isValid()) {
+				bounds = bounds ? bounds.extend(polyBounds) : polyBounds;
+			}
+		}
+
+		if (bounds && bounds.isValid()) {
+			if (validCoords.length === 1 && !polygonLayer) {
+				map.setView([validCoords[0].lat, validCoords[0].lng], 13);
+			} else {
+				map.fitBounds(bounds, { padding: [30, 30], maxZoom: 12 });
+			}
 		} else {
 			map.setView([31.5, 34.8], 8);
 		}
