@@ -60,9 +60,11 @@
 		const cityNames = cities.map((c) => c.city);
 		let coords: Record<string, { lat: number; lng: number } | null> = {};
 		try {
-			const res = await fetch(
-				`/api/alerts/geocode?cities=${encodeURIComponent(cityNames.join(','))}`
-			);
+			const res = await fetch('/api/alerts/geocode', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ cities: cityNames })
+			});
 			if (res.ok) {
 				coords = await res.json();
 			}

@@ -18,6 +18,14 @@ function geocodeCity(city: string): { lat: number; lng: number } | null {
 	return null;
 }
 
+function geocodeCities(cities: string[]): Record<string, { lat: number; lng: number } | null> {
+	const results: Record<string, { lat: number; lng: number } | null> = {};
+	for (const city of cities) {
+		results[city] = geocodeCity(city);
+	}
+	return results;
+}
+
 export const GET: RequestHandler = async ({ url }) => {
 	const citiesParam = url.searchParams.get('cities');
 	if (!citiesParam) {
@@ -28,13 +36,22 @@ export const GET: RequestHandler = async ({ url }) => {
 	}
 
 	const cities = citiesParam.split(',').map((c) => c.trim()).filter(Boolean);
-	const results: Record<string, { lat: number; lng: number } | null> = {};
 
-	for (const city of cities) {
-		results[city] = geocodeCity(city);
+	return new Response(JSON.stringify(geocodeCities(cities)), {
+		headers: { 'Content-Type': 'application/json' }
+	});
+};
+
+export const POST: RequestHandler = async ({ request }) => {
+	const { cities } = await request.json();
+	if (!Array.isArray(cities) || cities.length === 0) {
+		return new Response(JSON.stringify({ error: 'Missing cities array' }), {
+			status: 400,
+			headers: { 'Content-Type': 'application/json' }
+		});
 	}
 
-	return new Response(JSON.stringify(results), {
+	return new Response(JSON.stringify(geocodeCities(cities)), {
 		headers: { 'Content-Type': 'application/json' }
 	});
 };
