@@ -114,9 +114,17 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 	if (category) historyParams.set('category', category);
 	if (cityName) historyParams.set('cityName', cityName);
 
+	// Multi-category filter (comma-separated alert types)
+	const categoriesFilter = url.searchParams.get('categories');
+	const allowedTypes = categoriesFilter
+		? new Set(categoriesFilter.split(',').map((c) => c.trim()))
+		: null;
+
 	try {
 		const allAlerts = await fetchAllHistory(historyParams, apiKey);
-		const activeAlerts = allAlerts.filter(a => ACTIVE_ALERT_TYPES.includes(a.type || ''));
+		// Default to active alert types only; override with ?categories= if provided
+		const typeFilter = allowedTypes ?? new Set(ACTIVE_ALERT_TYPES);
+		const activeAlerts = allAlerts.filter(a => a.type && typeFilter.has(a.type));
 		const filtered = zone ? filterByZone(activeAlerts, zone) : activeAlerts;
 
 		const now = Date.now();
@@ -128,6 +136,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		let last7d = 0;
 		let last30d = 0;
 		const cityCount = new Map<string, number>();
+		const cityZoneMap = new Map<string, string>();
 		const zoneCount = new Map<string, number>();
 		const timelineBuckets = new Map<string, number>();
 		const hourlyBuckets = new Map<string, number>();
@@ -143,6 +152,9 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 			for (const c of alert.cities || []) {
 				if (!zone || c.zone === zone) {
 					cityCount.set(c.name, (cityCount.get(c.name) || 0) + 1);
+					if (c.zone && !cityZoneMap.has(c.name)) {
+						cityZoneMap.set(c.name, c.zone);
+					}
 				}
 				if (!zone && c.zone) {
 					zoneCount.set(c.zone, (zoneCount.get(c.zone) || 0) + 1);
@@ -162,7 +174,7 @@ export const GET: RequestHandler = async ({ url, platform }) => {
 		const topCities = [...cityCount.entries()]
 			.sort((a, b) => b[1] - a[1])
 			.slice(0, topLimit)
-			.map(([city, count]) => ({ city, zone: zone || '', count }));
+			.map(([city, count]) => ({ city, zone: cityZoneMap.get(city) || zone || '', count }));
 
 		// Build timeline
 		const timeline = [...timelineBuckets.entries()]
