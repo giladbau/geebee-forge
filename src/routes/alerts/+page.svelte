@@ -81,7 +81,7 @@
 
 			const mapPromise = selectedCity
 				? Promise.resolve(null)
-				: fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '100', categories: SIREN_CATEGORIES })}`);
+				: fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES })}`);
 
 			const [summaryData, hourlyData, distData, catDistData, mapData] = await Promise.all([
 				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
