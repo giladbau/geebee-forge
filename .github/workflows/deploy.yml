@@ -15,8 +15,23 @@ jobs:
           node-version: '22'
       - run: npm ci
       - run: npm run build
-      - uses: cloudflare/wrangler-action@v3
+
+      # Astro 6 + @astrojs/cloudflare v13 outputs a Workers project (not Pages).
+      # The generated wrangler.json in dist/server/ has the full config.
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy --config dist/server/wrangler.json
+
+      # Secrets persist across deploys — this step is idempotent.
+      # Requires REDALERT_API_KEY in GitHub repo secrets.
+      - name: Set worker secrets
+        run: |
+          jq -n --arg key "$REDALERT_API_KEY" '{"REDALERT_API_KEY": $key}' \
+            | npx wrangler secret bulk --config dist/server/wrangler.json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          REDALERT_API_KEY: ${{ secrets.REDALERT_API_KEY }}
