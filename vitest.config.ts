@@ -5,11 +5,13 @@ export default defineConfig({
 	plugins: [svelte({ hot: !process.env.VITEST })],
 	resolve: {
 		conditions: ['browser'],
+		alias: {
+			'$lib': '/src/lib'
+		}
 	},
 	test: {
 		environment: 'jsdom',
-		setupFiles: ['./src/test/setup.ts'],
 		globals: true,
-		include: ['src/test/**/*.test.ts', 'src/routes/**/*.test.ts'],
+		include: ['src/**/*.test.ts'],
 	},
 });

@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ConstellationCanvas from '../components/svelte/constellation/ConstellationCanvas.svelte';
+---
+<BaseLayout title="Constellation — Data's Neural Sky">
+	<ConstellationCanvas client:only="svelte" />
+</BaseLayout>

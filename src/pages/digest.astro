@@ -1,0 +1,25 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import DigestBrowser from '../components/svelte/digest/DigestBrowser.svelte';
+
+const modules = import.meta.glob('/src/lib/digest-data/*.json', { eager: true });
+
+interface Digest {
+	week: string;
+	published_at: string;
+	hero_topics: any[];
+	notable: any[];
+	filename: string;
+}
+
+const digests: Digest[] = Object.entries(modules).map(([path, mod]) => {
+	const data = mod as Record<string, unknown>;
+	const filename = path.split('/').pop()?.replace('.json', '') ?? '';
+	return { ...data, filename } as Digest;
+});
+
+digests.sort((a, b) => b.published_at.localeCompare(a.published_at));
+---
+<BaseLayout title="Digest — GeeBee Forge">
+	<DigestBrowser digests={digests} client:load />
+</BaseLayout>

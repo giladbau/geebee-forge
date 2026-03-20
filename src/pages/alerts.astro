@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AlertsDashboard from '../components/svelte/alerts/AlertsDashboard.svelte';
+---
+<BaseLayout title="Rocket Alerts | GeeBee Forge">
+	<AlertsDashboard client:only="svelte" />
+</BaseLayout>
