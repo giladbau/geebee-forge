@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import UnicornFarmPage from '../components/svelte/unicorn-farm/UnicornFarmPage.svelte';
+---
+<BaseLayout title="Unicorn Farm | GeeBee Forge">
+	<UnicornFarmPage client:only="svelte" />
+</BaseLayout>
