@@ -1,9 +1,9 @@
 # CLAUDE.md — geebee-forge
 
 ## Project
-- Astro 6 + Cloudflare Pages (migrated from SvelteKit)
-- Deploy: push to `main` → GitHub Actions → CF Pages
-- Live: https://geebee-forge.pages.dev
+- Astro 6 + Cloudflare Workers (migrated from SvelteKit → Pages → Workers)
+- Deploy: push to `main` → GitHub Actions → `wrangler deploy` (Workers)
+- Live: https://geebee-forge.pages.dev (legacy Pages URL — may need custom domain after Workers migration)
 - Remote: `origin/main` (no `master` branch — don't create one)
 
 ## Stack
@@ -47,7 +47,7 @@ Track all work in the **🤖 Data Dev** project via the Todoist MCP tool (config
 
 ## Alerts Dashboard
 - Page: `/alerts` — wartime rocket alert dashboard using RedAlert API
-- Upstream API: `https://redalert.orielhaim.com/api/stats/*` (auth via `REDALERT_API_KEY` CF env)
+- Upstream API: `https://redalert.orielhaim.com/api/stats/*` (auth via `REDALERT_API_KEY` Workers secret)
 - Active alert types: `missiles`, `hostileAircraftIntrusion`, `terroristInfiltration` (exclude `newsFlash`, `endAlert`)
 - **Shared normalization**: `src/lib/utils/city-names.ts` — `normalizeCity()` strips directional suffixes. Used by BOTH geocode endpoint AND AlertsMap component. ONE function, used everywhere — never duplicate this logic.
 - **Static data files** (in `src/lib/data/`):
