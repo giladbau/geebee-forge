@@ -48,7 +48,8 @@ export const GET: APIRoute = async ({ request }) => {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	} catch (e) {
-		return new Response(JSON.stringify({ error: 'Failed to compute zone distribution' }), {
+		const detail = e instanceof Error ? e.message : 'Unknown error';
+		return new Response(JSON.stringify({ error: 'Failed to compute zone distribution', detail }), {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' }
 		});
