@@ -18,6 +18,11 @@ export interface Alert {
 	[key: string]: unknown;
 }
 
+interface FetchResult {
+	alerts: Alert[];
+	complete: boolean;
+}
+
 /**
  * Determine cache TTL based on the date range.
  * If endDate is more than 1 hour in the past, data is historical → 24h cache.
@@ -30,16 +35,17 @@ export function getCacheTTL(endDate: string | null): number {
 	return end < oneHourAgo ? 86400 : 300;
 }
 
-async function fetchFromUpstream(
+export async function fetchFromUpstream(
 	params: URLSearchParams,
 	apiKey: string
-): Promise<Alert[]> {
+): Promise<FetchResult> {
 	const allAlerts: Alert[] = [];
 	let offset = 0;
 	let hasMore = true;
+	let complete = true;
 
 	while (hasMore) {
-		const batch: Promise<{ data: Alert[]; hasMore: boolean }>[] = [];
+		const batch: Promise<{ data: Alert[]; hasMore: boolean; ok: boolean }>[] = [];
 		for (let i = 0; i < BATCH_SIZE && hasMore; i++) {
 			const p = new URLSearchParams(params);
 			p.set('limit', String(PAGE_SIZE));
@@ -50,18 +56,21 @@ async function fetchFromUpstream(
 					headers: { Authorization: `Bearer ${apiKey}` }
 				})
 					.then(async (res) => {
-						if (!res.ok) return { data: [], hasMore: false };
+						if (!res.ok) return { data: [], hasMore: false, ok: false };
 						const json = await res.json();
 						const data = json?.data || [];
-						return { data, hasMore: json?.pagination?.hasMore ?? false };
+						return { data, hasMore: json?.pagination?.hasMore ?? false, ok: true };
 					})
-					.catch(() => ({ data: [], hasMore: false }))
+					.catch(() => ({ data: [] as Alert[], hasMore: false, ok: false }))
 			);
 		}
 
 		const results = await Promise.all(batch);
 		let anyHasMore = false;
 		for (const r of results) {
+			if (!r.ok) {
+				complete = false;
+			}
 			allAlerts.push(...r.data);
 			if (r.hasMore) anyHasMore = true;
 		}
@@ -73,12 +82,16 @@ async function fetchFromUpstream(
 		if (allAlerts.length >= 5000) break;
 	}
 
-	return allAlerts;
+	return { alerts: allAlerts, complete };
 }
+
+/** Deduplicates concurrent identical fetchAllHistory calls within the same isolate. */
+const inflight = new Map<string, Promise<Alert[]>>();
 
 /**
  * Fetch all history alerts with CF Cache API caching.
  * Cache key is built from query params; TTL depends on whether the date range is historical.
+ * Only caches results when all upstream pages were fetched successfully.
  */
 export async function fetchAllHistory(
 	params: URLSearchParams,
@@ -105,20 +118,33 @@ export async function fetchAllHistory(
 		}
 	}
 
-	const alerts = await fetchFromUpstream(params, apiKey);
-
-	if (cache) {
-		const ttl = getCacheTTL(params.get('endDate'));
-		await cache.put(
-			cacheKey,
-			new Response(JSON.stringify(alerts), {
-				headers: {
-					'Content-Type': 'application/json',
-					'Cache-Control': `public, max-age=${ttl}`
-				}
-			})
-		);
+	// Deduplicate concurrent identical calls
+	const dedupeKey = cacheUrl;
+	if (inflight.has(dedupeKey)) {
+		return inflight.get(dedupeKey)!;
 	}
 
-	return alerts;
+	const promise = fetchFromUpstream(params, apiKey)
+		.then(async (result) => {
+			// Only cache when all upstream pages succeeded
+			if (cache && result.complete) {
+				const ttl = getCacheTTL(params.get('endDate'));
+				await cache.put(
+					cacheKey,
+					new Response(JSON.stringify(result.alerts), {
+						headers: {
+							'Content-Type': 'application/json',
+							'Cache-Control': `public, max-age=${ttl}`
+						}
+					})
+				);
+			}
+			return result.alerts;
+		})
+		.finally(() => {
+			inflight.delete(dedupeKey);
+		});
+
+	inflight.set(dedupeKey, promise);
+	return promise;
 }

@@ -24,7 +24,9 @@
 	let zones: string[] = $state([]);
 	let citiesList: any[] = $state([]);
 	let loading = $state(true);
+	let dataErrors: string[] = $state([]);
 	let mapCities: { city: string; zone: string; count: number }[] = $state([]);
+	let currentController: AbortController | null = null;
 
 	// Only real siren alert types (exclude newsFlash, endAlert)
 	const SIREN_CATEGORIES = 'missiles,hostileAircraftIntrusion,terroristInfiltration';
@@ -66,51 +68,88 @@
 		return p.toString();
 	}
 
-	async function fetchJSON(url: string) {
-		const res = await fetch(url);
+	async function fetchJSON(url: string, signal?: AbortSignal) {
+		const res = await fetch(url, signal ? { signal } : undefined);
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		return res.json();
 	}
 
 	async function loadAllData() {
+		// Cancel any in-flight requests from previous filter change
+		if (currentController) currentController.abort();
+		currentController = new AbortController();
+		const { signal } = currentController;
+
 		loading = true;
-		try {
-			// Always use history-based endpoints for consistent data
-			const summaryBase = '/api/alerts/zone-summary';
-			const distBase = '/api/alerts/zone-distribution';
+		dataErrors = [];
 
-			const mapPromise = selectedCity
-				? Promise.resolve(null)
-				: fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES })}`);
+		// Always use history-based endpoints for consistent data
+		const summaryBase = '/api/alerts/zone-summary';
+		const distBase = '/api/alerts/zone-distribution';
 
-			const [summaryData, hourlyData, distData, catDistData, mapData] = await Promise.all([
-				fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`),
-				fetchJSON(`${summaryBase}?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`),
-				fetchJSON(`${distBase}?${buildParams({ groupBy: 'origin' })}`),
-				fetchJSON(`${distBase}?${buildParams({ groupBy: 'category' })}`),
-				mapPromise
-			]);
-			summary = summaryData;
-			hourlyTimeline = hourlyData?.timeline || [];
-			distribution = distData?.data || [];
-			categoryDistribution = catDistData?.data || [];
+		const mapPromise = selectedCity
+			? Promise.resolve(null)
+			: fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES })}`, signal);
 
-			if (selectedCity) {
-				mapCities = [{
-					city: selectedCity,
-					zone: selectedZone || '',
-					count: summaryData?.totals?.range ?? 0
-				}];
-			} else {
-				mapCities = mapData?.topCities || [];
-			}
-			renderTimelineChart();
-			renderDistributionChart(distribution);
-		} catch (e) {
-			console.error('Failed to load alert data:', e);
-		} finally {
-			loading = false;
+		const results = await Promise.allSettled([
+			fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`, signal),
+			fetchJSON(`${summaryBase}?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`, signal),
+			fetchJSON(`${distBase}?${buildParams({ groupBy: 'origin' })}`, signal),
+			fetchJSON(`${distBase}?${buildParams({ groupBy: 'category' })}`, signal),
+			mapPromise
+		]);
+
+		// Discard results if this request was superseded by a newer one
+		if (signal.aborted) return;
+
+		const errors: string[] = [];
+		const [summaryResult, hourlyResult, distResult, catDistResult, mapResult] = results;
+
+		if (summaryResult.status === 'fulfilled') {
+			summary = summaryResult.value;
+		} else {
+			errors.push('summary');
+			console.error('Failed to load summary:', summaryResult.reason);
 		}
+
+		if (hourlyResult.status === 'fulfilled') {
+			hourlyTimeline = hourlyResult.value?.timeline || [];
+		} else {
+			errors.push('timeline');
+			console.error('Failed to load timeline:', hourlyResult.reason);
+		}
+
+		if (distResult.status === 'fulfilled') {
+			distribution = distResult.value?.data || [];
+		} else {
+			errors.push('distribution');
+			console.error('Failed to load distribution:', distResult.reason);
+		}
+
+		if (catDistResult.status === 'fulfilled') {
+			categoryDistribution = catDistResult.value?.data || [];
+		} else {
+			errors.push('categories');
+			console.error('Failed to load categories:', catDistResult.reason);
+		}
+
+		if (selectedCity) {
+			mapCities = [{
+				city: selectedCity,
+				zone: selectedZone || '',
+				count: summary?.totals?.range ?? 0
+			}];
+		} else if (mapResult.status === 'fulfilled') {
+			mapCities = mapResult.value?.topCities || [];
+		} else {
+			errors.push('map');
+			console.error('Failed to load map data:', mapResult.reason);
+		}
+
+		dataErrors = errors;
+		renderTimelineChart();
+		renderDistributionChart(distribution);
+		loading = false;
 	}
 
 	async function loadZones() {
@@ -392,6 +431,12 @@
 
 	{#if loading}
 		<div class="loading">Loading alert data...</div>
+	{/if}
+
+	{#if dataErrors.length > 0}
+		<div class="error-banner">
+			Some data failed to load ({dataErrors.join(', ')}). Showing available data.
+		</div>
 	{/if}
 
 	<!-- Alert Map -->
@@ -685,6 +730,17 @@
 		text-align: center;
 		padding: 2rem;
 		color: #888;
+	}
+
+	.error-banner {
+		background: rgba(239, 68, 68, 0.1);
+		border: 1px solid rgba(239, 68, 68, 0.3);
+		border-radius: 8px;
+		padding: 0.75rem 1rem;
+		color: #f87171;
+		font-size: 0.85rem;
+		margin-bottom: 1.5rem;
+		text-align: center;
 	}
 
 	/* Summary Cards */
