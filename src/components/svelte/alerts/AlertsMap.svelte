@@ -28,17 +28,16 @@
 
 	async function loadHeatPlugin() {
 		if (heatPluginLoaded) return;
-		// leaflet.heat is a legacy plugin that attaches to global L.
-		// ESM dynamic import() wraps it in strict module scope where bare L
-		// is inaccessible, so we load it as a classic <script> instead.
+		// leaflet.heat is a legacy plugin that uses bare `L` references to
+		// register L.heatLayer. Vite wraps ESM imports in strict module scope
+		// where bare globals are inaccessible, so we inline the source and
+		// execute it as a classic <script> tag in global scope.
 		(window as any).L = L;
-		await new Promise<void>((resolve, reject) => {
-			const script = document.createElement('script');
-			script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
-			script.onload = () => { heatPluginLoaded = true; resolve(); };
-			script.onerror = () => reject(new Error('Failed to load leaflet.heat'));
-			document.head.appendChild(script);
-		});
+		const heatSrc = (await import('leaflet.heat/dist/leaflet-heat.js?raw')).default;
+		const script = document.createElement('script');
+		script.textContent = heatSrc;
+		document.head.appendChild(script);
+		heatPluginLoaded = true;
 	}
 
 	async function initMap() {
