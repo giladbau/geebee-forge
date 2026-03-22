@@ -23,11 +23,28 @@
 	let L: any = null;
 	let mapMode = $state<'pins' | 'heat'>('pins');
 	let cachedHeatPoints: [number, number, number][] = [];
+	let heatPluginReady = false;
+
+	async function loadHeatPlugin(): Promise<void> {
+		if (heatPluginReady) return;
+		if (typeof (L as any).heatLayer === 'function') {
+			heatPluginReady = true;
+			return;
+		}
+		return new Promise<void>((resolve, reject) => {
+			const script = document.createElement('script');
+			script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
+			script.onload = () => { heatPluginReady = true; resolve(); };
+			script.onerror = () => reject(new Error('Failed to load leaflet.heat'));
+			document.head.appendChild(script);
+		});
+	}
 
 	async function initMap() {
 		// Dynamic import — Leaflet has no SSR support
 		const leaflet = await import('leaflet');
 		L = leaflet.default || leaflet;
+		(window as any).L = L;
 
 		// Inject Leaflet CSS
 		if (!document.querySelector('link[href*="leaflet"]')) {
@@ -224,14 +241,23 @@
 			}
 
 			if (cachedHeatPoints.length > 0) {
-				await import('leaflet.heat');
-				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
-				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
-					radius: 25,
-					blur: 15,
-					maxZoom: 12,
-					max: maxCount,
-					minOpacity: 0.3,
+				await loadHeatPlugin();
+				if (typeof (L as any).heatLayer !== 'function') {
+					console.error('[AlertsMap] L.heatLayer not available after loading plugin');
+					return;
+				}
+				// Normalize intensities with log scale to handle skewed data
+				// (few cities with thousands of alerts, most with dozens)
+				const logPoints: [number, number, number][] = cachedHeatPoints.map(
+					([lat, lng, count]) => [lat, lng, Math.log(count + 1)]
+				);
+				const maxLog = Math.max(...logPoints.map((p) => p[2]));
+				heatLayer = (L as any).heatLayer(logPoints, {
+					radius: 35,
+					blur: 20,
+					maxZoom: 10,
+					max: maxLog,
+					minOpacity: 0.4,
 					gradient: {
 						0.2: '#2563eb',
 						0.4: '#7c3aed',
