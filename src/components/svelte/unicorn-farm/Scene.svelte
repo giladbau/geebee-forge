@@ -18,7 +18,7 @@
     width: 100vw;
     height: 100vh;
   }
-  :global(canvas) {
+  .scene-wrapper :global(canvas) {
     width: 100% !important;
     height: 100% !important;
   }
