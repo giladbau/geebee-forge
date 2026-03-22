@@ -52,13 +52,24 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           REDALERT_API_KEY: ${{ secrets.REDALERT_API_KEY }}
 
+      - name: Extract preview URL from deploy output
+        id: preview-url
+        run: |
+          # Parse the actual URL from wrangler deploy output
+          PREVIEW_URL=$(echo "${{ steps.deploy.outputs.command-output }}" | grep -oP 'https://[^\s]+\.workers\.dev' | head -1)
+          if [ -z "$PREVIEW_URL" ]; then
+            # Fallback: construct from known account subdomain
+            PREVIEW_URL="https://geebee-forge-pr-${{ github.event.number }}.gilad-bau.workers.dev"
+          fi
+          echo "url=$PREVIEW_URL" >> "$GITHUB_OUTPUT"
+
       - name: Comment preview URL on PR
         uses: actions/github-script@v7
         with:
           script: |
             const marker = '<!-- preview-url -->';
             const workerName = `geebee-forge-pr-${{ github.event.number }}`;
-            const previewUrl = `https://${workerName}.workers.dev`;
+            const previewUrl = `${{ steps.preview-url.outputs.url }}`;
             const body = [
               marker,
               `### 🔍 Preview Deploy`,
