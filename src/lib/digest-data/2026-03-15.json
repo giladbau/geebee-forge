@@ -7,7 +7,7 @@
       "slug": "streaming-spatial-intelligence",
       "summary": "Three independent papers this week tackle the same core problem: building persistent spatial understanding from continuous video streams. Spatial-TTT (70 upvotes) uses test-time training with fast weights as compressed spatial memory over unbounded video. Holi-Spatial (53 upvotes) builds a scalable 3DGS-based pipeline to curate spatial QA data from raw web video. LoGeR (31 upvotes) achieves dense 3D reconstruction from minutes-long video in a single feedforward pass — no post-optimization.",
       "insight": "The convergence here is striking: all three papers independently identify that the bottleneck for spatial AI is not model capacity but how spatial information is retained over time. Spatial-TTT's use of fast weights to compress spatial evidence into network parameters is the most architecturally novel — it bypasses context windows entirely. LoGeR's elimination of post-optimization (bundle adjustment, global alignment) is the practical breakthrough: it makes phone-scan-to-3D-model workflows viable in real-time. For CG/CV pipelines, this means 3D capture tooling will soon be constrained by sensor quality, not compute. Combined with Holi-Spatial's data flywheel from web video, training data for spatial reasoning scales automatically.",
-      "image_url": null,
+      "image_url": "/digest-images/2026-03-15-streaming-spatial.png",
       "sources": [
         {
           "title": "Spatial-TTT: Streaming Spatial Intelligence with Test-Time Training",
@@ -38,7 +38,7 @@
       "slug": "video-gen-cinematic-control",
       "summary": "Four papers push video generation from single-clip demos toward production-grade film tools. ShotVerse (28 upvotes) learns cinematic multi-shot camera control from naturally aligned (caption, trajectory, video) triplets. WildActor (26 upvotes) introduces a massive 18M-clip dataset for full-body identity consistency across viewpoints. DreamVideo-Omni (26 upvotes) solves multi-subject + multi-granularity motion control with identity reward learning. HiAR (21 upvotes) breaks the error-accumulation barrier for infinite-length AR video via hierarchical denoising.",
       "insight": "The shift is from 'generate a cool clip' to 'direct a sequence.' ShotVerse's data-centric approach — learning camera language from real film data rather than manual trajectory specification — is the right paradigm. WildActor addresses the ugly truth that prior identity-preserving methods were really face-preserving: body-level consistency across dynamic shots requires a fundamentally different dataset and architecture. For content production pipelines (toys, animation, marketing), multi-shot identity consistency with controllable camera is the unlock. HiAR's hierarchical denoising for infinite-length video solves the quality degradation problem that made AR video generation impractical beyond ~10 seconds. These pieces are assembling toward AI-directed video production.",
-      "image_url": null,
+      "image_url": "/digest-images/2026-03-15-video-gen.png",
       "sources": [
         {
           "title": "ShotVerse: Cinematic Camera Control for Multi-Shot Video",
@@ -74,7 +74,7 @@
       "slug": "coding-agents-go-production",
       "summary": "The coding agent stack crosses from demos to production infrastructure. Anthropic ships multi-agent code review in Claude Code — Boris Cherny reports 200% code output per engineer, with review being the bottleneck now addressed by agent teams. Karpathy releases his 'autoresearch' setup: a minimal 630-line LLM training loop where agents iterate on training code while humans steer research direction. Varun Mathur's Autoskill extends this to distributed skill factories. AgentCraft by Ido Salomon lets you orchestrate agents via an RTS-game interface.",
       "insight": "The signal here is that Anthropic dogfoods agent-driven code review internally — this isn't a product demo, it's their actual engineering workflow. When your AI company's own engineers use agents to review agent-written code, the loop is closed. Karpathy's autoresearch is the minimal viable version of this for ML research: human picks the hypothesis, agent grinds through training iterations. The practical implication for teams using Claude Code: adopt the review agent now, it's already battle-tested at scale. For research teams: the autoresearch pattern (630 lines of training code + agent iteration) is immediately replicable.",
-      "image_url": null,
+      "image_url": "/digest-images/2026-03-15-coding-agents.png",
       "sources": [
         {
           "title": "Claude Code Review launch (Boris Cherny)",
