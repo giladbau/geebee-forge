@@ -246,13 +246,18 @@
 					console.error('[AlertsMap] L.heatLayer not available after loading plugin');
 					return;
 				}
-				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
-				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
-					radius: 25,
-					blur: 15,
+				// Normalize intensities with log scale to handle skewed data
+				// (few cities with thousands of alerts, most with dozens)
+				const logPoints: [number, number, number][] = cachedHeatPoints.map(
+					([lat, lng, count]) => [lat, lng, Math.log(count + 1)]
+				);
+				const maxLog = Math.max(...logPoints.map((p) => p[2]));
+				heatLayer = (L as any).heatLayer(logPoints, {
+					radius: 35,
+					blur: 20,
 					maxZoom: 10,
-					max: maxCount,
-					minOpacity: 0.3,
+					max: maxLog,
+					minOpacity: 0.4,
 					gradient: {
 						0.2: '#2563eb',
 						0.4: '#7c3aed',
