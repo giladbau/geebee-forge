@@ -19,7 +19,10 @@
 	let map: any = null;
 	let markersLayer: any = null;
 	let polygonLayer: any = null;
+	let heatLayer: any = null;
 	let L: any = null;
+	let mapMode = $state<'pins' | 'heat'>('pins');
+	let cachedHeatPoints: [number, number, number][] = [];
 
 	async function initMap() {
 		// Dynamic import — Leaflet has no SSR support
@@ -136,6 +139,12 @@
 			agg.entries.push(city);
 		}
 
+		// Build heat points from aggregated data
+		cachedHeatPoints = [];
+		for (const agg of aggregated.values()) {
+			cachedHeatPoints.push([agg.lat, agg.lng, agg.count]);
+		}
+
 		const pinIcon = L.divIcon({
 			className: 'alert-pin',
 			html: '<div class="pin"></div>',
@@ -196,6 +205,51 @@
 		} else {
 			map.setView([31.5, 34.8], 8);
 		}
+
+		syncLayers();
+	}
+
+	async function syncLayers() {
+		if (!map || !L) return;
+
+		if (mapMode === 'heat') {
+			// Hide pins + polygons
+			if (markersLayer && map.hasLayer(markersLayer)) map.removeLayer(markersLayer);
+			if (polygonLayer && map.hasLayer(polygonLayer)) map.removeLayer(polygonLayer);
+
+			// Remove old heat layer
+			if (heatLayer) {
+				map.removeLayer(heatLayer);
+				heatLayer = null;
+			}
+
+			if (cachedHeatPoints.length > 0) {
+				await import('leaflet.heat');
+				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
+				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
+					radius: 25,
+					blur: 15,
+					maxZoom: 12,
+					max: maxCount,
+					minOpacity: 0.3,
+					gradient: {
+						0.2: '#2563eb',
+						0.4: '#7c3aed',
+						0.6: '#f59e0b',
+						0.8: '#ef4444',
+						1.0: '#fef08a'
+					}
+				}).addTo(map);
+			}
+		} else {
+			// Pins mode: remove heat, restore markers + polygons
+			if (heatLayer) {
+				map.removeLayer(heatLayer);
+				heatLayer = null;
+			}
+			if (markersLayer && !map.hasLayer(markersLayer)) markersLayer.addTo(map);
+			if (polygonLayer && !map.hasLayer(polygonLayer)) polygonLayer.addTo(map);
+		}
 	}
 
 	onMount(() => {
@@ -206,10 +260,8 @@
 		});
 
 		return () => {
-			if (map) {
-				map.remove();
-				map = null;
-			}
+			if (heatLayer) { map?.removeLayer(heatLayer); heatLayer = null; }
+			if (map) { map.remove(); map = null; }
 		};
 	});
 
@@ -218,10 +270,21 @@
 			updateMarkers(topCities);
 		}
 	});
+
+	$effect(() => {
+		mapMode;
+		if (map) syncLayers();
+	});
 </script>
 
 <section class="map-section">
-	<h2>Alert Map</h2>
+	<div class="map-header">
+		<h2>Alert Map</h2>
+		<div class="mode-toggle">
+			<button class:active={mapMode === 'pins'} onclick={() => mapMode = 'pins'}>Pins</button>
+			<button class:active={mapMode === 'heat'} onclick={() => mapMode = 'heat'}>Heat Map</button>
+		</div>
+	</div>
 	<div class="map-container" bind:this={mapContainer}></div>
 </section>
 
@@ -234,10 +297,44 @@
 		margin-bottom: 2rem;
 	}
 
-	.map-section h2 {
-		margin: 0 0 1rem;
+	.map-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 1rem;
+	}
+
+	.map-header h2 {
+		margin: 0;
 		font-size: 1.1rem;
 		color: #e0e0e0;
+	}
+
+	.mode-toggle {
+		display: flex;
+		gap: 0.25rem;
+	}
+
+	.mode-toggle button {
+		background: #0a0a0a;
+		border: 1px solid #333;
+		color: #999;
+		padding: 0.35rem 0.75rem;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.8rem;
+		transition: all 0.15s;
+	}
+
+	.mode-toggle button:hover {
+		border-color: #555;
+		color: #ccc;
+	}
+
+	.mode-toggle button.active {
+		background: #ef4444;
+		border-color: #ef4444;
+		color: #fff;
 	}
 
 	.map-container {
