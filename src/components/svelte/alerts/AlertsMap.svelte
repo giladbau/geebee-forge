@@ -29,19 +29,19 @@
 
 	async function loadHeatPlugin() {
 		if (heatPluginLoaded) return;
-		// leaflet.heat is a legacy plugin that uses bare `L` references to
-		// register L.heatLayer. Vite wraps ESM imports in strict module scope
-		// where bare globals are inaccessible, so we inline the source and
-		// execute it as a classic <script> tag in global scope.
 		(window as any).L = L;
 		try {
-			const heatSrc = (await import('leaflet.heat/dist/leaflet-heat.js?raw')).default;
-			heatDebug = `raw import OK (${heatSrc.length} chars)`;
-			const script = document.createElement('script');
-			script.textContent = heatSrc;
-			document.head.appendChild(script);
+			// Load leaflet.heat from CDN as a classic script so it can
+			// access bare `L` in the global scope
+			await new Promise<void>((resolve, reject) => {
+				const script = document.createElement('script');
+				script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
+				script.onload = () => resolve();
+				script.onerror = () => reject(new Error('CDN script failed to load'));
+				document.head.appendChild(script);
+			});
 			heatPluginLoaded = true;
-			heatDebug += ` | L.heatLayer=${typeof (L as any).heatLayer}`;
+			heatDebug = `CDN loaded | L.heatLayer=${typeof (L as any).heatLayer}`;
 		} catch (err: any) {
 			heatDebug = `loadHeatPlugin error: ${err?.message || err}`;
 		}
