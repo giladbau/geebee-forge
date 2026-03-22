@@ -10,10 +10,15 @@ const demos = [
 ---
 
 <nav class="global-nav">
-  <a href="/" class:list={['brand', { active: pathname === '/' }]}>
-    <span class="brand-glyph">⬡</span>
-    <span class="brand-name">GeeBee Forge</span>
-  </a>
+  <div class="left">
+    {pathname !== '/' && (
+      <a href="/" class="back-btn" aria-label="Back to home">&#8592;</a>
+    )}
+    <a href="/" class:list={['brand', { active: pathname === '/' }]}>
+      <span class="brand-glyph">⬡</span>
+      <span class="brand-name">GeeBee Forge</span>
+    </a>
+  </div>
 
   <div class="demo-links">
     {demos.map(({ href, label }) => (
@@ -43,6 +48,32 @@ const demos = [
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .back-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #888;
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s, background 0.2s, border-color 0.2s;
+  }
+
+  .back-btn:hover {
+    color: #e0e0e0;
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.2);
   }
 
   .brand {
