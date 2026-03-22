@@ -254,13 +254,17 @@
 					return;
 				}
 				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
+				// Normalize intensities to 0–1 range so leaflet.heat renders them
+				// correctly regardless of zoom level
+				const normalizedPoints = cachedHeatPoints.map(
+					([lat, lng, count]) => [lat, lng, count / maxCount] as [number, number, number]
+				);
 				heatDebug += ` | max=${maxCount} | creating layer...`;
-				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
-					radius: 25,
-					blur: 15,
-					maxZoom: 12,
-					max: maxCount,
-					minOpacity: 0.3,
+				heatLayer = (L as any).heatLayer(normalizedPoints, {
+					radius: 30,
+					blur: 20,
+					max: 1.0,
+					minOpacity: 0.4,
 					gradient: {
 						0.2: '#2563eb',
 						0.4: '#7c3aed',
