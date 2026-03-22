@@ -22,6 +22,7 @@
 	let heatLayer: any = null;
 	let L: any = null;
 	let mapMode = $state<'pins' | 'heat'>('pins');
+	let expanded = $state(false);
 	let cachedHeatPoints: [number, number, number][] = [];
 	let heatPluginReady = false;
 
@@ -38,6 +39,13 @@
 			script.onerror = () => reject(new Error('Failed to load leaflet.heat'));
 			document.head.appendChild(script);
 		});
+	}
+
+	/** Dynamic heatmap radius/blur based on zoom — smaller at low zoom to prevent blob formation */
+	function getHeatOptions(zoom: number): { radius: number; blur: number } {
+		const radius = Math.max(10, Math.min(25, zoom * 2 - 4));
+		const blur = Math.round(radius * 0.7);
+		return { radius, blur };
 	}
 
 	async function initMap() {
@@ -70,6 +78,13 @@
 		}).addTo(map);
 
 		markersLayer = L.layerGroup().addTo(map);
+
+		map.on('zoomend', () => {
+			if (heatLayer && mapMode === 'heat') {
+				const opts = getHeatOptions(map.getZoom());
+				heatLayer.setOptions(opts);
+			}
+		});
 	}
 
 	async function updateMarkers(cities: CityData[]) {
@@ -252,10 +267,11 @@
 					([lat, lng, count]) => [lat, lng, Math.log(count + 1)]
 				);
 				const maxLog = Math.max(...logPoints.map((p) => p[2]));
+				const { radius, blur } = getHeatOptions(map.getZoom());
 				heatLayer = (L as any).heatLayer(logPoints, {
-					radius: 35,
-					blur: 20,
-					maxZoom: 10,
+					radius,
+					blur,
+					maxZoom: 15,
 					max: maxLog,
 					minOpacity: 0.4,
 					gradient: {
@@ -301,17 +317,33 @@
 		mapMode;
 		if (map) syncLayers();
 	});
+
+	$effect(() => {
+		expanded;
+		if (map) {
+			setTimeout(() => map.invalidateSize({ animate: true }), 310);
+		}
+	});
 </script>
 
 <section class="map-section">
 	<div class="map-header">
 		<h2>Alert Map</h2>
-		<div class="mode-toggle">
-			<button class:active={mapMode === 'pins'} onclick={() => mapMode = 'pins'}>Pins</button>
-			<button class:active={mapMode === 'heat'} onclick={() => mapMode = 'heat'}>Heat Map</button>
+		<div class="map-controls">
+			<div class="mode-toggle">
+				<button class:active={mapMode === 'pins'} onclick={() => mapMode = 'pins'}>Pins</button>
+				<button class:active={mapMode === 'heat'} onclick={() => mapMode = 'heat'}>Heat Map</button>
+			</div>
+			<button
+				class="expand-toggle"
+				onclick={() => expanded = !expanded}
+				title={expanded ? 'Collapse map' : 'Expand map'}
+			>
+				{expanded ? '\u2195 Collapse' : '\u2195 Expand'}
+			</button>
 		</div>
 	</div>
-	<div class="map-container" bind:this={mapContainer}></div>
+	<div class="map-container" class:expanded bind:this={mapContainer}></div>
 </section>
 
 <style>
@@ -334,6 +366,12 @@
 		margin: 0;
 		font-size: 1.1rem;
 		color: #e0e0e0;
+	}
+
+	.map-controls {
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
 	}
 
 	.mode-toggle {
@@ -363,11 +401,32 @@
 		color: #fff;
 	}
 
+	.expand-toggle {
+		background: #0a0a0a;
+		border: 1px solid #333;
+		color: #999;
+		padding: 0.35rem 0.75rem;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.8rem;
+		transition: all 0.15s;
+	}
+
+	.expand-toggle:hover {
+		border-color: #555;
+		color: #ccc;
+	}
+
 	.map-container {
 		height: 400px;
 		border-radius: 8px;
 		overflow: hidden;
 		border: 1px solid #2a2a2a;
+		transition: height 0.3s ease;
+	}
+
+	.map-container.expanded {
+		height: 700px;
 	}
 
 	/* Override Leaflet controls for dark theme */
