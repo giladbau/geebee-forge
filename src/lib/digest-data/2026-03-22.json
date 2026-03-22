@@ -1,0 +1,446 @@
+{
+  "week": "2026-03-16 to 2026-03-22",
+  "published_at": "2026-03-22T10:01:00Z",
+  "hero_topics": [
+    {
+      "title": "Video Diffusion Models Are Secretly Reasoning Engines with 3D Understanding",
+      "slug": "video-diffusion-reasoning-3d",
+      "summary": "Two major papers reveal that video diffusion models encode far more than visual generation. \"Demystifying Video Reasoning\" (347 HF upvotes) shows reasoning emerges through denoising steps — not frame sequences — via a Chain-of-Steps mechanism with working memory, self-correction, and perception-before-action. Separately, VEGA-3D demonstrates that video generation models implicitly learn robust 3D structural priors and physical laws, which can be extracted as a plug-and-play \"Latent World Simulator\" to give MLLMs spatial understanding without explicit 3D supervision.",
+      "insight": "These findings reframe video diffusion as more than a generative tool — it's a substrate for spatial intelligence and reasoning. For rendering teams, this means video generation backbones could become general-purpose scene understanding modules. The VEGA-3D approach of repurposing generative priors for perception is particularly elegant and could lower the barrier to integrating 3D awareness into production pipelines that already use video models.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Demystifying Video Reasoning (347 upvotes)",
+          "url": "https://arxiv.org/abs/2603.16870",
+          "type": "paper"
+        },
+        {
+          "title": "VEGA-3D: Generation Models Know Space",
+          "url": "https://arxiv.org/abs/2603.19235",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "video-diffusion",
+        "reasoning",
+        "3D-priors",
+        "world-models",
+        "spatial-intelligence"
+      ]
+    },
+    {
+      "title": "World Models Break Out of the Lab: Real Cities, Stereo VR, and 4D Robotics",
+      "slug": "world-models-go-real",
+      "summary": "This week saw a convergence of world model papers moving from toy environments to real-world grounding. Seoul World Model generates navigable video grounded in actual street-view imagery over hundreds of meters. MosaicMem introduces hybrid 3D/implicit spatial memory enabling minute-level consistent navigation in video world models. WorldCam uses camera pose as a unifying geometric representation for interactive 3D gaming worlds. StereoWorld produces end-to-end stereo video for VR without depth estimation. Kinema4D builds a 4D generative robotic simulator with URDF-based robot control and environment reaction synthesis.",
+      "insight": "World models are fragmenting into specialized niches — navigation, gaming, robotics, VR — but sharing architectural DNA (video diffusion + spatial conditioning). For Riverside's rendering pipeline, the stereo/VR angle (StereoWorld) and the real-city grounding approach (Seoul World Model with retrieval-augmented street-view conditioning) are directly relevant. The hybrid memory approach in MosaicMem — lifting patches into 3D for localization while letting the model hallucinate dynamics — is an elegant compromise between explicit and implicit spatial representations.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Seoul World Model: Grounding in a Real Metropolis",
+          "url": "https://arxiv.org/abs/2603.15583",
+          "type": "paper"
+        },
+        {
+          "title": "MosaicMem: Hybrid Spatial Memory for Video World Models",
+          "url": "https://arxiv.org/abs/2603.17117",
+          "type": "paper"
+        },
+        {
+          "title": "WorldCam: Interactive 3D Gaming Worlds via Camera Pose",
+          "url": "https://arxiv.org/abs/2603.16871",
+          "type": "paper"
+        },
+        {
+          "title": "StereoWorld: Camera-Guided Stereo Video Generation",
+          "url": "https://arxiv.org/abs/2603.17375",
+          "type": "paper"
+        },
+        {
+          "title": "Kinema4D: Kinematic 4D World Modeling for Embodied Simulation",
+          "url": "https://arxiv.org/abs/2603.16669",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "world-models",
+        "video-generation",
+        "3D-consistency",
+        "VR",
+        "robotics",
+        "spatial-memory"
+      ]
+    },
+    {
+      "title": "3D Reconstruction and Generation: Physics-Grounded, Continuous LoD, and Semantic Tokenization",
+      "slug": "3d-reconstruction-generation-matures",
+      "summary": "Several advances push 3D pipelines toward production readiness. HSImul3R (149 HF upvotes) introduces physics-in-the-loop 3D reconstruction of human-scene interactions — using the physics simulator as an active supervisor to jointly refine dynamics and geometry, producing outputs directly deployable to humanoid robots. Matryoshka Gaussian Splatting enables continuous level-of-detail from a single 3DGS model via stochastic budget training — any prefix of the ordered Gaussian set produces a coherent reconstruction. M³ augments multi-view foundation models with dense matching for monocular Gaussian Splatting SLAM, cutting ATE by 64% over VGGT-SLAM. LoST proposes semantic-salience tokenization for 3D shapes, achieving SOTA reconstruction using 0.1-10% of the tokens of prior autoregressive methods.",
+      "insight": "The HSImul3R physics-in-the-loop approach is a paradigm worth watching: treating the simulator as a differentiable supervisor rather than just a downstream consumer. Matryoshka GS is immediately practical — continuous LoD from a single model is exactly what streaming/adaptive rendering needs. The LoST semantic tokenization for 3D could become foundational for AR-based 3D generation as the field converges on token-based architectures. For someone moving into a rendering team, the M³ monocular SLAM paper represents the cutting edge of real-time 3D reconstruction without calibrated stereo.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "HSImul3R: Physics-in-the-Loop 3D Human-Scene Reconstruction",
+          "url": "https://arxiv.org/abs/2603.15612",
+          "type": "paper"
+        },
+        {
+          "title": "Matryoshka Gaussian Splatting: Continuous LoD for 3DGS",
+          "url": "https://arxiv.org/abs/2603.19234",
+          "type": "paper"
+        },
+        {
+          "title": "M³: Dense Matching for Monocular GS SLAM",
+          "url": "https://arxiv.org/abs/2603.16844",
+          "type": "paper"
+        },
+        {
+          "title": "LoST: Level of Semantics Tokenization for 3D Shapes",
+          "url": "https://arxiv.org/abs/2603.17995",
+          "type": "paper"
+        },
+        {
+          "title": "MonoArt: Monocular Articulated 3D Reconstruction",
+          "url": "https://arxiv.org/abs/2603.19231",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "3D-reconstruction",
+        "gaussian-splatting",
+        "SLAM",
+        "physics-simulation",
+        "3D-generation",
+        "level-of-detail"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "NVIDIA DLSS 5 Sparks \"AI Slop\" Controversy",
+      "summary": "DLSS 5 appears to generate AI imagery on top of upscaling rather than just enhance existing frames — characters look like different people, drawing sharp criticism from gamers and CG professionals.",
+      "sources": [
+        {
+          "title": "@SynthPotato on DLSS 5 hallucination issues",
+          "url": "https://x.com/SynthPotato/status/2033617510268826004",
+          "type": "twitter"
+        },
+        {
+          "title": "@NikTek DLSS 5 comparison",
+          "url": "https://x.com/NikTek/status/2033634199522185312",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "rendering",
+        "DLSS",
+        "NVIDIA",
+        "upscaling"
+      ]
+    },
+    {
+      "title": "Radiant: 80+ Production-Ready WebGL/Canvas Shaders, MIT Licensed",
+      "summary": "Open-source library of ultra-realistic shader effects for the web — multiple themes, zero dependencies, copy-paste integration.",
+      "sources": [
+        {
+          "title": "radiant-shaders.com launch",
+          "url": "https://x.com/pbakaus/status/2034410464424382824",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "shaders",
+        "webgl",
+        "rendering",
+        "open-source"
+      ]
+    },
+    {
+      "title": "Off-Axis Projection with World Labs Splats + Three.js + Face Tracking",
+      "summary": "Demo combining Blender → World Labs detailed splat generation → Three.js rendering with MediaPipe face tracking for parallax window effect.",
+      "sources": [
+        {
+          "title": "@XRarchitect off-axis projection demo",
+          "url": "https://x.com/XRarchitect/status/2034675907898876133",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "gaussian-splatting",
+        "three.js",
+        "face-tracking",
+        "XR"
+      ]
+    },
+    {
+      "title": "AI-Driven Facial Animation via Depth Map Projection",
+      "summary": "Technique generating AI video facial animations (LTX 2), extracting depth maps, and projecting onto face meshes via vertex displacement — L.A. Noire-like results for indie games.",
+      "sources": [
+        {
+          "title": "@alexfredo87 facial animation pipeline",
+          "url": "https://x.com/alexfredo87/status/2031558590754894104",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "facial-animation",
+        "depth-estimation",
+        "game-dev",
+        "generative-AI"
+      ]
+    },
+    {
+      "title": "Neural Network World Emulation — Forest Trail Demo",
+      "summary": "Ollin Boer Bohan trained a neural network to mimic a real forest trail near his apartment, with an interactive web demo for real-time exploration.",
+      "sources": [
+        {
+          "title": "World emulation via DNN blog post",
+          "url": "https://madebyoll.in/posts/world_emulation_via_dnn/",
+          "type": "blog"
+        },
+        {
+          "title": "@madebyollin tweet",
+          "url": "https://x.com/madebyollin/status/1915838978718158890",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "neural-rendering",
+        "world-emulation",
+        "interactive-demo"
+      ]
+    },
+    {
+      "title": "Attention Residuals: Kimi Team Rethinks Depth Scaling",
+      "summary": "Replaces fixed residual accumulation with softmax attention over preceding layer outputs — 2.11% downstream gain at negligible overhead. Addresses hidden-state growth diluting layer contributions.",
+      "sources": [
+        {
+          "title": "Attention Residuals (134 upvotes)",
+          "url": "https://arxiv.org/abs/2603.15031",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "LLM-architecture",
+        "attention",
+        "depth-scaling"
+      ]
+    },
+    {
+      "title": "Mixture-of-Depths Attention (MoDA)",
+      "summary": "Each attention head attends to both sequence KV pairs at current layer AND depth KV pairs from preceding layers — 2.11% downstream improvement with 97.3% FlashAttention-2 efficiency.",
+      "sources": [
+        {
+          "title": "MoDA paper (73 upvotes)",
+          "url": "https://arxiv.org/abs/2603.15619",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "LLM-architecture",
+        "attention",
+        "efficiency"
+      ]
+    },
+    {
+      "title": "SAMA: Factorized Video Editing Without External Priors",
+      "summary": "Decouples video editing into semantic anchoring and motion alignment — pre-training on motion-centric tasks alone yields strong zero-shot editing. Competitive with Kling-Omni.",
+      "sources": [
+        {
+          "title": "SAMA paper (60 upvotes)",
+          "url": "https://arxiv.org/abs/2603.19228",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "video-editing",
+        "diffusion",
+        "zero-shot"
+      ]
+    },
+    {
+      "title": "3DreamBooth: 3D-Aware Subject-Driven Video Generation",
+      "summary": "Decouples spatial geometry from temporal motion via 1-frame optimization, enabling genuine 3D-aware video customization for VR/AR and virtual production without multi-view video datasets.",
+      "sources": [
+        {
+          "title": "3DreamBooth paper (48 upvotes)",
+          "url": "https://arxiv.org/abs/2603.18524",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "3D-generation",
+        "video-generation",
+        "VR",
+        "customization"
+      ]
+    },
+    {
+      "title": "Spatial-TTT: Streaming Spatial Intelligence via Test-Time Training",
+      "summary": "Maintains and updates spatial evidence from unbounded video streams using test-time training with fast weights — hybrid architecture with sliding-window attention and 3D spatiotemporal convolution.",
+      "sources": [
+        {
+          "title": "Spatial-TTT paper (76 upvotes)",
+          "url": "https://arxiv.org/abs/2603.12255",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "spatial-intelligence",
+        "test-time-training",
+        "streaming",
+        "video-understanding"
+      ]
+    },
+    {
+      "title": "Nemotron-Cascade 2: Gold-Medal Reasoning at 3B Active Parameters",
+      "summary": "NVIDIA's 30B MoE with only 3B activated params matches frontier models on IMO/IOI/ICPC — 20× fewer parameters than DeepSeek equivalent. Open weights released.",
+      "sources": [
+        {
+          "title": "Nemotron-Cascade 2 paper (44 upvotes)",
+          "url": "https://arxiv.org/abs/2603.19220",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "LLM",
+        "MoE",
+        "reasoning",
+        "efficiency"
+      ]
+    },
+    {
+      "title": "OmniForcing: Real-Time Joint Audio-Visual Generation at 25 FPS",
+      "summary": "First framework to distill bidirectional audio-visual diffusion into a streaming autoregressive generator — solves extreme token sparsity and cross-modal sync issues for real-time generation.",
+      "sources": [
+        {
+          "title": "OmniForcing paper (31 upvotes)",
+          "url": "https://arxiv.org/abs/2603.11647",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "audio-visual",
+        "real-time",
+        "diffusion",
+        "streaming"
+      ]
+    },
+    {
+      "title": "LoGeR: Long-Context Geometric Reconstruction with Hybrid Memory",
+      "summary": "Handles geometric reconstruction from long video sequences using hybrid memory architecture.",
+      "sources": [
+        {
+          "title": "@_akhaliq LoGeR thread",
+          "url": "https://x.com/_akhaliq/status/2031390677343289468",
+          "type": "twitter"
+        },
+        {
+          "title": "LoGeR paper",
+          "url": "https://huggingface.co/papers/2603.03269",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "3D-reconstruction",
+        "long-context",
+        "geometric-reconstruction"
+      ]
+    },
+    {
+      "title": "Browser Use CLI 2.0: 2× Faster Browser Automation via Direct CDP",
+      "summary": "Major update to browser automation tool — direct Chrome DevTools Protocol, half the cost, connect to running Chrome instances.",
+      "sources": [
+        {
+          "title": "Browser Use CLI 2.0 announcement",
+          "url": "https://x.com/browser_use/status/2035081807209931153",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "tooling",
+        "browser-automation",
+        "developer-tools"
+      ]
+    },
+    {
+      "title": "MoTok: Diffusion-Based Motion Tokenizer Bridges Semantic and Kinematic Control",
+      "summary": "Three-stage motion generation framework using a novel diffusion-based discrete tokenizer — reduces trajectory error from 0.72cm to 0.08cm while using 1/6 the tokens.",
+      "sources": [
+        {
+          "title": "MoTok paper (36 upvotes)",
+          "url": "https://arxiv.org/abs/2603.19227",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "motion-generation",
+        "tokenization",
+        "diffusion"
+      ]
+    },
+    {
+      "title": "IndexCache: 2× Faster Sparse Attention via Cross-Layer Index Reuse",
+      "summary": "Exploits the insight that sparse attention indices are highly redundant across adjacent layers — shares indices via 'Full' and 'Shared' layers with multi-layer distillation, significantly accelerating prefill and decode.",
+      "sources": [
+        {
+          "title": "IndexCache paper (45 upvotes)",
+          "url": "https://arxiv.org/abs/2603.12201",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "LLM-inference",
+        "sparse-attention",
+        "efficiency"
+      ]
+    },
+    {
+      "title": "SK-Adapter: Skeleton-Based Control for Native 3D Generation",
+      "summary": "Lightweight adapter injects 3D skeleton joint coordinates and topology into frozen 3D generation backbones via cross-attention — enables precise structural articulation control and local 3D editing.",
+      "sources": [
+        {
+          "title": "SK-Adapter paper",
+          "url": "https://arxiv.org/abs/2603.14152",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "3D-generation",
+        "skeleton",
+        "controllable-generation"
+      ]
+    },
+    {
+      "title": "OneWorld: 3D Scene Generation in Native 3D Space",
+      "summary": "Performs diffusion directly within coherent 3D representation space instead of 2D image/video latents — uses 3D-URAE autoencoder with cross-view correspondence loss for consistent scene generation.",
+      "sources": [
+        {
+          "title": "OneWorld paper",
+          "url": "https://arxiv.org/abs/2603.16099",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "3D-generation",
+        "scene-generation",
+        "diffusion"
+      ]
+    },
+    {
+      "title": "V-JEPA 2.1: Dense Self-Supervised Visual Representations",
+      "summary": "Meta's V-JEPA 2.1 achieves SOTA on egocentric anticipation, robotic grasping (+20pt over V-JEPA-2), depth estimation, and navigation — dense predictive loss with deep self-supervision across encoder layers.",
+      "sources": [
+        {
+          "title": "V-JEPA 2.1 paper",
+          "url": "https://arxiv.org/abs/2603.14482",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "self-supervised",
+        "visual-representation",
+        "robotics",
+        "dense-prediction"
+      ]
+    }
+  ]
+}
