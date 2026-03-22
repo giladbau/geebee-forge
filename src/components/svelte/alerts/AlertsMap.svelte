@@ -23,11 +23,28 @@
 	let L: any = null;
 	let mapMode = $state<'pins' | 'heat'>('pins');
 	let cachedHeatPoints: [number, number, number][] = [];
+	let heatPluginReady = false;
+
+	async function loadHeatPlugin(): Promise<void> {
+		if (heatPluginReady) return;
+		if (typeof (L as any).heatLayer === 'function') {
+			heatPluginReady = true;
+			return;
+		}
+		return new Promise<void>((resolve, reject) => {
+			const script = document.createElement('script');
+			script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
+			script.onload = () => { heatPluginReady = true; resolve(); };
+			script.onerror = () => reject(new Error('Failed to load leaflet.heat'));
+			document.head.appendChild(script);
+		});
+	}
 
 	async function initMap() {
 		// Dynamic import — Leaflet has no SSR support
 		const leaflet = await import('leaflet');
 		L = leaflet.default || leaflet;
+		(window as any).L = L;
 
 		// Inject Leaflet CSS
 		if (!document.querySelector('link[href*="leaflet"]')) {
@@ -224,12 +241,16 @@
 			}
 
 			if (cachedHeatPoints.length > 0) {
-				await import('leaflet.heat');
+				await loadHeatPlugin();
+				if (typeof (L as any).heatLayer !== 'function') {
+					console.error('[AlertsMap] L.heatLayer not available after loading plugin');
+					return;
+				}
 				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
 				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
 					radius: 25,
 					blur: 15,
-					maxZoom: 12,
+					maxZoom: 10,
 					max: maxCount,
 					minOpacity: 0.3,
 					gradient: {
