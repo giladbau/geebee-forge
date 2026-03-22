@@ -1,5 +1,6 @@
 ---
 import { ClientRouter } from 'astro:transitions';
+import GlobalNav from '../components/GlobalNav.astro';
 
 interface Props {
 	title: string;
@@ -16,6 +17,7 @@ const { title } = Astro.props;
 	<ClientRouter />
 </head>
 <body>
+	<GlobalNav />
 	<slot />
 </body>
 </html>

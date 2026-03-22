@@ -301,8 +301,6 @@
 	});
 </script>
 
-<a href="/" class="back-link">&larr; Back</a>
-
 <h1 class="sr-only">Constellation</h1>
 
 <div class="container" bind:this={container} data-testid="constellation-canvas" aria-label="Interactive constellation visualization">
@@ -313,21 +311,6 @@
 </div>
 
 <style>
-	.back-link {
-		position: fixed;
-		top: 1rem;
-		left: 1rem;
-		color: rgba(255, 255, 255, 0.6);
-		text-decoration: none;
-		font-size: 0.9rem;
-		z-index: 10;
-		transition: color 0.2s;
-	}
-
-	.back-link:hover {
-		color: rgba(255, 255, 255, 1);
-	}
-
 	.container {
 		position: fixed;
 		top: 0;

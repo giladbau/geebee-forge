@@ -18,8 +18,6 @@
     </div>
   {/if}
 
-  <a href="/" class="back-link">&larr; Back</a>
-
   <div class="title-overlay">
     <h1>Unicorn Farm</h1>
     <p>Click unicorns &bull; Scroll to zoom &bull; Drag to orbit</p>
@@ -41,23 +39,6 @@
     height: 100%;
     color: #c8a0ff;
     font-size: 1.4rem;
-  }
-  .back-link {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    color: #c8a0ff;
-    text-decoration: none;
-    font-size: 0.95rem;
-    z-index: 10;
-    background: rgba(20, 10, 40, 0.7);
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    backdrop-filter: blur(4px);
-  }
-  .back-link:hover {
-    color: #fff;
-    background: rgba(40, 20, 80, 0.8);
   }
   .title-overlay {
     position: absolute;
