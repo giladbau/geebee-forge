@@ -87,7 +87,6 @@
 
 <div class="digest-page">
 	<header class="page-header">
-		<a href="/" class="back-link">&larr; Home</a>
 		<h1>Digest</h1>
 		<p class="tagline">Weekly signal from the noise — AI, 3D, and the tools that matter.</p>
 	</header>
@@ -307,19 +306,6 @@
 	/* Header */
 	.page-header {
 		margin-bottom: 3rem;
-	}
-
-	.back-link {
-		color: #6ba3ff;
-		text-decoration: none;
-		font-size: 0.85rem;
-		display: inline-block;
-		margin-bottom: 1rem;
-		transition: color 0.2s;
-	}
-
-	.back-link:hover {
-		color: #93c5fd;
 	}
 
 	.page-header h1 {
