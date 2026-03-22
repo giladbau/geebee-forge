@@ -354,7 +354,6 @@
 
 <div class="alerts-page">
 	<header>
-		<a href="/" class="back-link">&larr; Home</a>
 		<h1>Rocket Alert Dashboard</h1>
 		<p class="subtitle">Israel rocket alert statistics &mdash; powered by RedAlert API</p>
 	</header>
@@ -556,16 +555,6 @@
 
 	header {
 		margin-bottom: 2rem;
-	}
-
-	.back-link {
-		color: #6ba3ff;
-		text-decoration: none;
-		font-size: 0.9rem;
-	}
-
-	.back-link:hover {
-		text-decoration: underline;
 	}
 
 	h1 {
