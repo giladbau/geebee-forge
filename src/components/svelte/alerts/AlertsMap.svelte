@@ -28,6 +28,8 @@
 		// Dynamic import — Leaflet has no SSR support
 		const leaflet = await import('leaflet');
 		L = leaflet.default || leaflet;
+		// Expose globally so legacy plugins (leaflet.heat) can find it
+		(window as any).L = L;
 
 		// Inject Leaflet CSS
 		if (!document.querySelector('link[href*="leaflet"]')) {
@@ -225,6 +227,10 @@
 
 			if (cachedHeatPoints.length > 0) {
 				await import('leaflet.heat');
+				if (typeof (L as any).heatLayer !== 'function') {
+					console.error('[AlertsMap] leaflet.heat failed to register L.heatLayer');
+					return;
+				}
 				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
 				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
 					radius: 25,
@@ -273,7 +279,9 @@
 
 	$effect(() => {
 		mapMode;
-		if (map) syncLayers();
+		if (map) {
+			syncLayers().catch((err) => console.error('[AlertsMap] syncLayers failed:', err));
+		}
 	});
 </script>
 
