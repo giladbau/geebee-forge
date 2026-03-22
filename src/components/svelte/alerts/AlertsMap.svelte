@@ -24,12 +24,27 @@
 	let mapMode = $state<'pins' | 'heat'>('pins');
 	let cachedHeatPoints: [number, number, number][] = [];
 
+	let heatPluginLoaded = false;
+
+	async function loadHeatPlugin() {
+		if (heatPluginLoaded) return;
+		// leaflet.heat is a legacy plugin that attaches to global L.
+		// ESM dynamic import() wraps it in strict module scope where bare L
+		// is inaccessible, so we load it as a classic <script> instead.
+		(window as any).L = L;
+		await new Promise<void>((resolve, reject) => {
+			const script = document.createElement('script');
+			script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
+			script.onload = () => { heatPluginLoaded = true; resolve(); };
+			script.onerror = () => reject(new Error('Failed to load leaflet.heat'));
+			document.head.appendChild(script);
+		});
+	}
+
 	async function initMap() {
 		// Dynamic import — Leaflet has no SSR support
 		const leaflet = await import('leaflet');
 		L = leaflet.default || leaflet;
-		// Expose globally so legacy plugins (leaflet.heat) can find it
-		(window as any).L = L;
 
 		// Inject Leaflet CSS
 		if (!document.querySelector('link[href*="leaflet"]')) {
@@ -226,11 +241,7 @@
 			}
 
 			if (cachedHeatPoints.length > 0) {
-				await import('leaflet.heat');
-				if (typeof (L as any).heatLayer !== 'function') {
-					console.error('[AlertsMap] leaflet.heat failed to register L.heatLayer');
-					return;
-				}
+				await loadHeatPlugin();
 				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
 				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
 					radius: 25,
