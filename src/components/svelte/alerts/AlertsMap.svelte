@@ -23,6 +23,7 @@
 	let L: any = null;
 	let mapMode = $state<'pins' | 'heat'>('pins');
 	let cachedHeatPoints: [number, number, number][] = [];
+	let heatDebug = $state('');
 
 	let heatPluginLoaded = false;
 
@@ -33,11 +34,17 @@
 		// where bare globals are inaccessible, so we inline the source and
 		// execute it as a classic <script> tag in global scope.
 		(window as any).L = L;
-		const heatSrc = (await import('leaflet.heat/dist/leaflet-heat.js?raw')).default;
-		const script = document.createElement('script');
-		script.textContent = heatSrc;
-		document.head.appendChild(script);
-		heatPluginLoaded = true;
+		try {
+			const heatSrc = (await import('leaflet.heat/dist/leaflet-heat.js?raw')).default;
+			heatDebug = `raw import OK (${heatSrc.length} chars)`;
+			const script = document.createElement('script');
+			script.textContent = heatSrc;
+			document.head.appendChild(script);
+			heatPluginLoaded = true;
+			heatDebug += ` | L.heatLayer=${typeof (L as any).heatLayer}`;
+		} catch (err: any) {
+			heatDebug = `loadHeatPlugin error: ${err?.message || err}`;
+		}
 	}
 
 	async function initMap() {
@@ -229,6 +236,7 @@
 		if (!map || !L) return;
 
 		if (mapMode === 'heat') {
+			heatDebug = `heat mode | ${cachedHeatPoints.length} points`;
 			// Hide pins + polygons
 			if (markersLayer && map.hasLayer(markersLayer)) map.removeLayer(markersLayer);
 			if (polygonLayer && map.hasLayer(polygonLayer)) map.removeLayer(polygonLayer);
@@ -241,7 +249,12 @@
 
 			if (cachedHeatPoints.length > 0) {
 				await loadHeatPlugin();
+				if (typeof (L as any).heatLayer !== 'function') {
+					heatDebug += ' | FAIL: L.heatLayer not registered';
+					return;
+				}
 				const maxCount = Math.max(...cachedHeatPoints.map((p) => p[2]));
+				heatDebug += ` | max=${maxCount} | creating layer...`;
 				heatLayer = (L as any).heatLayer(cachedHeatPoints, {
 					radius: 25,
 					blur: 15,
@@ -256,8 +269,12 @@
 						1.0: '#fef08a'
 					}
 				}).addTo(map);
+				heatDebug += ' | layer added OK';
+			} else {
+				heatDebug += ' | no heat points';
 			}
 		} else {
+			heatDebug = '';
 			// Pins mode: remove heat, restore markers + polygons
 			if (heatLayer) {
 				map.removeLayer(heatLayer);
@@ -303,6 +320,9 @@
 			<button class:active={mapMode === 'heat'} onclick={() => mapMode = 'heat'}>Heat Map</button>
 		</div>
 	</div>
+	{#if heatDebug}
+		<div class="heat-debug">{heatDebug}</div>
+	{/if}
 	<div class="map-container" bind:this={mapContainer}></div>
 </section>
 
@@ -353,6 +373,18 @@
 		background: #ef4444;
 		border-color: #ef4444;
 		color: #fff;
+	}
+
+	.heat-debug {
+		font-size: 0.75rem;
+		color: #f59e0b;
+		background: rgba(245, 158, 11, 0.1);
+		border: 1px solid rgba(245, 158, 11, 0.3);
+		border-radius: 4px;
+		padding: 0.4rem 0.6rem;
+		margin-bottom: 0.5rem;
+		font-family: monospace;
+		word-break: break-all;
 	}
 
 	.map-container {
