@@ -7,7 +7,7 @@
       "slug": "video-diffusion-reasoning-3d",
       "summary": "Two major papers reveal that video diffusion models encode far more than visual generation. \"Demystifying Video Reasoning\" (347 HF upvotes) shows reasoning emerges through denoising steps — not frame sequences — via a Chain-of-Steps mechanism with working memory, self-correction, and perception-before-action. Separately, VEGA-3D demonstrates that video generation models implicitly learn robust 3D structural priors and physical laws, which can be extracted as a plug-and-play \"Latent World Simulator\" to give MLLMs spatial understanding without explicit 3D supervision.",
       "insight": "These findings reframe video diffusion as more than a generative tool — it's a substrate for spatial intelligence and reasoning. For rendering teams, this means video generation backbones could become general-purpose scene understanding modules. The VEGA-3D approach of repurposing generative priors for perception is particularly elegant and could lower the barrier to integrating 3D awareness into production pipelines that already use video models.",
-      "image_url": "/digest-images/2026-03-22-video-diffusion-reasoning-3d-c4f2e2e5.jpg",
+      "image_url": "https://img.youtube.com/vi/Gs9TPZmzo-s/maxresdefault.jpg",
       "sources": [
         {
           "title": "Demystifying Video Reasoning (347 upvotes)",
@@ -33,7 +33,7 @@
       "slug": "world-models-go-real",
       "summary": "This week saw a convergence of world model papers moving from toy environments to real-world grounding. Seoul World Model generates navigable video grounded in actual street-view imagery over hundreds of meters. MosaicMem introduces hybrid 3D/implicit spatial memory enabling minute-level consistent navigation in video world models. WorldCam uses camera pose as a unifying geometric representation for interactive 3D gaming worlds. StereoWorld produces end-to-end stereo video for VR without depth estimation. Kinema4D builds a 4D generative robotic simulator with URDF-based robot control and environment reaction synthesis.",
       "insight": "World models are fragmenting into specialized niches — navigation, gaming, robotics, VR — but sharing architectural DNA (video diffusion + spatial conditioning). For Riverside's rendering pipeline, the stereo/VR angle (StereoWorld) and the real-city grounding approach (Seoul World Model with retrieval-augmented street-view conditioning) are directly relevant. The hybrid memory approach in MosaicMem — lifting patches into 3D for localization while letting the model hallucinate dynamics — is an elegant compromise between explicit and implicit spatial representations.",
-      "image_url": "/digest-images/2026-03-22-world-models-go-real-57642678.png",
+      "image_url": "https://arxiv.org/html/2603.15583v1/x1.png",
       "sources": [
         {
           "title": "Seoul World Model: Grounding in a Real Metropolis",
