@@ -24,7 +24,7 @@
           "type": "reddit"
         }
       ],
-      "image_url": "/digest-images/2026-03-09-gaussian-splatting-video.png",
+      "image_url": null,
       "tags": [
         "gaussian-splatting",
         "real-time-rendering",
@@ -58,7 +58,7 @@
           "type": "reddit"
         }
       ],
-      "image_url": "/digest-images/2026-03-09-claude-native-tools.png",
+      "image_url": null,
       "tags": [
         "llm",
         "claude",
@@ -83,7 +83,7 @@
           "type": "twitter"
         }
       ],
-      "image_url": "/digest-images/2026-03-09-world-models.png",
+      "image_url": null,
       "tags": [
         "world-models",
         "3d",
