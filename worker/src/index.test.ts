@@ -55,6 +55,32 @@ describe('Worker routing', () => {
 		expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://geebee-forge.pages.dev');
 	});
 
+	it('rejects disallowed origins with default CORS', async () => {
+		fetchMock.mockResolvedValueOnce(
+			new Response(JSON.stringify({ total: 5 }), {
+				status: 200,
+				headers: { 'Content-Type': 'application/json' }
+			})
+		);
+
+		const req = new Request('https://worker.test/api/alerts/summary?startDate=2026-03-01', {
+			method: 'GET',
+			headers: { Origin: 'https://evil-site.com' }
+		});
+		const res = await worker.fetch(req, env);
+		// Should NOT reflect the attacker's origin
+		expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://geebee-forge.pages.dev');
+	});
+
+	it('allows preview branch origins', async () => {
+		const req = new Request('https://worker.test/api/alerts/geocode?cities=test', {
+			method: 'GET',
+			headers: { Origin: 'https://pr-42.geebee-forge.pages.dev' }
+		});
+		const res = await worker.fetch(req, env);
+		expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://pr-42.geebee-forge.pages.dev');
+	});
+
 	it('routes /api/alerts/summary correctly', async () => {
 		fetchMock.mockResolvedValueOnce(
 			new Response(JSON.stringify({ total: 10 }), {
