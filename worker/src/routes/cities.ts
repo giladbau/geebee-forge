@@ -1,9 +1,6 @@
-import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
+import type { Env } from '../index';
 
-export const prerender = false;
-
-export const GET: APIRoute = async ({ request }) => {
+export async function handleCities(request: Request, env: Env): Promise<Response> {
 	const url = new URL(request.url);
 	const params = url.searchParams.toString();
 	const apiUrl = `https://redalert.orielhaim.com/api/data/cities${params ? `?${params}` : ''}`;
@@ -23,4 +20,4 @@ export const GET: APIRoute = async ({ request }) => {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
-};
+}

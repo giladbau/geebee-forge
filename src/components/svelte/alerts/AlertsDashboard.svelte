@@ -68,8 +68,10 @@
 		return p.toString();
 	}
 
-	async function fetchJSON(url: string, signal?: AbortSignal) {
-		const res = await fetch(url, signal ? { signal } : undefined);
+	const API_BASE = import.meta.env.PUBLIC_API_URL || '';
+
+	async function fetchJSON(path: string, signal?: AbortSignal) {
+		const res = await fetch(`${API_BASE}${path}`, signal ? { signal } : undefined);
 		if (!res.ok) throw new Error(`HTTP ${res.status}`);
 		return res.json();
 	}

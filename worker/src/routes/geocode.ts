@@ -1,8 +1,5 @@
-import type { APIRoute } from 'astro';
-import coordsData from '$lib/data/israel-cities-coords.json';
-import { normalizeCity } from '$lib/utils/city-names';
-
-export const prerender = false;
+import coordsData from '../data/israel-cities-coords.json';
+import { normalizeCity } from '../lib/city-names';
 
 const staticCoords: Record<string, { lat: number; lng: number }> = coordsData;
 
@@ -21,7 +18,14 @@ function geocodeCities(cities: string[]): Record<string, { lat: number; lng: num
 	return results;
 }
 
-export const GET: APIRoute = async ({ request }) => {
+export async function handleGeocode(request: Request): Promise<Response> {
+	if (request.method === 'POST') {
+		return handleGeocodePost(request);
+	}
+	return handleGeocodeGet(request);
+}
+
+async function handleGeocodeGet(request: Request): Promise<Response> {
 	const url = new URL(request.url);
 	const citiesParam = url.searchParams.get('cities');
 	if (!citiesParam) {
@@ -36,9 +40,9 @@ export const GET: APIRoute = async ({ request }) => {
 	return new Response(JSON.stringify(geocodeCities(cities)), {
 		headers: { 'Content-Type': 'application/json' }
 	});
-};
+}
 
-export const POST: APIRoute = async ({ request }) => {
+async function handleGeocodePost(request: Request): Promise<Response> {
 	let body: unknown;
 	try {
 		body = await request.json();
@@ -60,4 +64,4 @@ export const POST: APIRoute = async ({ request }) => {
 	return new Response(JSON.stringify(geocodeCities(cities)), {
 		headers: { 'Content-Type': 'application/json' }
 	});
-};
+}

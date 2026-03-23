@@ -1,10 +1,7 @@
-import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
-import { fetchAllHistory, ACTIVE_ALERT_TYPES } from '$lib/server/redalert-cache';
+import type { Env } from '../index';
+import { fetchAllHistory, ACTIVE_ALERT_TYPES } from '../lib/redalert-cache';
 
-export const prerender = false;
-
-export const GET: APIRoute = async ({ request }) => {
+export async function handleZoneDistribution(request: Request, env: Env): Promise<Response> {
 	const url = new URL(request.url);
 	const zone = url.searchParams.get('zone');
 
@@ -54,4 +51,4 @@ export const GET: APIRoute = async ({ request }) => {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
-};
+}

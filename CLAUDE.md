@@ -1,9 +1,10 @@
 # CLAUDE.md — geebee-forge
 
 ## Project
-- Astro 6 + Cloudflare Workers (migrated from SvelteKit → Pages → Workers)
-- Deploy: push to `main` → GitHub Actions → `wrangler deploy` (Workers)
-- Live: https://geebee-forge.pages.dev (legacy Pages URL — may need custom domain after Workers migration)
+- Astro 6 static site (CF Pages) + standalone CF Worker (alerts API)
+- Deploy: push to `main` → GitHub Actions → `wrangler pages deploy` (site) + `wrangler deploy` (worker)
+- Site: https://geebee-forge.pages.dev
+- API: https://geebee-forge-api.gilad-bau.workers.dev
 - Remote: `origin/main` (no `master` branch — don't create one)
 
 ## Stack
@@ -21,9 +22,13 @@
   - `unicorn-farm/` — Threlte 3D farm scene
   - `alerts/` — AlertsDashboard + AlertsMap (Chart.js, Leaflet)
   - `digest/` — DigestBrowser (tag filtering)
-- **API routes**: `src/pages/api/alerts/*.ts` — Astro APIRoute endpoints
+- **Worker**: `worker/` — standalone CF Worker for alerts API
+  - `worker/src/index.ts` — fetch handler with URL routing
+  - `worker/src/routes/` — one handler per API endpoint
+  - `worker/src/lib/` — cache logic, CORS, city normalization
+  - `worker/src/data/` — static geocode data (bundled into worker)
 - **Layout**: `src/layouts/BaseLayout.astro` — shared HTML shell + global styles
-- **Lib**: `src/lib/` — shared utils, server code, data files
+- **Lib**: `src/lib/` — shared utils, data files (frontend only)
 - **Static**: `public/` (was `static/` in SvelteKit)
 
 ## Todoist
@@ -47,21 +52,25 @@ Track all work in the **🤖 Data Dev** project via the Todoist MCP tool (config
 
 ## Alerts Dashboard
 - Page: `/alerts` — wartime rocket alert dashboard using RedAlert API
+- **API lives in `worker/`** — standalone CF Worker proxying RedAlert upstream
 - Upstream API: `https://redalert.orielhaim.com/api/stats/*` (auth via `REDALERT_API_KEY` Workers secret)
 - Active alert types: `missiles`, `hostileAircraftIntrusion`, `terroristInfiltration` (exclude `newsFlash`, `endAlert`)
-- **Shared normalization**: `src/lib/utils/city-names.ts` — `normalizeCity()` strips directional suffixes. Used by BOTH geocode endpoint AND AlertsMap component. ONE function, used everywhere — never duplicate this logic.
-- **Static data files** (in `src/lib/data/`):
-  - `israel-cities-coords.json` — 1,660 city geocode entries
-  - `israel-city-boundaries.json` — 992 OSM boundary polygons (admin + residential landuse)
-- **Caching**: `src/lib/server/redalert-cache.ts` — CF Cache API, 24h TTL for historical data, 5min for recent
+- **City normalization** exists in TWO copies (intentional — avoids monorepo complexity):
+  - `src/lib/utils/city-names.ts` — used by AlertsMap.svelte (frontend)
+  - `worker/src/lib/city-names.ts` — used by geocode route (worker)
+- **Static data files**:
+  - `src/lib/data/israel-city-boundaries.json` — 992 OSM boundary polygons (frontend only)
+  - `worker/src/data/israel-cities-coords.json` — 1,660 city geocode entries (worker only)
+- **Caching**: `worker/src/lib/redalert-cache.ts` — CF Cache API, 24h TTL for historical data, 5min for recent
 - Map: Leaflet + CartoDB dark tiles, red pin markers + semi-transparent boundary polygons
 - Geocode endpoint: GET (small requests) + POST (bulk) at `/api/alerts/geocode`
-- **Env access**: `import { env } from 'cloudflare:workers'` (Astro v6 pattern)
+- **API URL**: `AlertsDashboard.svelte` uses `import.meta.env.PUBLIC_API_URL` to reach the worker (set at build time)
+- **Local dev**: run `npm run dev` (Astro at :4321) + `cd worker && npx wrangler dev` (API at :8787)
 
 ## Conventions
 - Commit messages: `feat(scope):`, `fix(scope):`, `chore(scope):`
 - Svelte components go in `src/components/svelte/<feature>/`
-- API endpoints: `src/pages/api/` with `export const prerender = false;`
+- Worker API routes go in `worker/src/routes/` — plain `(request, env) => Response` functions
 - Browser-only libs (Leaflet, Three.js, Threlte): use `client:only="svelte"` NOT `client:load`
 - When adding interactivity: always `stopPropagation` on click handlers to avoid camera interference
 
