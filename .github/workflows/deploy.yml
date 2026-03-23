@@ -1,9 +1,23 @@
-name: Deploy to Cloudflare Workers
+name: Deploy
+
 on:
   push:
     branches: [main]
+
 jobs:
-  deploy:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npm test
+      - run: cd worker && npm ci && npm test
+
+  deploy-app:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -15,22 +29,37 @@ jobs:
           node-version: '22'
       - run: npm ci
       - run: npm run build
+        env:
+          PUBLIC_API_URL: ${{ secrets.PUBLIC_API_URL }}
+      - name: Deploy to CF Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name geebee-forge
 
-      # Astro 6 + @astrojs/cloudflare v13 outputs a Workers project (not Pages).
-      # The generated wrangler.json in dist/server/ has the full config.
+  deploy-worker:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: deploy --config dist/server/wrangler.json
-
-      # Secrets persist across deploys — this step is idempotent.
-      # Requires REDALERT_API_KEY in GitHub repo secrets.
+          workingDirectory: worker
+          command: deploy
       - name: Set worker secrets
         run: |
           jq -n --arg key "$REDALERT_API_KEY" '{"REDALERT_API_KEY": $key}' \
-            | npx wrangler secret bulk --config dist/server/wrangler.json
+            | npx wrangler secret bulk
+        working-directory: worker
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

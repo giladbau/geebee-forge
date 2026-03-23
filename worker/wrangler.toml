@@ -1,0 +1,7 @@
+name = "geebee-forge-api"
+main = "src/index.ts"
+compatibility_date = "2025-03-14"
+compatibility_flags = ["nodejs_compat"]
+
+[env.preview]
+name = "geebee-forge-api-preview"

@@ -1,8 +1,5 @@
-import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
-import { fetchAllHistory, ACTIVE_ALERT_TYPES, type Alert } from '$lib/server/redalert-cache';
-
-export const prerender = false;
+import type { Env } from '../index';
+import { fetchAllHistory, ACTIVE_ALERT_TYPES, type Alert } from '../lib/redalert-cache';
 
 function filterByZone(alerts: Alert[], zone: string): Alert[] {
 	return alerts.filter((a) =>
@@ -31,7 +28,7 @@ function getBucketKey(
 	return d.toISOString().slice(0, 10);
 }
 
-export const GET: APIRoute = async ({ request }) => {
+export async function handleZoneSummary(request: Request, env: Env): Promise<Response> {
 	const url = new URL(request.url);
 	const zone = url.searchParams.get('zone');
 
@@ -177,4 +174,4 @@ export const GET: APIRoute = async ({ request }) => {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
-};
+}

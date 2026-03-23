@@ -1,13 +1,10 @@
-import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
-import { getCacheTTL } from '$lib/server/redalert-cache';
+import type { Env } from '../index';
+import { getCacheTTL } from '../lib/redalert-cache';
 
-export const prerender = false;
-
-export const GET: APIRoute = async ({ request }) => {
+export async function handleStatsCities(request: Request, env: Env): Promise<Response> {
 	const url = new URL(request.url);
 	const params = url.searchParams.toString();
-	const apiUrl = `https://redalert.orielhaim.com/api/stats/history${params ? `?${params}` : ''}`;
+	const apiUrl = `https://redalert.orielhaim.com/api/stats/cities${params ? `?${params}` : ''}`;
 
 	try {
 		const res = await fetch(apiUrl, {
@@ -23,9 +20,9 @@ export const GET: APIRoute = async ({ request }) => {
 			}
 		});
 	} catch (e) {
-		return new Response(JSON.stringify({ error: 'Failed to fetch history' }), {
+		return new Response(JSON.stringify({ error: 'Failed to fetch stats cities' }), {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
-};
+}

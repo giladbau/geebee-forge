@@ -25,7 +25,6 @@
 		"vitest": "^4.0.18"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^13.1.2",
 		"@astrojs/react": "^5.0.1",
 		"@astrojs/svelte": "^8.0.3",
 		"@threlte/core": "^8.4.1",

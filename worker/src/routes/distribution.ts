@@ -1,10 +1,7 @@
-import type { APIRoute } from 'astro';
-import { env } from 'cloudflare:workers';
-import { getCacheTTL } from '$lib/server/redalert-cache';
+import type { Env } from '../index';
+import { getCacheTTL } from '../lib/redalert-cache';
 
-export const prerender = false;
-
-export const GET: APIRoute = async ({ request }) => {
+export async function handleDistribution(request: Request, env: Env): Promise<Response> {
 	const url = new URL(request.url);
 	const params = url.searchParams.toString();
 	const apiUrl = `https://redalert.orielhaim.com/api/stats/distribution${params ? `?${params}` : ''}`;
@@ -28,4 +25,4 @@ export const GET: APIRoute = async ({ request }) => {
 			headers: { 'Content-Type': 'application/json' }
 		});
 	}
-};
+}

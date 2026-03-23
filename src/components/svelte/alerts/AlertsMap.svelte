@@ -98,8 +98,9 @@
 		// Geocode cities
 		const cityNames = cities.map((c) => c.city);
 		let coords: Record<string, { lat: number; lng: number } | null> = {};
+		const API_BASE = import.meta.env.PUBLIC_API_URL || '';
 		try {
-			const res = await fetch('/api/alerts/geocode', {
+			const res = await fetch(`${API_BASE}/api/alerts/geocode`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ cities: cityNames })
