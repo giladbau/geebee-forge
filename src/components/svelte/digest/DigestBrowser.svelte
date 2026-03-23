@@ -37,6 +37,55 @@
 	let { digests }: Props = $props();
 
 	let activeTag = $state<string | null>(null);
+	let showFavorites = $state(false);
+
+	// --- Favorites (localStorage-backed) ---
+	function slugify(text: string): string {
+		return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+	}
+
+	function heroId(topic: HeroTopic): string {
+		return topic.slug;
+	}
+
+	function notableId(item: Notable): string {
+		return slugify(item.title);
+	}
+
+	function loadFavorites(): Set<string> {
+		try {
+			const raw = localStorage.getItem('digest-favorites');
+			if (raw) return new Set(JSON.parse(raw));
+		} catch {}
+		return new Set();
+	}
+
+	function saveFavorites() {
+		try {
+			localStorage.setItem('digest-favorites', JSON.stringify([...favorites]));
+		} catch {}
+	}
+
+	let favorites = $state<Set<string>>(new Set());
+
+	// Load from localStorage on mount
+	$effect(() => {
+		favorites = loadFavorites();
+	});
+
+	function toggleFavorite(id: string) {
+		if (favorites.has(id)) {
+			favorites.delete(id);
+		} else {
+			favorites.add(id);
+		}
+		favorites = new Set(favorites); // trigger reactivity
+		saveFavorites();
+	}
+
+	function isFavorited(id: string): boolean {
+		return favorites.has(id);
+	}
 
 	const latest = $derived(digests[0]);
 	const archive = $derived(digests);
@@ -51,16 +100,22 @@
 		return [...tags].sort();
 	});
 
-	// Filter entries by active tag
+	// Filter entries by active tag AND favorites
 	function heroMatchesTag(topic: any): boolean {
-		return !activeTag || topic.tags.includes(activeTag);
+		const tagOk = !activeTag || topic.tags.includes(activeTag);
+		const favOk = !showFavorites || favorites.has(heroId(topic));
+		return tagOk && favOk;
 	}
 	function notableMatchesTag(item: any): boolean {
-		return !activeTag || item.tags.includes(activeTag);
+		const tagOk = !activeTag || item.tags.includes(activeTag);
+		const favOk = !showFavorites || favorites.has(notableId(item));
+		return tagOk && favOk;
 	}
 	function digestHasMatches(digest: any): boolean {
 		return digest.hero_topics.some(heroMatchesTag) || digest.notable.some(notableMatchesTag);
 	}
+
+	const favoritesEmpty = $derived(showFavorites && !digests.some(digestHasMatches));
 
 	function toggleTag(tag: string) {
 		activeTag = activeTag === tag ? null : tag;
@@ -91,10 +146,30 @@
 		<p class="tagline">Weekly signal from the noise — AI, 3D, and the tools that matter.</p>
 	</header>
 
-	{#if activeTag}
+	<div class="filter-actions">
+		<button
+			class="fav-toggle"
+			class:active={showFavorites}
+			onclick={() => showFavorites = !showFavorites}
+			aria-label={showFavorites ? 'Hide favorites' : 'Show favorites'}
+		>★ Favorites</button>
+	</div>
+
+	{#if activeTag || showFavorites}
 		<div class="tag-filter-bar">
-			<span class="filter-label">Filtered by:</span>
-			<button class="tag-pill active" onclick={() => toggleTag(activeTag!)}>{activeTag} ✕</button>
+			{#if showFavorites}
+				<button class="fav-filter-pill active" onclick={() => showFavorites = false}>★ Favorites ✕</button>
+			{/if}
+			{#if activeTag}
+				<span class="filter-label">Filtered by:</span>
+				<button class="tag-pill active" onclick={() => toggleTag(activeTag!)}>{activeTag} ✕</button>
+			{/if}
+		</div>
+	{/if}
+
+	{#if favoritesEmpty}
+		<div class="empty-state">
+			<p>No favorites yet — tap the ★ on any topic to save it here.</p>
 		</div>
 	{/if}
 
@@ -109,6 +184,12 @@
 			<section class="heroes">
 				{#each latest.hero_topics as topic}
 					<div class="hero-card" id={topic.slug} class:hidden-by-filter={!heroMatchesTag(topic)}>
+						<button
+							class="star-btn"
+							class:favorited={isFavorited(heroId(topic))}
+							onclick={() => toggleFavorite(heroId(topic))}
+							aria-label={isFavorited(heroId(topic)) ? `Remove ${topic.title} from favorites` : `Add ${topic.title} to favorites`}
+						>★</button>
 						<h2 class="hero-title">{topic.title}</h2>
 						{#if topic.image_url}
 							<div class="hero-image">
@@ -156,7 +237,15 @@
 						{#each latest.notable as item}
 							<div class="notable-item" class:hidden-by-filter={!notableMatchesTag(item)}>
 								<div class="notable-main">
-									<h4 class="notable-title">{item.title}</h4>
+									<div class="notable-title-row">
+										<h4 class="notable-title">{item.title}</h4>
+										<button
+											class="star-btn inline"
+											class:favorited={isFavorited(notableId(item))}
+											onclick={() => toggleFavorite(notableId(item))}
+											aria-label={isFavorited(notableId(item)) ? `Remove ${item.title} from favorites` : `Add ${item.title} to favorites`}
+										>★</button>
+									</div>
 									<p class="notable-summary">{item.summary}</p>
 								</div>
 								<div class="notable-meta">
@@ -188,7 +277,7 @@
 
 		<!-- Remaining digests (archive posts) -->
 		{#each digests.slice(1) as digest}
-			{#if !activeTag || digestHasMatches(digest)}
+			{#if (!activeTag && !showFavorites) || digestHasMatches(digest)}
 			<article class="digest-post" id="digest-{digest.filename}">
 				<div class="post-header">
 					<span class="week-label">Week of {digest.week}</span>
@@ -198,6 +287,12 @@
 				<section class="heroes">
 					{#each digest.hero_topics as topic}
 						<div class="hero-card" id={topic.slug} class:hidden-by-filter={!heroMatchesTag(topic)}>
+							<button
+								class="star-btn"
+								class:favorited={isFavorited(heroId(topic))}
+								onclick={() => toggleFavorite(heroId(topic))}
+								aria-label={isFavorited(heroId(topic)) ? `Remove ${topic.title} from favorites` : `Add ${topic.title} to favorites`}
+							>★</button>
 							<h2 class="hero-title">{topic.title}</h2>
 							{#if topic.image_url}
 								<div class="hero-image">
@@ -244,7 +339,15 @@
 							{#each digest.notable as item}
 								<div class="notable-item" class:hidden-by-filter={!notableMatchesTag(item)}>
 									<div class="notable-main">
-										<h4 class="notable-title">{item.title}</h4>
+										<div class="notable-title-row">
+											<h4 class="notable-title">{item.title}</h4>
+											<button
+												class="star-btn inline"
+												class:favorited={isFavorited(notableId(item))}
+												onclick={() => toggleFavorite(notableId(item))}
+												aria-label={isFavorited(notableId(item)) ? `Remove ${item.title} from favorites` : `Add ${item.title} to favorites`}
+											>★</button>
+										</div>
 										<p class="notable-summary">{item.summary}</p>
 									</div>
 									<div class="notable-meta">
@@ -326,6 +429,106 @@
 		letter-spacing: 0.02em;
 	}
 
+	/* Filter Actions */
+	.filter-actions {
+		display: flex;
+		gap: 0.5rem;
+		margin-bottom: 1rem;
+	}
+
+	.fav-toggle {
+		font-size: 0.78rem;
+		color: #666;
+		padding: 0.3rem 0.75rem;
+		border: 1px solid #222;
+		border-radius: 16px;
+		background: transparent;
+		cursor: pointer;
+		transition: all 0.15s;
+		font-family: inherit;
+	}
+
+	.fav-toggle:hover {
+		color: #f59e0b;
+		border-color: #f59e0b44;
+	}
+
+	.fav-toggle.active {
+		color: #f59e0b;
+		border-color: #f59e0b;
+		background: rgba(245, 158, 11, 0.1);
+	}
+
+	.fav-filter-pill {
+		font-size: 0.7rem;
+		color: #f59e0b;
+		padding: 0.15rem 0.5rem;
+		border: 1px solid #f59e0b;
+		border-radius: 12px;
+		background: rgba(245, 158, 11, 0.1);
+		cursor: pointer;
+		transition: all 0.15s;
+		font-family: inherit;
+	}
+
+	.fav-filter-pill:hover {
+		background: rgba(245, 158, 11, 0.2);
+	}
+
+	/* Empty State */
+	.empty-state {
+		text-align: center;
+		padding: 2.5rem 1rem;
+		color: #555;
+		font-size: 0.9rem;
+	}
+
+	.empty-state p {
+		margin: 0;
+	}
+
+	/* Star Button */
+	.star-btn {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		background: none;
+		border: none;
+		font-size: 1.2rem;
+		color: #333;
+		cursor: pointer;
+		padding: 0.25rem;
+		line-height: 1;
+		transition: color 0.15s, transform 0.15s;
+		z-index: 1;
+	}
+
+	.star-btn:hover {
+		color: #f59e0b88;
+		transform: scale(1.15);
+	}
+
+	.star-btn.favorited {
+		color: #f59e0b;
+	}
+
+	.star-btn.favorited:hover {
+		color: #f59e0bcc;
+	}
+
+	.star-btn.inline {
+		position: static;
+		font-size: 0.95rem;
+		flex-shrink: 0;
+	}
+
+	/* Notable Title Row */
+	.notable-title-row {
+		display: flex;
+		align-items: center;
+		gap: 0.4rem;
+	}
+
 	/* Digest Post */
 	.digest-post {
 		margin-bottom: 4rem;
@@ -366,6 +569,7 @@
 	}
 
 	.hero-card {
+		position: relative;
 		background: #111;
 		border: 1px solid #1e1e1e;
 		border-radius: 10px;
@@ -383,6 +587,7 @@
 		margin: 0 0 0.75rem;
 		color: #e8e8e8;
 		line-height: 1.3;
+		padding-right: 2rem;
 	}
 
 	.hero-summary {
