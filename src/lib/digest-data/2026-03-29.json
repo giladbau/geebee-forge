@@ -1,0 +1,321 @@
+{
+  "week": "2026-03-23 to 2026-03-29",
+  "published_at": "2026-03-29T08:20:00Z",
+  "hero_topics": [
+    {
+      "title": "Claude Gets a Body: Computer Use Ships in Cowork",
+      "slug": "claude-cowork-computer-use",
+      "summary": "Anthropic launched Claude Cowork with Computer Use in research preview — Claude can now open apps, navigate browsers, fill spreadsheets, and operate your desktop directly. It prioritizes connected integrations (Slack, Calendar) before falling back to screen-level control.",
+      "insight": "This is the 'agent-on-your-desktop' paradigm going mainstream. The real unlock isn't the screen control (which is slow and fragile) — it's the integration-first approach. When Claude can use Slack and Calendar natively and only falls back to pixels when it has to, you get reliability where it matters and flexibility everywhere else. Combined with the leaked Mythos model reportedly showing 'a step change in capabilities,' Anthropic is clearly building toward always-on autonomous agents.",
+      "image_url": "https://external-preview.redd.it/cWt2d3Vpb3g2dnFnMWlMZ7fkrBd74LgjHcyJJJ_rpoMAkqvnqDTR4zfCznRJ.png?format=pjpg&auto=webp&s=57f82c526915fbd09fe9d71b54aef358eec9efd3",
+      "sources": [
+        {
+          "title": "Claude can now use your computer (r/ClaudeAI)",
+          "url": "https://reddit.com/r/ClaudeAI/comments/1s1ujv6/claude_can_now_use_your_computer/",
+          "type": "reddit"
+        },
+        {
+          "title": "Anthropic testing 'Mythos' — most powerful model ever (Fortune)",
+          "url": "https://fortune.com/2026/03/26/anthropic-says-testing-mythos-powerful-new-ai-model-after-data-leak-reveals-its-existence-step-change-in-capabilities/",
+          "type": "blog"
+        },
+        {
+          "title": "Giving Claude access to macOS (r/ClaudeAI)",
+          "url": "https://reddit.com/r/ClaudeAI/comments/1s3ss8s/giving_claude_access_to_my_macbook_macos/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "agents",
+        "anthropic",
+        "computer-use",
+        "productivity"
+      ]
+    },
+    {
+      "title": "LoGeR: Long-Context Geometric Reconstruction with Hybrid Memory",
+      "slug": "loger-geometric-reconstruction",
+      "summary": "LoGeR tackles a fundamental bottleneck in 3D reconstruction from video: maintaining geometric consistency across long sequences. The paper introduces a hybrid memory architecture that combines explicit geometric features with learned latent representations, enabling coherent reconstruction from hundreds of frames where previous methods degrade.",
+      "insight": "Most reconstruction methods choke on long videos — they either drift or run out of memory. LoGeR's hybrid approach (explicit geometry for precision + learned latents for compression) is the kind of architecture that could make casual phone-scan-to-3D actually reliable. The Google/Berkeley pedigree and the fact that it handles real-world sequences rather than synthetic benchmarks makes this practically relevant for anyone building spatial computing pipelines.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "LoGeR (arXiv 2603.03269)",
+          "url": "https://huggingface.co/papers/2603.03269",
+          "type": "paper"
+        },
+        {
+          "title": "@_akhaliq on X",
+          "url": "https://x.com/_akhaliq/status/2031390677343289468",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "3d-reconstruction",
+        "computer-vision",
+        "geometric-learning"
+      ]
+    },
+    {
+      "title": "L.A. Noire-Style Facial Animation with AI Video Depth Maps",
+      "slug": "ai-facial-animation-depth-maps",
+      "summary": "Independent developer Alex shared a practical pipeline for game facial animation: generate a facial animation video using AI (LTX 2), extract a depth map sequence from it, then project the depth onto a face mask using vertex displacement. The result is nuanced, realistic facial movement reminiscent of L.A. Noire's MotionScan — but built entirely from commodity AI tools.",
+      "insight": "L.A. Noire spent years and millions on custom capture rigs to get that facial fidelity. This pipeline achieves something similar with a text-to-video model and a depth estimator — tools anyone can run. It's a glimpse of how AI is collapsing the cost of high-fidelity game content. The depth-as-displacement trick is particularly clever: it sidesteps the entire rigging/blendshape workflow that makes traditional facial animation so expensive.",
+      "image_url": "https://pbs.twimg.com/amplify_video_thumb/2031558259522293760/img/nUEvcf41h4jjl-4x.jpg",
+      "sources": [
+        {
+          "title": "@alexfredo87 on X",
+          "url": "https://x.com/alexfredo87/status/2031558590754894104",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "facial-animation",
+        "game-dev",
+        "video-generation",
+        "depth-estimation"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "Radiant: 80+ Production Web Shaders, MIT Licensed",
+      "summary": "Zero-dependency library of production-ready WebGL and Canvas 2D shaders with multiple color themes. Copy, integrate, ship.",
+      "sources": [
+        {
+          "title": "@pbakaus on X",
+          "url": "https://x.com/pbakaus/status/2034410464424382824",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "webgl",
+        "shaders"
+      ]
+    },
+    {
+      "title": "Off-Axis Projection with World Labs Splats + Face Tracking",
+      "summary": "Ian Curtis demoed a parallax window effect using Blender → World Labs Gaussian splat → Three.js with MediaPipe face tracking for off-axis projection.",
+      "sources": [
+        {
+          "title": "@XRarchitect on X",
+          "url": "https://x.com/XRarchitect/status/2034675907898876133",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "gaussian-splatting",
+        "3d",
+        "face-tracking"
+      ]
+    },
+    {
+      "title": "Neural Network Mimics a Forest Trail",
+      "summary": "Ollin Boer Bohan trained a neural network to reproduce a forest trail near his apartment as an interactive web experience — a tiny world model you can walk through in the browser.",
+      "sources": [
+        {
+          "title": "@madebyollin on X",
+          "url": "https://x.com/madebyollin/status/1915838978718158890",
+          "type": "twitter"
+        },
+        {
+          "title": "Web demo + writeup",
+          "url": "https://madebyoll.in/posts/world_emulation_via_dnn/",
+          "type": "blog"
+        }
+      ],
+      "tags": [
+        "neural-rendering",
+        "world-model"
+      ]
+    },
+    {
+      "title": "Speed by Simplicity: Single-Stream Audio-Video Generation",
+      "summary": "A single-stream transformer architecture for joint audio-video generation that's significantly faster than multi-stream approaches while maintaining quality. 115 HF upvotes.",
+      "sources": [
+        {
+          "title": "arXiv 2603.21986",
+          "url": "https://huggingface.co/papers/2603.21986",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "video-generation",
+        "audio",
+        "architecture"
+      ]
+    },
+    {
+      "title": "LeWorldModel: JEPA World Model from Pixels",
+      "summary": "A stable end-to-end Joint-Embedding Predictive Architecture that learns world models directly from pixel observations — continuing the LeCun JEPA lineage.",
+      "sources": [
+        {
+          "title": "arXiv 2603.19312",
+          "url": "https://huggingface.co/papers/2603.19312",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "world-model",
+        "jepa",
+        "self-supervised"
+      ]
+    },
+    {
+      "title": "VibeVoice: High-Quality Speech Synthesis",
+      "summary": "Top-trending HF paper this week (144 upvotes). Technical report on a new speech synthesis approach.",
+      "sources": [
+        {
+          "title": "arXiv 2508.19205",
+          "url": "https://huggingface.co/papers/2508.19205",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "speech",
+        "tts"
+      ]
+    },
+    {
+      "title": "Cohere Transcribe: SOTA Open-Source Transcription in Browser",
+      "summary": "Cohere released an open-source transcription model that runs in-browser with weights on HuggingFace. Claims state-of-the-art for open models.",
+      "sources": [
+        {
+          "title": "@nickfrosst on X",
+          "url": "https://x.com/nickfrosst/status/2037914966305493286",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "speech",
+        "open-source",
+        "browser"
+      ]
+    },
+    {
+      "title": "Browser Use CLI 2.0: 2x Speed, Direct CDP",
+      "summary": "Major update to the browser automation CLI — 2x faster, half the cost, direct Chrome DevTools Protocol integration instead of high-level abstractions.",
+      "sources": [
+        {
+          "title": "@browser_use on X",
+          "url": "https://x.com/browser_use/status/2035081807209931153",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "browser-automation",
+        "tools"
+      ]
+    },
+    {
+      "title": "Cheng Lou's 'Foundational Piece of UI Engineering'",
+      "summary": "Former React team member Cheng Lou dropped what he calls one of the more important foundational pieces of UI engineering for the foreseeable future. 29K likes, massively viral.",
+      "sources": [
+        {
+          "title": "@_chenglou on X",
+          "url": "https://x.com/_chenglou/status/2037713766205608234",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "frontend",
+        "ui"
+      ]
+    },
+    {
+      "title": "Figure 03 Robot Flipping Packages",
+      "summary": "Salesforce CEO Benioff posted video of Figure's latest humanoid robot handling packages with notable dexterity improvements.",
+      "sources": [
+        {
+          "title": "r/singularity",
+          "url": "https://reddit.com/r/singularity/comments/1s235n7/marc_benioff_ceo_of_salesforce_tweeted_video_of/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "robotics"
+      ]
+    },
+    {
+      "title": "AI + AlphaFold = Custom mRNA Cancer Vaccine for a Dog",
+      "summary": "An Australian tech entrepreneur used ChatGPT and AlphaFold to design a custom mRNA vaccine that significantly reduced his dog's tumor. Researchers involved are reportedly excited by the results.",
+      "sources": [
+        {
+          "title": "r/singularity",
+          "url": "https://reddit.com/r/singularity/comments/1rtmmpe/fascinating_story_tech_entrepreneur_in_australia/",
+          "type": "reddit"
+        },
+        {
+          "title": "The Australian",
+          "url": "https://www.theaustralian.com.au/business/technology/tech-boss-uses-ai-and-chatgpt-to-create-cancer-vaccine-for-his-dying-dog/news-story/292a21bcbe93efa17810bfcfcdfadbf7",
+          "type": "blog"
+        }
+      ],
+      "tags": [
+        "biotech",
+        "alphafold"
+      ]
+    },
+    {
+      "title": "4D OSINT Reconstruction of Iran Strikes",
+      "summary": "Bilawal Sidhu deployed an AI agent swarm to capture every OSINT signal during Operation Epic Fury, then built a full 4D temporal reconstruction in WorldView — scrubbing through the strikes minute by minute.",
+      "sources": [
+        {
+          "title": "@bilawalsidhu on X",
+          "url": "https://x.com/bilawalsidhu/status/2028197571840106985",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "osint",
+        "geospatial",
+        "agents"
+      ]
+    },
+    {
+      "title": "AgentCraft: RTS-Style Agent Control",
+      "summary": "Control your coding agents like units in a real-time strategy game. Early but creative take on agent orchestration UX.",
+      "sources": [
+        {
+          "title": "@idosal1 on X",
+          "url": "https://x.com/idosal1/status/2021661861163544818",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "agents",
+        "developer-tools"
+      ]
+    },
+    {
+      "title": "Internal Safety Collapse in Frontier LLMs",
+      "summary": "Paper documenting how safety guardrails in frontier models can catastrophically collapse under certain conditions. 30 HF upvotes.",
+      "sources": [
+        {
+          "title": "arXiv 2603.23509",
+          "url": "https://huggingface.co/papers/2603.23509",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "safety",
+        "alignment"
+      ]
+    },
+    {
+      "title": "Bernie Sanders: Pause AI Data Center Construction",
+      "summary": "Legislation introduced to pause AI data center building and pursue international coordination, plus a ban on chip exports. The political angle on AI scaling heats up.",
+      "sources": [
+        {
+          "title": "r/ChatGPT",
+          "url": "https://reddit.com/r/ChatGPT/comments/1s3p0c6/bernie_sanders_introduces_legislation_to_pause_ai/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "policy",
+        "regulation"
+      ]
+    }
+  ]
+}
