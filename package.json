@@ -9,7 +9,12 @@
 		"preview": "astro preview",
 		"check": "astro check",
 		"test": "vitest run --passWithNoTests",
-		"test:watch": "vitest"
+		"test:watch": "vitest",
+		"digest:accumulate": "node scripts/digest/accumulate.mjs",
+		"digest:status": "node scripts/digest/status.mjs",
+		"digest:preview": "node scripts/digest/preview.mjs",
+		"digest:compile": "node scripts/digest/compile.mjs",
+		"digest:test": "vitest run --passWithNoTests src/lib/digest/*.test.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/vite-plugin-svelte": "^6.2.4",
