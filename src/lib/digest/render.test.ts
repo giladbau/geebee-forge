@@ -135,6 +135,47 @@ describe('digest render', () => {
     expect(digest.hero_topics[0].summary).not.toContain('https://');
   });
 
+  it('writes a synthesized hero summary from multiple items in the subject group', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-08',
+      publishedAt: '2026-04-08T13:00:00Z',
+      items: [
+        {
+          id: 'img:1',
+          source: 'reddit',
+          title: 'Last week in Generative Image & Video',
+          summary: 'A broad roundup of visual-ai tooling and releases.',
+          url: 'https://example.com/one',
+          sources: [{ title: 'one', url: 'https://example.com/one', type: 'reddit' }],
+          tags: ['stablediffusion'],
+          subject_primary: 'image-video-genai',
+          subject_matches: ['image-video-genai'],
+          subject_match_score: 2,
+          engagement: { score: 300 }
+        },
+        {
+          id: 'img:2',
+          source: 'huggingface_daily_papers',
+          title: 'Think in Strokes, Not Pixels: Process-Driven Image Generation via Interleaved Reasoning',
+          summary: 'A paper on process-driven image generation.',
+          url: 'https://example.com/two',
+          sources: [{ title: 'two', url: 'https://example.com/two', type: 'paper' }],
+          tags: ['vision'],
+          subject_primary: 'image-video-genai',
+          subject_matches: ['image-video-genai'],
+          subject_match_score: 2,
+          engagement: { upvotes: 27 }
+        }
+      ],
+      heroTopicTargetMax: 1,
+      notableTargetMax: 1
+    });
+
+    expect(digest.hero_topics[0].summary).toContain('Key signals this cycle');
+    expect(digest.hero_topics[0].summary).toContain('Last week in Generative Image & Video');
+    expect(digest.hero_topics[0].summary).toContain('Think in Strokes, Not Pixels');
+  });
+
   it('respects hero and notable limits', () => {
     const digest = buildPreviewDigest({
       issueDate: '2026-04-08',

@@ -131,6 +131,20 @@ function buildSupportingSources(group) {
   ).slice(0, 4);
 }
 
+function buildHeroSummary(group, lead) {
+  const extraCount = Math.max(group.items.length - 1, 0);
+  const leadSummary = cleanText(lead.summary ?? lead.snippet ?? '', 260);
+
+  if (group.items.length >= 2) {
+    const topTitles = uniqueBy(group.items.map((item) => cleanText(item.title, 90)).filter(Boolean), (value) => value).slice(0, 3);
+    const synthesized = cleanText(`Key signals this cycle: ${topTitles.join('; ')}.`, 420);
+    return extraCount > 0 ? `${synthesized} Includes ${extraCount} additional in-scope item${extraCount === 1 ? '' : 's'}.` : synthesized;
+  }
+
+  if (leadSummary) return leadSummary;
+  return cleanText(`Lead item: ${lead.title ?? 'Untitled item'}.`, 180) || 'Pending summary.';
+}
+
 function buildHeroTopic(group, index) {
   const lead = group.items[0];
   const supporting = buildSupportingSources(group);
@@ -139,16 +153,11 @@ function buildHeroTopic(group, index) {
     group.subjectId
   ], (value) => value).slice(0, 8);
   const sourceTypes = uniqueBy(supporting, (source) => source.type).length;
-  const extraCount = Math.max(group.items.length - 1, 0);
-  const leadSummary = cleanText(lead.summary ?? lead.snippet ?? '', 420);
-  const fallbackSummary = cleanText(`Lead item: ${lead.title ?? 'Untitled item'}.`, 180);
-  const summaryBase = leadSummary || fallbackSummary || 'Pending summary.';
-  const summarySuffix = extraCount > 0 ? ` Includes ${extraCount} additional in-scope item${extraCount === 1 ? '' : 's'}.` : '';
 
   return {
     title: `${group.subjectLabel}: ${cleanText(lead.title ?? `Topic ${index + 1}`, 120)}`,
     slug: lead.slug ?? `${group.subjectId}-${index + 1}`,
-    summary: `${summaryBase}${summarySuffix}`,
+    summary: buildHeroSummary(group, lead),
     insight: cleanText(`Why it matters: ${group.subjectLabel} produced ${group.items.length} in-scope item${group.items.length === 1 ? '' : 's'} across ${sourceTypes} source type${sourceTypes === 1 ? '' : 's'} in this cycle. Lead signal: ${lead.title ?? 'Untitled item'}.`, 260),
     image_url: lead.image_url ?? null,
     sources: supporting,
