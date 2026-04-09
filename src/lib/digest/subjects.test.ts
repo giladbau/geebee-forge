@@ -1,0 +1,98 @@
+import { describe, expect, it } from 'vitest';
+import { classifyDigestItem, collectSubjectCounts } from '../../../scripts/digest/shared/subjects.mjs';
+
+const config = {
+  enabled: true,
+  mode: 'allowlist',
+  minimum_match_score: 1,
+  professional_only: true,
+  families: [
+    {
+      id: 'gaussian-splatting',
+      label: '3D Gaussian Splatting',
+      include_terms: ['gaussian splatting', '3d gaussian splatting'],
+      adjacent_terms: ['radiance fields', 'novel view synthesis'],
+      exclude_terms: []
+    },
+    {
+      id: 'ai-agents',
+      label: 'AI Agents',
+      include_terms: ['ai agents', 'agentic', 'claude', 'gpt', 'hermes', 'openclaw'],
+      adjacent_terms: ['tool use', 'coding agent', 'orchestration'],
+      exclude_terms: []
+    },
+    {
+      id: 'image-video-genai',
+      label: 'Image/Video GenAI',
+      include_terms: ['image generation', 'video generation', 'sam'],
+      adjacent_terms: ['segmentation', 'image editing', 'video editing'],
+      exclude_terms: []
+    }
+  ]
+};
+
+describe('digest subject classification', () => {
+  it('accepts gaussian splatting items and annotates subject metadata', () => {
+    const item = {
+      id: 'reddit:1',
+      title: '3D Gaussian Splatting pushes real-time novel view synthesis forward',
+      summary: 'A new radiance fields paper improves scene rendering quality.',
+      tags: ['graphics'],
+      url: 'https://example.com/gs'
+    };
+
+    const result = classifyDigestItem(item, config);
+
+    expect(result.accepted).toBe(true);
+    expect(result.item.subject_primary).toBe('gaussian-splatting');
+    expect(result.item.subject_matches).toContain('gaussian-splatting');
+    expect(result.item.subject_match_score).toBeGreaterThan(0);
+    expect(result.item.filter_decision).toBe('accepted');
+  });
+
+  it('keeps notable classic CV items in scope for image/video coverage', () => {
+    const item = {
+      id: 'paper:1',
+      title: 'Segment Anything (SAM) sets a new baseline for promptable segmentation',
+      summary: 'The work matters broadly for image processing and visual tooling.',
+      tags: ['computer-vision'],
+      url: 'https://example.com/sam'
+    };
+
+    const result = classifyDigestItem(item, config);
+
+    expect(result.accepted).toBe(true);
+    expect(result.item.subject_matches).toContain('image-video-genai');
+  });
+
+  it('rejects items that do not match any chosen professional subject', () => {
+    const item = {
+      id: 'reddit:2',
+      title: 'A general startup funding roundup',
+      summary: 'Market commentary without relevance to the configured subjects.',
+      tags: ['business'],
+      url: 'https://example.com/funding'
+    };
+
+    const result = classifyDigestItem(item, config);
+
+    expect(result.accepted).toBe(false);
+    expect(result.item.filter_decision).toBe('rejected');
+    expect(result.item.subject_matches).toEqual([]);
+  });
+
+  it('collects subject counts from accepted pool items', () => {
+    const counts = collectSubjectCounts([
+      { id: '1', subject_primary: 'ai-agents' },
+      { id: '2', subject_primary: 'ai-agents' },
+      { id: '3', subject_primary: 'gaussian-splatting' },
+      { id: '4', subject_primary: null }
+    ]);
+
+    expect(counts).toEqual({
+      'ai-agents': 2,
+      'gaussian-splatting': 1,
+      unknown: 1
+    });
+  });
+});

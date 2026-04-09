@@ -41,7 +41,8 @@ describe('digest pool helpers', () => {
 	it('tracks accumulation and compile metadata in state', () => {
 		const accumulated = markAccumulationRun(createEmptyState(), {
 			at: '2026-04-08T12:00:00Z',
-			sourceHealth: { reddit: 'ok', x_following: 'ok' }
+			sourceHealth: { reddit: 'ok', x_following: 'ok' },
+			subjectCounts: { 'ai-agents': 2 }
 		});
 		const compiled = markCompileRun(accumulated, {
 			at: '2026-04-12T08:00:00Z',
@@ -57,6 +58,9 @@ describe('digest pool helpers', () => {
 				x_following: 'ok',
 				x_bookmarks: null,
 				huggingface_daily_papers: null
+			},
+			subject_counts: {
+				'ai-agents': 2
 			}
 		});
 	});
