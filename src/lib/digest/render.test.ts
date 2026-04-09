@@ -176,6 +176,86 @@ describe('digest render', () => {
     expect(digest.hero_topics[0].summary).toContain('Think in Strokes, Not Pixels');
   });
 
+  it('keeps cross-subject diversity first, then can use AI subthemes for extra hero slots', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-08',
+      publishedAt: '2026-04-08T13:00:00Z',
+      items: [
+        {
+          id: 'x:model',
+          source: 'x',
+          title: 'Claude Mythos Preview raises the ceiling for agentic coding',
+          summary: 'A frontier model update with stronger tool use and reasoning.',
+          url: 'https://example.com/model',
+          sources: [{ title: 'model', url: 'https://example.com/model', type: 'twitter' }],
+          tags: ['claude'],
+          subject_primary: 'ai-agents',
+          subject_matches: ['ai-agents'],
+          subject_match_score: 3,
+          engagement: { likes: 5000 }
+        },
+        {
+          id: 'x:tooling',
+          source: 'x',
+          title: 'A new agent harness simplifies orchestration and deployment',
+          summary: 'A tooling release for agent infrastructure and managed execution.',
+          url: 'https://example.com/tooling',
+          sources: [{ title: 'tooling', url: 'https://example.com/tooling', type: 'twitter' }],
+          tags: ['agents'],
+          subject_primary: 'ai-agents',
+          subject_matches: ['ai-agents'],
+          subject_match_score: 3,
+          engagement: { likes: 3200 }
+        },
+        {
+          id: 'img:hero',
+          source: 'reddit',
+          title: 'Last week in Generative Image & Video',
+          summary: 'A broad roundup of visual-ai tooling and releases.',
+          url: 'https://example.com/image',
+          sources: [{ title: 'image', url: 'https://example.com/image', type: 'reddit' }],
+          tags: ['stablediffusion'],
+          subject_primary: 'image-video-genai',
+          subject_matches: ['image-video-genai'],
+          subject_match_score: 2,
+          engagement: { score: 300 }
+        },
+        {
+          id: 'gs:hero',
+          source: 'huggingface_daily_papers',
+          title: '3D Gaussian Splatting improves dynamic scene reconstruction',
+          summary: 'A splatting paper advances radiance fields and reconstruction quality.',
+          url: 'https://example.com/gs',
+          sources: [{ title: 'gs', url: 'https://example.com/gs', type: 'paper' }],
+          tags: ['gaussian-splatting'],
+          subject_primary: 'gaussian-splatting',
+          subject_matches: ['gaussian-splatting'],
+          subject_match_score: 3,
+          engagement: { upvotes: 85 }
+        }
+      ],
+      heroTopicTargetMax: 4,
+      notableTargetMax: 2
+    });
+
+    expect(digest.hero_topics[0].title).toContain('AI Agents');
+    expect(digest.hero_topics.some((topic) => topic.title.includes('Image/Video GenAI'))).toBe(true);
+    expect(digest.hero_topics.some((topic) => topic.title.includes('3D Gaussian Splatting'))).toBe(true);
+  });
+
+  it('writes analytical insights instead of only pool metadata', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-08',
+      publishedAt: '2026-04-08T13:00:00Z',
+      items,
+      heroTopicTargetMax: 2,
+      notableTargetMax: 2
+    });
+
+    expect(digest.hero_topics[0].insight).toContain('The dominant thread');
+    expect(digest.hero_topics[0].insight).not.toContain('produced');
+  });
+
   it('respects hero and notable limits', () => {
     const digest = buildPreviewDigest({
       issueDate: '2026-04-08',

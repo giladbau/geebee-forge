@@ -31,9 +31,24 @@ function isRecord(value) {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function mergeArrays(defaults, existing) {
+  if (!Array.isArray(existing) || existing.length === 0) return defaults;
+  if (defaults.every((item) => typeof item === 'string') && existing.every((item) => typeof item === 'string')) {
+    return [...new Set([...defaults, ...existing])];
+  }
+  if (defaults.every(isRecord) && existing.every(isRecord) && defaults.every((item) => item.id) && existing.every((item) => item.id)) {
+    const byId = new Map(defaults.map((item) => [item.id, item]));
+    for (const item of existing) {
+      byId.set(item.id, mergeWithDefaults(byId.get(item.id) || {}, item));
+    }
+    return [...byId.values()];
+  }
+  return existing;
+}
+
 function mergeWithDefaults(defaults, existing) {
   if (Array.isArray(defaults)) {
-    return Array.isArray(existing) ? existing : defaults;
+    return mergeArrays(defaults, existing);
   }
 
   if (!isRecord(defaults)) {

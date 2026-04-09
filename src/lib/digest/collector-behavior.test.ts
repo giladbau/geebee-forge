@@ -49,6 +49,45 @@ describe('digest source collectors', () => {
 		expect(result.items).toEqual([]);
 	});
 
+	it('collects from multiple reddit listing modes to improve coverage without duplicating posts', async () => {
+		const originalFetch = globalThis.fetch;
+		const seenUrls: string[] = [];
+		globalThis.fetch = async (url) => {
+			seenUrls.push(String(url));
+			return {
+				ok: true,
+				json: async () => ({
+					data: {
+						children: [{
+							data: {
+								id: 'abc123',
+								title: 'Gaussian splatting update',
+								selftext: 'Scene reconstruction notes',
+								author: 'alice',
+								score: 100,
+								created_utc: 1775650000,
+								permalink: '/r/GaussianSplatting/comments/abc123/test/'
+							}
+						}]
+					}
+				})
+			} as Response;
+		};
+
+		try {
+			const result = await collectRedditSource({ subreddits: ['GaussianSplatting'], min_score: 50, window_days: 30 }, {
+				fetchedAt: '2026-04-08T13:00:00Z',
+				rawRefBase: 'raw/run'
+			});
+
+			expect(seenUrls.some((url) => url.includes('/hot.json'))).toBe(true);
+			expect(seenUrls.some((url) => url.includes('/new.json'))).toBe(true);
+			expect(result.items).toHaveLength(1);
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
+	});
+
 	it('parses bookmark search timeline tweets into canonical X items', () => {
 		const items = parseBookmarkSearchTimelineToItems({
 			data: {

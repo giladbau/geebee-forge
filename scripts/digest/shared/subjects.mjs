@@ -11,6 +11,10 @@ const DEFAULT_SUBJECTS_CONFIG = {
         '3d gaussian splatting',
         'gaussian splatting',
         'gaussian splats',
+        '3dgs',
+        '4dgs',
+        'splatfacto',
+        'gsplat',
         'radiance fields',
         'nerf',
         'neural radiance field'
@@ -19,9 +23,12 @@ const DEFAULT_SUBJECTS_CONFIG = {
         'novel view synthesis',
         '3d reconstruction',
         'scene representation',
+        'scene reconstruction',
         'dynamic scene reconstruction',
         'differentiable rendering',
-        'point-based rendering'
+        'point-based rendering',
+        'photogrammetry',
+        'colmap'
       ],
       exclude_terms: []
     },

@@ -10,8 +10,8 @@ const config = {
     {
       id: 'gaussian-splatting',
       label: '3D Gaussian Splatting',
-      include_terms: ['gaussian splatting', '3d gaussian splatting'],
-      adjacent_terms: ['radiance fields', 'novel view synthesis'],
+      include_terms: ['gaussian splatting', '3d gaussian splatting', '3dgs', 'splatfacto', 'gsplat'],
+      adjacent_terms: ['radiance fields', 'novel view synthesis', 'scene reconstruction'],
       exclude_terms: []
     },
     {
@@ -48,6 +48,21 @@ describe('digest subject classification', () => {
     expect(result.item.subject_matches).toContain('gaussian-splatting');
     expect(result.item.subject_match_score).toBeGreaterThan(0);
     expect(result.item.filter_decision).toBe('accepted');
+  });
+
+  it('captures additional gaussian-splatting adjacent terminology like 3DGS and splatfacto', () => {
+    const item = {
+      id: 'paper:3dgs',
+      title: 'Splatfacto improves 3DGS training and rendering speed',
+      summary: 'A practical update for gsplat-style pipelines and scene reconstruction.',
+      tags: ['3dgs'],
+      url: 'https://example.com/3dgs'
+    };
+
+    const result = classifyDigestItem(item, config);
+
+    expect(result.accepted).toBe(true);
+    expect(result.item.subject_primary).toBe('gaussian-splatting');
   });
 
   it('keeps notable classic CV items in scope for image/video coverage', () => {

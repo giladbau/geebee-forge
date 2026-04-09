@@ -100,28 +100,87 @@ function uniqueBy(items, keyFn) {
   return output;
 }
 
+function detectAiSubtheme(item) {
+  const text = itemText(item);
+  if (/\b(glasswing|mythos|opus|sonnet|gpt|gemini|muse spark|release|launch|preview|frontier model|model update)\b/.test(text)) {
+    return { id: 'frontier-models', label: 'Frontier Models' };
+  }
+  if (/\b(paper|benchmark|evaluation|safety|analysis|study|research|arxiv|openclaw)\b/.test(text)) {
+    return { id: 'research-and-evals', label: 'Research & Evals' };
+  }
+  if (/\b(harness|orchestration|deployment|managed agents|framework|tooling|infrastructure|platform|mcp)\b/.test(text)) {
+    return { id: 'tooling-and-platforms', label: 'Tooling & Platforms' };
+  }
+  return { id: 'applications-and-builds', label: 'Applications & Builds' };
+}
+
+function groupForItem(item, subjectConfig) {
+  const subjectId = item.subject_primary || 'unknown';
+  const subjectLabel = getSubjectLabel(subjectId, subjectConfig);
+
+  if (subjectId === 'ai-agents') {
+    const subtheme = detectAiSubtheme(item);
+    return {
+      groupKey: `${subjectId}:${subtheme.id}`,
+      subjectId,
+      subjectLabel,
+      subthemeId: subtheme.id,
+      subthemeLabel: subtheme.label
+    };
+  }
+
+  return {
+    groupKey: subjectId,
+    subjectId,
+    subjectLabel,
+    subthemeId: null,
+    subthemeLabel: null
+  };
+}
+
 function buildGroups(items, subjectConfig) {
   const groups = new Map();
 
   for (const item of items) {
-    const subjectId = item.subject_primary || 'unknown';
-    if (!groups.has(subjectId)) groups.set(subjectId, []);
-    groups.get(subjectId).push(item);
+    const groupInfo = groupForItem(item, subjectConfig);
+    if (!groups.has(groupInfo.groupKey)) {
+      groups.set(groupInfo.groupKey, { ...groupInfo, items: [] });
+    }
+    groups.get(groupInfo.groupKey).items.push(item);
   }
 
-  return [...groups.entries()]
-    .map(([subjectId, groupItems]) => {
-      const sorted = [...groupItems].sort((a, b) => rankScore(b) - rankScore(a));
+  return [...groups.values()]
+    .map((group) => {
+      const sorted = [...group.items].sort((a, b) => rankScore(b) - rankScore(a));
       const topScore = sorted[0] ? rankScore(sorted[0]) : 0;
       return {
-        subjectId,
-        subjectLabel: getSubjectLabel(subjectId, subjectConfig),
+        ...group,
         items: sorted,
         topScore,
         groupScore: topScore + sorted.length * 25
       };
     })
     .sort((a, b) => b.groupScore - a.groupScore || a.subjectLabel.localeCompare(b.subjectLabel));
+}
+
+function selectHeroGroups(groups, heroTopicTargetMax) {
+  const selected = [];
+  const usedSubjects = new Set();
+
+  for (const group of groups) {
+    if (selected.length >= heroTopicTargetMax) break;
+    if (usedSubjects.has(group.subjectId)) continue;
+    selected.push(group);
+    usedSubjects.add(group.subjectId);
+  }
+
+  for (const group of groups) {
+    if (selected.length >= heroTopicTargetMax) break;
+    if (selected.some((entry) => entry.groupKey === group.groupKey)) continue;
+    selected.push(group);
+  }
+
+  return selected;
 }
 
 function buildSupportingSources(group) {
@@ -131,18 +190,40 @@ function buildSupportingSources(group) {
   ).slice(0, 4);
 }
 
-function buildHeroSummary(group, lead) {
+function buildHeroSummary(group) {
   const extraCount = Math.max(group.items.length - 1, 0);
-  const leadSummary = cleanText(lead.summary ?? lead.snippet ?? '', 260);
+  const topTitles = uniqueBy(group.items.map((item) => cleanText(item.title, 90)).filter(Boolean), (value) => value).slice(0, 3);
 
   if (group.items.length >= 2) {
-    const topTitles = uniqueBy(group.items.map((item) => cleanText(item.title, 90)).filter(Boolean), (value) => value).slice(0, 3);
     const synthesized = cleanText(`Key signals this cycle: ${topTitles.join('; ')}.`, 420);
     return extraCount > 0 ? `${synthesized} Includes ${extraCount} additional in-scope item${extraCount === 1 ? '' : 's'}.` : synthesized;
   }
 
+  const lead = group.items[0];
+  const leadSummary = cleanText(lead?.summary ?? lead?.snippet ?? '', 260);
   if (leadSummary) return leadSummary;
-  return cleanText(`Lead item: ${lead.title ?? 'Untitled item'}.`, 180) || 'Pending summary.';
+  return cleanText(`Lead item: ${lead?.title ?? 'Untitled item'}.`, 180) || 'Pending summary.';
+}
+
+function buildHeroInsight(group, supporting) {
+  const lead = group.items[0];
+  const secondary = group.items[1];
+  const subjectLabel = group.subjectLabel;
+  const sourceTypes = uniqueBy(supporting, (source) => source.type).length;
+
+  if (group.subjectId === 'ai-agents' && group.subthemeLabel) {
+    return cleanText(`The dominant thread in ${subjectLabel} this cycle was ${group.subthemeLabel.toLowerCase()}. ${lead?.title ?? 'The lead item'} set the pace${secondary ? `, with ${secondary.title} reinforcing the same direction` : ''}. Practical takeaway: watch how these signals change agent capability, deployment, or operating risk.`, 320);
+  }
+
+  if (group.subjectId === 'image-video-genai') {
+    return cleanText(`The dominant thread in ${subjectLabel} this cycle was workflow-oriented visual tooling and model quality. ${lead?.title ?? 'The lead item'} anchors the story${secondary ? `, while ${secondary.title} shows where the field is extending next` : ''}. Practical takeaway: pay attention to tools that improve controllability, editing, and production readiness.`, 320);
+  }
+
+  if (group.subjectId === 'gaussian-splatting') {
+    return cleanText(`The dominant thread in ${subjectLabel} this cycle was practical scene-editing and reconstruction workflow progress. ${lead?.title ?? 'The lead item'} is the clearest signal${secondary ? `, with ${secondary.title} adding adjacent research context` : ''}. Practical takeaway: the space still looks early, but tools are getting closer to usable pipelines.`, 320);
+  }
+
+  return cleanText(`The dominant thread in ${subjectLabel} this cycle was ${lead?.title ?? 'the lead item'}. ${secondary ? `${secondary.title} provided supporting evidence. ` : ''}This theme surfaced across ${sourceTypes} source type${sourceTypes === 1 ? '' : 's'}, suggesting it is worth tracking into the next cycle.`, 320);
 }
 
 function buildHeroTopic(group, index) {
@@ -150,15 +231,16 @@ function buildHeroTopic(group, index) {
   const supporting = buildSupportingSources(group);
   const tags = uniqueBy([
     ...(lead.tags || []),
-    group.subjectId
-  ], (value) => value).slice(0, 8);
-  const sourceTypes = uniqueBy(supporting, (source) => source.type).length;
+    group.subjectId,
+    group.subthemeId
+  ].filter(Boolean), (value) => value).slice(0, 8);
+  const titlePrefix = group.subthemeLabel ? `${group.subjectLabel} — ${group.subthemeLabel}` : group.subjectLabel;
 
   return {
-    title: `${group.subjectLabel}: ${cleanText(lead.title ?? `Topic ${index + 1}`, 120)}`,
-    slug: lead.slug ?? `${group.subjectId}-${index + 1}`,
-    summary: buildHeroSummary(group, lead),
-    insight: cleanText(`Why it matters: ${group.subjectLabel} produced ${group.items.length} in-scope item${group.items.length === 1 ? '' : 's'} across ${sourceTypes} source type${sourceTypes === 1 ? '' : 's'} in this cycle. Lead signal: ${lead.title ?? 'Untitled item'}.`, 260),
+    title: `${titlePrefix}: ${cleanText(lead.title ?? `Topic ${index + 1}`, 120)}`,
+    slug: lead.slug ?? `${group.subjectId}-${group.subthemeId || index + 1}`,
+    summary: buildHeroSummary(group),
+    insight: buildHeroInsight(group, supporting),
     image_url: lead.image_url ?? null,
     sources: supporting,
     tags
@@ -166,12 +248,24 @@ function buildHeroTopic(group, index) {
 }
 
 function buildNotableItems(items, notableTargetMax) {
-  return items.slice(0, notableTargetMax).map((item, index) => ({
-    title: cleanText(item.title ?? `Untitled notable ${index + 1}`, 140),
-    summary: cleanText(item.summary ?? item.snippet ?? '', 260) || 'Pending summary',
-    sources: item.sources ?? [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }],
-    tags: uniqueBy([...(item.tags || []), ...(item.subject_matches || []), item.subject_primary].filter(Boolean), (value) => value)
-  }));
+  const perSubjectCounts = new Map();
+  const output = [];
+
+  for (const item of items) {
+    if (output.length >= notableTargetMax) break;
+    const subject = item.subject_primary || 'unknown';
+    const count = perSubjectCounts.get(subject) || 0;
+    if (count >= 6) continue;
+    output.push({
+      title: cleanText(item.title ?? `Untitled notable ${output.length + 1}`, 140),
+      summary: cleanText(item.summary ?? item.snippet ?? '', 260) || 'Pending summary',
+      sources: item.sources ?? [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }],
+      tags: uniqueBy([...(item.tags || []), ...(item.subject_matches || []), item.subject_primary].filter(Boolean), (value) => value)
+    });
+    perSubjectCounts.set(subject, count + 1);
+  }
+
+  return output;
 }
 
 export function buildPreviewDigest({
@@ -184,7 +278,7 @@ export function buildPreviewDigest({
 }) {
   const ranked = [...items].sort((a, b) => rankScore(b) - rankScore(a));
   const groups = buildGroups(ranked, subjectConfig);
-  const heroGroups = groups.slice(0, heroTopicTargetMax);
+  const heroGroups = selectHeroGroups(groups, heroTopicTargetMax);
   const usedLeadIds = new Set(heroGroups.map((group) => group.items[0]?.id).filter(Boolean));
   const remainingItems = ranked.filter((item) => !usedLeadIds.has(item.id));
 
