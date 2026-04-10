@@ -1,5 +1,6 @@
 import type { Env } from '../index';
 import { fetchAllHistory, ACTIVE_ALERT_TYPES, type Alert } from '../lib/redalert-cache';
+import { normalizeCity } from '../lib/city-names';
 
 function filterByZone(alerts: Alert[], zone: string): Alert[] {
 	return alerts.filter((a) =>
@@ -83,9 +84,10 @@ export async function handleZoneSummary(request: Request, env: Env): Promise<Res
 
 			for (const c of alert.cities || []) {
 				if (!zone || c.zone === zone) {
-					cityCount.set(c.name, (cityCount.get(c.name) || 0) + 1);
-					if (c.zone && !cityZoneMap.has(c.name)) {
-						cityZoneMap.set(c.name, c.zone);
+					const base = normalizeCity(c.name);
+					cityCount.set(base, (cityCount.get(base) || 0) + 1);
+					if (c.zone && !cityZoneMap.has(base)) {
+						cityZoneMap.set(base, c.zone);
 					}
 				}
 				if (!zone && c.zone) {
