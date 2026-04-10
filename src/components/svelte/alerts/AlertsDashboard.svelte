@@ -55,7 +55,7 @@
 		return `${date}T00:00:00Z`;
 	}
 
-	function buildParams(extra: Record<string, string> = {}) {
+	function buildParams(extra: Record<string, string> = {}, { skipCity = false } = {}) {
 		const p = new URLSearchParams({
 			startDate: toISO(startDate),
 			endDate: toISO(endDate, true),
@@ -64,7 +64,7 @@
 		if (selectedZone) p.set('zone', selectedZone);
 		if (selectedOrigin) p.set('origin', selectedOrigin);
 		if (selectedCategory) p.set('category', selectedCategory);
-		if (selectedCity) p.set('cityName', selectedCity);
+		if (selectedCity && !skipCity) p.set('cityName', selectedCity);
 		return p.toString();
 	}
 
@@ -89,7 +89,7 @@
 		const summaryBase = '/api/alerts/zone-summary';
 		const distBase = '/api/alerts/zone-distribution';
 
-		const mapPromise = fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES })}`, signal);
+		const mapPromise = fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES }, { skipCity: true })}`, signal);
 
 		const results = await Promise.allSettled([
 			fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`, signal),
