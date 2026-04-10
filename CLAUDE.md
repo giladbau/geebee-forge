@@ -62,7 +62,7 @@ Track all work in the **🤖 Data Dev** project via the Todoist MCP tool (config
   - `src/lib/data/israel-city-boundaries.json` — 992 OSM boundary polygons (frontend only)
   - `worker/src/data/israel-cities-coords.json` — 1,660 city geocode entries (worker only)
 - **Caching**: `worker/src/lib/redalert-cache.ts` — CF Cache API, 24h TTL for historical data, 5min for recent
-- Map: Leaflet + CartoDB dark tiles, red pin markers + semi-transparent boundary polygons
+- Map: Leaflet + CartoDB dark tiles, two modes: pins (red markers + uniform polygons) and heat (choropleth — polygons colored by log-normalized alert intensity, no external heatmap plugin)
 - Geocode endpoint: GET (small requests) + POST (bulk) at `/api/alerts/geocode`
 - **API URL**: `AlertsDashboard.svelte` uses `import.meta.env.PUBLIC_API_URL` to reach the worker (set at build time)
 - **Local dev**: run `npm run dev` (Astro at :4321) + `cd worker && npx wrangler dev` (API at :8787)
