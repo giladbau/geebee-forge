@@ -89,9 +89,7 @@
 		const summaryBase = '/api/alerts/zone-summary';
 		const distBase = '/api/alerts/zone-distribution';
 
-		const mapPromise = selectedCity
-			? Promise.resolve(null)
-			: fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES })}`, signal);
+		const mapPromise = fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES })}`, signal);
 
 		const results = await Promise.allSettled([
 			fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`, signal),
@@ -135,13 +133,7 @@
 			console.error('Failed to load categories:', catDistResult.reason);
 		}
 
-		if (selectedCity) {
-			mapCities = [{
-				city: selectedCity,
-				zone: selectedZone || '',
-				count: summary?.totals?.range ?? 0
-			}];
-		} else if (mapResult.status === 'fulfilled') {
+		if (mapResult.status === 'fulfilled') {
 			mapCities = mapResult.value?.topCities || [];
 		} else {
 			errors.push('map');
@@ -442,7 +434,7 @@
 
 	<!-- Alert Map -->
 	{#if mapCities.length > 0}
-		<AlertsMap topCities={mapCities} />
+		<AlertsMap topCities={mapCities} highlightCity={selectedCity} />
 	{/if}
 
 	<!-- Summary Cards -->

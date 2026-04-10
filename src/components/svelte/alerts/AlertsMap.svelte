@@ -12,9 +12,10 @@
 
 	interface Props {
 		topCities: CityData[];
+		highlightCity?: string;
 	}
 
-	let { topCities }: Props = $props();
+	let { topCities, highlightCity = '' }: Props = $props();
 
 	let mapContainer: HTMLDivElement;
 	let map: any = null;
@@ -221,6 +222,8 @@
 		const counts = [...normalizedCountMap.values()];
 		const maxLog = Math.max(...counts.map(c => Math.log(c + 1)), 1);
 
+		const normalizedHighlight = highlightCity ? normalizeCity(highlightCity) : '';
+
 		const matchedCities = new Set<string>();
 		const matchingFeatures = (boundaryData as any).features.filter((f: any) => {
 			const name = f.properties.name;
@@ -233,6 +236,7 @@
 
 		choroplethLayer = L.layerGroup();
 
+		let highlightLayer: any = null;
 		if (matchingFeatures.length > 0) {
 			L.geoJSON(
 				{ type: 'FeatureCollection', features: matchingFeatures },
@@ -242,12 +246,13 @@
 						const count = normalizedCountMap.get(name) || 0;
 						const logVal = Math.log(count + 1) / maxLog;
 						const color = intensityColor(logVal);
+						const isHighlighted = normalizedHighlight && name === normalizedHighlight;
 						return {
 							fillColor: color,
-							fillOpacity: 0.55,
-							color: color,
-							weight: 1,
-							opacity: 0.6
+							fillOpacity: isHighlighted ? 0.75 : 0.55,
+							color: isHighlighted ? '#ffffff' : color,
+							weight: isHighlighted ? 3 : 1,
+							opacity: isHighlighted ? 1 : 0.6
 						};
 					},
 					onEachFeature: (feature: any, layer: any) => {
@@ -259,12 +264,23 @@
 								<br><span style="color: #ef4444; font-weight: 600;">${count.toLocaleString()} alerts</span>
 							</div>`
 						);
+						if (normalizedHighlight && name === normalizedHighlight) {
+							highlightLayer = layer;
+						}
 					}
 				}
 			).addTo(choroplethLayer);
 		}
 
 		choroplethLayer.addTo(map);
+
+		// Zoom to highlighted city polygon
+		if (highlightLayer) {
+			const hlBounds = highlightLayer.getBounds();
+			if (hlBounds && hlBounds.isValid()) {
+				map.fitBounds(hlBounds, { padding: [60, 60], maxZoom: 13 });
+			}
+		}
 
 		// Add color legend
 		if (legendControl) { map.removeControl(legendControl); legendControl = null; }
@@ -344,6 +360,7 @@
 
 	$effect(() => {
 		mapMode;
+		highlightCity;
 		if (map) syncLayers();
 	});
 
