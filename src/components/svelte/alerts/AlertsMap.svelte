@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 	import boundaryData from '$lib/data/israel-city-boundaries.json';
 	import { normalizeCity } from '$lib/utils/city-names';
-	import { intensityColor } from '$lib/utils/color';
+	import { intensityColor, GRADIENT_STOPS } from '$lib/utils/color';
 
 	interface CityData {
 		city: string;
@@ -21,6 +21,7 @@
 	let markersLayer: any = null;
 	let polygonLayer: any = null;
 	let choroplethLayer: any = null;
+	let legendControl: any = null;
 	let L: any = null;
 	let mapMode = $state<'pins' | 'heat'>('pins');
 	let expanded = $state(false);
@@ -273,21 +274,21 @@
 			).addTo(choroplethLayer);
 		}
 
-		// Fallback circle markers for cities without polygon boundaries
+		// Colored pin markers for cities without polygon boundaries
 		for (const [normalizedName, count] of normalizedCountMap) {
 			if (matchedCities.has(normalizedName)) continue;
 			const loc = coordsLookup.get(normalizedName);
 			if (!loc) continue;
 			const logVal = Math.log(count + 1) / maxLog;
 			const color = intensityColor(logVal);
-			L.circleMarker([loc.lat, loc.lng], {
-				radius: 8,
-				fillColor: color,
-				fillOpacity: 0.6,
-				color: color,
-				weight: 1,
-				opacity: 0.7
-			}).bindPopup(
+			const icon = L.divIcon({
+				className: 'choropleth-pin',
+				html: `<div style="background:${color};width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(0,0,0,0.4);box-shadow:0 0 4px ${color}80;"></div>`,
+				iconSize: [10, 10],
+				iconAnchor: [5, 5],
+				popupAnchor: [0, -7]
+			});
+			L.marker([loc.lat, loc.lng], { icon }).bindPopup(
 				`<div style="font-family: system-ui; font-size: 13px; color: #222;">
 					<strong>${normalizedName}</strong>
 					<br><span style="color: #ef4444; font-weight: 600;">${count.toLocaleString()} alerts</span>
@@ -296,6 +297,29 @@
 		}
 
 		choroplethLayer.addTo(map);
+
+		// Add color legend
+		if (legendControl) { map.removeControl(legendControl); legendControl = null; }
+		const maxCount = Math.max(...counts, 0);
+		if (maxCount > 0) {
+			legendControl = (L.Control as any).extend({
+				onAdd() {
+					const div = L.DomUtil.create('div', 'choropleth-legend');
+					const gradientCss = GRADIENT_STOPS.map(([stop, color]) => `${color} ${stop * 100}%`).join(', ');
+					div.innerHTML = `
+						<div style="font-family:system-ui;font-size:11px;color:#ccc;background:rgba(10,10,10,0.85);padding:8px 10px;border-radius:6px;border:1px solid #333;">
+							<div style="margin-bottom:4px;font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:0.5px;">Alert Intensity</div>
+							<div style="display:flex;align-items:center;gap:6px;">
+								<span>0</span>
+								<div style="width:100px;height:10px;border-radius:3px;background:linear-gradient(to right,${gradientCss});"></div>
+								<span>${maxCount.toLocaleString()}</span>
+							</div>
+						</div>`;
+					return div;
+				}
+			});
+			new legendControl({ position: 'bottomright' }).addTo(map);
+		}
 	}
 
 	function syncLayers() {
@@ -316,10 +340,14 @@
 				buildChoropleth(cachedCities);
 			}
 		} else {
-			// Pins mode: remove choropleth, restore markers + polygons
+			// Pins mode: remove choropleth + legend, restore markers + polygons
 			if (choroplethLayer) {
 				map.removeLayer(choroplethLayer);
 				choroplethLayer = null;
+			}
+			if (legendControl) {
+				map.removeControl(legendControl);
+				legendControl = null;
 			}
 			if (markersLayer && !map.hasLayer(markersLayer)) markersLayer.addTo(map);
 			if (polygonLayer && !map.hasLayer(polygonLayer)) polygonLayer.addTo(map);
@@ -334,6 +362,7 @@
 		});
 
 		return () => {
+			if (legendControl) { map?.removeControl(legendControl); legendControl = null; }
 			if (choroplethLayer) { map?.removeLayer(choroplethLayer); choroplethLayer = null; }
 			if (map) { map.remove(); map = null; }
 		};
