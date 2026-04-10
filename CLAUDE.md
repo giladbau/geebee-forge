@@ -74,8 +74,17 @@ Track all work in the **🤖 Data Dev** project via the Todoist MCP tool (config
 - Browser-only libs (Leaflet, Three.js, Threlte): use `client:only="svelte"` NOT `client:load`
 - When adding interactivity: always `stopPropagation` on click handlers to avoid camera interference
 
+## Testing
+- Test framework: **Vitest** — run with `npx vitest run`
+- Tests live next to the code they test (e.g. `src/lib/utils/color.test.ts`)
+- **Always run tests before pushing** — `npx vitest run` must pass
+- **Always run `npx astro build`** to verify no compile errors before pushing
+- Extract pure logic from Svelte components into `src/lib/` modules so it can be unit tested
+
 ## Workflow
-- **Don't push untested changes** — verify in browser before pushing to prod
+- **Don't push untested changes** — run tests and build before pushing
+- **Always create a PR** for feature work — don't merge directly to `main`
+- **Update CLAUDE.md** when adding new features, changing architecture, or modifying conventions
 - **For multi-system features**: trace the full data flow first. Identify every point where names/IDs need to match. Ensure one normalization path.
 - **Batch changes**: accumulate fixes into one solid commit instead of rapid-fire push-and-pray
 - After feature work: run /review and /simplify
