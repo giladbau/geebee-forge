@@ -92,8 +92,8 @@
 		const mapPromise = fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities', topLimit: '2000', categories: SIREN_CATEGORIES }, { skipCity: true })}`, signal);
 
 		const results = await Promise.allSettled([
-			fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5' })}`, signal),
-			fetchJSON(`${summaryBase}?${buildParams({ include: 'timeline', timelineGroup: 'hour' })}`, signal),
+			fetchJSON(`${summaryBase}?${buildParams({ include: 'topCities,topZones,topOrigins,peak', topLimit: '5', categories: SIREN_CATEGORIES })}`, signal),
+			fetchJSON(`${summaryBase}?${buildParams({ include: 'timeline', timelineGroup: 'hour', categories: SIREN_CATEGORIES })}`, signal),
 			fetchJSON(`${distBase}?${buildParams({ groupBy: 'origin' })}`, signal),
 			fetchJSON(`${distBase}?${buildParams({ groupBy: 'category' })}`, signal),
 			mapPromise
