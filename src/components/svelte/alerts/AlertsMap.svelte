@@ -19,33 +19,45 @@
 	let map: any = null;
 	let markersLayer: any = null;
 	let polygonLayer: any = null;
-	let heatLayer: any = null;
+	let choroplethLayer: any = null;
 	let L: any = null;
 	let mapMode = $state<'pins' | 'heat'>('pins');
 	let expanded = $state(false);
-	let cachedHeatPoints: [number, number, number][] = [];
-	let heatPluginReady = false;
+	let cachedCities: CityData[] = [];
+	let coordsLookup = new Map<string, { lat: number; lng: number }>();
 
-	async function loadHeatPlugin(): Promise<void> {
-		if (heatPluginReady) return;
-		if (typeof (L as any).heatLayer === 'function') {
-			heatPluginReady = true;
-			return;
-		}
-		return new Promise<void>((resolve, reject) => {
-			const script = document.createElement('script');
-			script.src = 'https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js';
-			script.onload = () => { heatPluginReady = true; resolve(); };
-			script.onerror = () => reject(new Error('Failed to load leaflet.heat'));
-			document.head.appendChild(script);
-		});
+	const GRADIENT_STOPS: [number, string][] = [
+		[0.0, '#2563eb'],
+		[0.25, '#7c3aed'],
+		[0.5, '#f59e0b'],
+		[0.75, '#ef4444'],
+		[1.0, '#fef08a'],
+	];
+
+	function lerpColor(hex1: string, hex2: string, t: number): string {
+		const r1 = parseInt(hex1.slice(1, 3), 16);
+		const g1 = parseInt(hex1.slice(3, 5), 16);
+		const b1 = parseInt(hex1.slice(5, 7), 16);
+		const r2 = parseInt(hex2.slice(1, 3), 16);
+		const g2 = parseInt(hex2.slice(3, 5), 16);
+		const b2 = parseInt(hex2.slice(5, 7), 16);
+		const r = Math.round(r1 + (r2 - r1) * t);
+		const g = Math.round(g1 + (g2 - g1) * t);
+		const b = Math.round(b1 + (b2 - b1) * t);
+		return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 	}
 
-	/** Dynamic heatmap radius/blur based on zoom — smaller at low zoom to prevent blob formation */
-	function getHeatOptions(zoom: number): { radius: number; blur: number } {
-		const radius = Math.max(10, Math.min(25, zoom * 2 - 4));
-		const blur = Math.round(radius * 0.7);
-		return { radius, blur };
+	function intensityColor(normalizedValue: number): string {
+		const t = Math.max(0, Math.min(1, normalizedValue));
+		for (let i = 1; i < GRADIENT_STOPS.length; i++) {
+			const [stopLo, colorLo] = GRADIENT_STOPS[i - 1];
+			const [stopHi, colorHi] = GRADIENT_STOPS[i];
+			if (t <= stopHi) {
+				const ratio = (t - stopLo) / (stopHi - stopLo);
+				return lerpColor(colorLo, colorHi, ratio);
+			}
+		}
+		return GRADIENT_STOPS[GRADIENT_STOPS.length - 1][1];
 	}
 
 	async function initMap() {
@@ -78,17 +90,11 @@
 		}).addTo(map);
 
 		markersLayer = L.layerGroup().addTo(map);
-
-		map.on('zoomend', () => {
-			if (heatLayer && mapMode === 'heat') {
-				const opts = getHeatOptions(map.getZoom());
-				heatLayer.setOptions(opts);
-			}
-		});
 	}
 
 	async function updateMarkers(cities: CityData[]) {
 		if (!map || !L || !markersLayer) return;
+		cachedCities = cities;
 		if (!cities || cities.length === 0) {
 			markersLayer.clearLayers();
 			if (polygonLayer) polygonLayer.clearLayers();
@@ -111,6 +117,15 @@
 		} catch {
 			// Geocoding failed — show map without markers
 			return;
+		}
+
+		// Cache normalized coords for choropleth fallback circle markers
+		coordsLookup.clear();
+		for (const c of cities) {
+			const loc = coords[c.city];
+			if (loc) {
+				coordsLookup.set(normalizeCity(c.city), loc);
+			}
 		}
 
 		markersLayer.clearLayers();
@@ -170,12 +185,6 @@
 			const agg = aggregated.get(key)!;
 			agg.count += city.count;
 			agg.entries.push(city);
-		}
-
-		// Build heat points from aggregated data
-		cachedHeatPoints = [];
-		for (const agg of aggregated.values()) {
-			cachedHeatPoints.push([agg.lat, agg.lng, agg.count]);
 		}
 
 		const pinIcon = L.divIcon({
@@ -242,7 +251,87 @@
 		syncLayers();
 	}
 
-	async function syncLayers() {
+	function buildChoropleth(cities: CityData[]): void {
+		if (!L || !map) return;
+
+		const normalizedCountMap = new Map<string, number>();
+		for (const c of cities) {
+			const base = normalizeCity(c.city);
+			normalizedCountMap.set(base, (normalizedCountMap.get(base) || 0) + c.count);
+		}
+
+		const counts = [...normalizedCountMap.values()];
+		const maxLog = Math.max(...counts.map(c => Math.log(c + 1)), 1);
+
+		const matchedCities = new Set<string>();
+		const matchingFeatures = (boundaryData as any).features.filter((f: any) => {
+			const name = f.properties.name;
+			if (normalizedCountMap.has(name)) {
+				matchedCities.add(name);
+				return true;
+			}
+			return false;
+		});
+
+		choroplethLayer = L.layerGroup();
+
+		if (matchingFeatures.length > 0) {
+			L.geoJSON(
+				{ type: 'FeatureCollection', features: matchingFeatures },
+				{
+					style: (feature: any) => {
+						const name = feature.properties.name;
+						const count = normalizedCountMap.get(name) || 0;
+						const logVal = Math.log(count + 1) / maxLog;
+						const color = intensityColor(logVal);
+						return {
+							fillColor: color,
+							fillOpacity: 0.55,
+							color: color,
+							weight: 1,
+							opacity: 0.6
+						};
+					},
+					onEachFeature: (feature: any, layer: any) => {
+						const name = feature.properties.name;
+						const count = normalizedCountMap.get(name) || 0;
+						layer.bindPopup(
+							`<div style="font-family: system-ui; font-size: 13px; color: #222;">
+								<strong>${name}</strong>
+								<br><span style="color: #ef4444; font-weight: 600;">${count.toLocaleString()} alerts</span>
+							</div>`
+						);
+					}
+				}
+			).addTo(choroplethLayer);
+		}
+
+		// Fallback circle markers for cities without polygon boundaries
+		for (const [normalizedName, count] of normalizedCountMap) {
+			if (matchedCities.has(normalizedName)) continue;
+			const loc = coordsLookup.get(normalizedName);
+			if (!loc) continue;
+			const logVal = Math.log(count + 1) / maxLog;
+			const color = intensityColor(logVal);
+			L.circleMarker([loc.lat, loc.lng], {
+				radius: 8,
+				fillColor: color,
+				fillOpacity: 0.6,
+				color: color,
+				weight: 1,
+				opacity: 0.7
+			}).bindPopup(
+				`<div style="font-family: system-ui; font-size: 13px; color: #222;">
+					<strong>${normalizedName}</strong>
+					<br><span style="color: #ef4444; font-weight: 600;">${count.toLocaleString()} alerts</span>
+				</div>`
+			).addTo(choroplethLayer);
+		}
+
+		choroplethLayer.addTo(map);
+	}
+
+	function syncLayers() {
 		if (!map || !L) return;
 
 		if (mapMode === 'heat') {
@@ -250,45 +339,20 @@
 			if (markersLayer && map.hasLayer(markersLayer)) map.removeLayer(markersLayer);
 			if (polygonLayer && map.hasLayer(polygonLayer)) map.removeLayer(polygonLayer);
 
-			// Remove old heat layer
-			if (heatLayer) {
-				map.removeLayer(heatLayer);
-				heatLayer = null;
+			// Remove old choropleth
+			if (choroplethLayer) {
+				map.removeLayer(choroplethLayer);
+				choroplethLayer = null;
 			}
 
-			if (cachedHeatPoints.length > 0) {
-				await loadHeatPlugin();
-				if (typeof (L as any).heatLayer !== 'function') {
-					console.error('[AlertsMap] L.heatLayer not available after loading plugin');
-					return;
-				}
-				// Normalize intensities with log scale to handle skewed data
-				// (few cities with thousands of alerts, most with dozens)
-				const logPoints: [number, number, number][] = cachedHeatPoints.map(
-					([lat, lng, count]) => [lat, lng, Math.log(count + 1)]
-				);
-				const maxLog = Math.max(...logPoints.map((p) => p[2]));
-				const { radius, blur } = getHeatOptions(map.getZoom());
-				heatLayer = (L as any).heatLayer(logPoints, {
-					radius,
-					blur,
-					maxZoom: 15,
-					max: maxLog,
-					minOpacity: 0.4,
-					gradient: {
-						0.2: '#2563eb',
-						0.4: '#7c3aed',
-						0.6: '#f59e0b',
-						0.8: '#ef4444',
-						1.0: '#fef08a'
-					}
-				}).addTo(map);
+			if (cachedCities.length > 0) {
+				buildChoropleth(cachedCities);
 			}
 		} else {
-			// Pins mode: remove heat, restore markers + polygons
-			if (heatLayer) {
-				map.removeLayer(heatLayer);
-				heatLayer = null;
+			// Pins mode: remove choropleth, restore markers + polygons
+			if (choroplethLayer) {
+				map.removeLayer(choroplethLayer);
+				choroplethLayer = null;
 			}
 			if (markersLayer && !map.hasLayer(markersLayer)) markersLayer.addTo(map);
 			if (polygonLayer && !map.hasLayer(polygonLayer)) polygonLayer.addTo(map);
@@ -303,7 +367,7 @@
 		});
 
 		return () => {
-			if (heatLayer) { map?.removeLayer(heatLayer); heatLayer = null; }
+			if (choroplethLayer) { map?.removeLayer(choroplethLayer); choroplethLayer = null; }
 			if (map) { map.remove(); map = null; }
 		};
 	});
