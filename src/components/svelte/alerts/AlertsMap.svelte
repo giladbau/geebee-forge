@@ -2,6 +2,11 @@
 	import { onMount } from 'svelte';
 	import boundaryData from '$lib/data/israel-city-boundaries.json';
 	import { normalizeCity } from '$lib/utils/city-names';
+	import { buildAreaHeatPoints } from '$lib/alerts/heat-points';
+	import {
+		buildAlertIntensityLegend,
+		normalizeAlertIntensity
+	} from '$lib/alerts/heat-intensity';
 
 	interface CityData {
 		city: string;
@@ -25,6 +30,9 @@
 	let expanded = $state(false);
 	let cachedHeatPoints: [number, number, number][] = [];
 	let heatPluginReady = false;
+	let heatLegendItems = $state<{ label: string; min: number; max: number; color: string }[]>([]);
+	let maxHeatCount = 0;
+	let maxHeatPointWeight = 0;
 
 	async function loadHeatPlugin(): Promise<void> {
 		if (heatPluginReady) return;
@@ -92,6 +100,9 @@
 		if (!cities || cities.length === 0) {
 			markersLayer.clearLayers();
 			if (polygonLayer) polygonLayer.clearLayers();
+			heatLegendItems = [];
+			maxHeatCount = 0;
+			maxHeatPointWeight = 0;
 			return;
 		}
 
@@ -132,6 +143,13 @@
 		const matchingFeatures = (boundaryData as any).features.filter(
 			(f: any) => normalizedCountMap.has(f.properties.name)
 		);
+		const areaAlertCounts = Array.from(normalizedCountMap.values());
+		const maxAreaAlertCount = Math.max(0, ...areaAlertCounts);
+		heatLegendItems = buildAlertIntensityLegend(areaAlertCounts);
+		maxHeatCount = maxAreaAlertCount;
+		const featureByName = new Map(
+			matchingFeatures.map((feature: any) => [feature.properties.name, feature])
+		);
 
 		if (matchingFeatures.length > 0) {
 			polygonLayer = L.geoJSON(
@@ -156,6 +174,7 @@
 					}
 				}
 			).addTo(map);
+
 		}
 
 		// Aggregate cities that share the same coordinates (same base city after normalization)
@@ -172,11 +191,21 @@
 			agg.entries.push(city);
 		}
 
-		// Build heat points from aggregated data
+		// Build heat points from aggregated data, spreading each city's intensity across
+		// a few samples inside its boundary so heat mode reflects area intensity instead
+		// of just one hotspot per pin/centroid.
 		cachedHeatPoints = [];
 		for (const agg of aggregated.values()) {
-			cachedHeatPoints.push([agg.lat, agg.lng, agg.count]);
+			const normalizedName = normalizeCity(agg.entries[0]?.city || '');
+			const feature = featureByName.get(normalizedName);
+			cachedHeatPoints.push(...buildAreaHeatPoints({
+				lat: agg.lat,
+				lng: agg.lng,
+				count: agg.count,
+				geometry: feature?.geometry ?? null
+			}));
 		}
+		maxHeatPointWeight = Math.max(0, ...cachedHeatPoints.map(([, , weight]) => weight));
 
 		const pinIcon = L.divIcon({
 			className: 'alert-pin',
@@ -246,7 +275,7 @@
 		if (!map || !L) return;
 
 		if (mapMode === 'heat') {
-			// Hide pins + polygons
+			// Hide pins + polygons; show the heat layer only.
 			if (markersLayer && map.hasLayer(markersLayer)) map.removeLayer(markersLayer);
 			if (polygonLayer && map.hasLayer(polygonLayer)) map.removeLayer(polygonLayer);
 
@@ -262,22 +291,19 @@
 					console.error('[AlertsMap] L.heatLayer not available after loading plugin');
 					return;
 				}
-				// Normalize intensities with log scale to handle skewed data
-				// (few cities with thousands of alerts, most with dozens)
-				const logPoints: [number, number, number][] = cachedHeatPoints.map(
-					([lat, lng, count]) => [lat, lng, Math.log(count + 1)]
+				const normalizedPoints: [number, number, number][] = cachedHeatPoints.map(
+					([lat, lng, count]) => [lat, lng, normalizeAlertIntensity(count, maxHeatPointWeight)]
 				);
-				const maxLog = Math.max(...logPoints.map((p) => p[2]));
 				const { radius, blur } = getHeatOptions(map.getZoom());
-				heatLayer = (L as any).heatLayer(logPoints, {
+				heatLayer = (L as any).heatLayer(normalizedPoints, {
 					radius,
 					blur,
 					maxZoom: 15,
-					max: maxLog,
-					minOpacity: 0.4,
+					max: 1,
+					minOpacity: 0.3,
 					gradient: {
-						0.2: '#2563eb',
-						0.4: '#7c3aed',
+						0.15: '#2563eb',
+						0.35: '#7c3aed',
 						0.6: '#f59e0b',
 						0.8: '#ef4444',
 						1.0: '#fef08a'
@@ -345,6 +371,22 @@
 		</div>
 	</div>
 	<div class="map-container" class:expanded bind:this={mapContainer}></div>
+	{#if mapMode === 'heat' && heatLegendItems.length > 0}
+		<div class="heat-legend">
+			<div class="heat-legend-copy">
+				<strong>Area intensity</strong>
+				<span>The heat map now spreads each area's alert total across its mapped footprint, so hotter regions reflect intensity rather than just stacked pins.</span>
+			</div>
+			<div class="heat-legend-scale">
+				{#each heatLegendItems as item}
+					<div class="legend-item">
+						<span class="legend-swatch" style={`background:${item.color}`}></span>
+						<span>{item.label}: {item.min.toLocaleString()}{item.max > item.min ? `–${item.max.toLocaleString()}` : '+'}</span>
+					</div>
+				{/each}
+			</div>
+		</div>
+	{/if}
 </section>
 
 <style>
@@ -428,6 +470,54 @@
 
 	.map-container.expanded {
 		height: 700px;
+	}
+
+	.heat-legend {
+		margin-top: 0.9rem;
+		display: grid;
+		gap: 0.8rem;
+		padding: 0.9rem 1rem;
+		background: #121212;
+		border: 1px solid #2a2a2a;
+		border-radius: 8px;
+	}
+
+	.heat-legend-copy {
+		display: grid;
+		gap: 0.3rem;
+	}
+
+	.heat-legend-copy strong {
+		color: #f5f5f5;
+		font-size: 0.9rem;
+	}
+
+	.heat-legend-copy span {
+		color: #a3a3a3;
+		font-size: 0.8rem;
+		line-height: 1.45;
+	}
+
+	.heat-legend-scale {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.65rem 1rem;
+	}
+
+	.legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		color: #d4d4d4;
+		font-size: 0.8rem;
+	}
+
+	.legend-swatch {
+		width: 0.8rem;
+		height: 0.8rem;
+		border-radius: 999px;
+		box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+		flex: 0 0 auto;
 	}
 
 	/* Override Leaflet controls for dark theme */
