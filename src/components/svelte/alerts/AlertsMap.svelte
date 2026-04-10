@@ -26,7 +26,6 @@
 	let mapMode = $state<'pins' | 'heat'>('pins');
 	let expanded = $state(false);
 	let cachedCities: CityData[] = [];
-	let coordsLookup = new Map<string, { lat: number; lng: number }>();
 
 	async function initMap() {
 		// Dynamic import — Leaflet has no SSR support
@@ -85,15 +84,6 @@
 		} catch {
 			// Geocoding failed — show map without markers
 			return;
-		}
-
-		// Cache normalized coords for choropleth fallback circle markers
-		coordsLookup.clear();
-		for (const c of cities) {
-			const loc = coords[c.city];
-			if (loc) {
-				coordsLookup.set(normalizeCity(c.city), loc);
-			}
 		}
 
 		markersLayer.clearLayers();
@@ -271,28 +261,6 @@
 						);
 					}
 				}
-			).addTo(choroplethLayer);
-		}
-
-		// Colored pin markers for cities without polygon boundaries
-		for (const [normalizedName, count] of normalizedCountMap) {
-			if (matchedCities.has(normalizedName)) continue;
-			const loc = coordsLookup.get(normalizedName);
-			if (!loc) continue;
-			const logVal = Math.log(count + 1) / maxLog;
-			const color = intensityColor(logVal);
-			const icon = L.divIcon({
-				className: 'choropleth-pin',
-				html: `<div style="background:${color};width:10px;height:10px;border-radius:50%;border:1.5px solid rgba(0,0,0,0.4);box-shadow:0 0 4px ${color}80;"></div>`,
-				iconSize: [10, 10],
-				iconAnchor: [5, 5],
-				popupAnchor: [0, -7]
-			});
-			L.marker([loc.lat, loc.lng], { icon }).bindPopup(
-				`<div style="font-family: system-ui; font-size: 13px; color: #222;">
-					<strong>${normalizedName}</strong>
-					<br><span style="color: #ef4444; font-weight: 600;">${count.toLocaleString()} alerts</span>
-				</div>`
 			).addTo(choroplethLayer);
 		}
 
