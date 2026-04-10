@@ -1,10 +1,8 @@
-/** Gradient stops for choropleth intensity mapping (blue → purple → amber → red → yellow) */
+/** Gradient stops for choropleth intensity mapping (green → yellow → red) */
 export const GRADIENT_STOPS: [number, string][] = [
-	[0.0, '#2563eb'],
-	[0.25, '#7c3aed'],
-	[0.5, '#f59e0b'],
-	[0.75, '#ef4444'],
-	[1.0, '#fef08a'],
+	[0.0, '#22c55e'],
+	[0.5, '#eab308'],
+	[1.0, '#ef4444'],
 ];
 
 /** Linear RGB interpolation between two hex colors */
