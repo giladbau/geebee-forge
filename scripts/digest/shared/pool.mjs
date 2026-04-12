@@ -24,6 +24,19 @@ export function mergePoolItems(existingPool, incomingItems) {
   return { items: dedupeItems([...(existingPool?.items ?? []), ...incomingItems]) };
 }
 
+export function filterItemsNewerThan(items, cutoffAt) {
+  if (!cutoffAt) return items;
+  const cutoff = Date.parse(cutoffAt);
+  if (Number.isNaN(cutoff)) return items;
+
+  return items.filter((item) => {
+    if (!item?.published_at) return true;
+    const publishedAt = Date.parse(item.published_at);
+    if (Number.isNaN(publishedAt)) return true;
+    return publishedAt > cutoff;
+  });
+}
+
 export function resetPool() {
   return createEmptyPool();
 }
