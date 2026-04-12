@@ -1,0 +1,361 @@
+{
+  "week": "2026-04-09 to 2026-04-12",
+  "published_at": "2026-04-12T06:00:57.000Z",
+  "hero_topics": [
+    {
+      "title": "AI Agents — Frontier Models: Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b...",
+      "slug": "ai-agents-frontier-models",
+      "summary": "Key signals this cycle: Introducing Project Glasswing: an urgent initiative to help secure the world’s most criti…; We're bringing the advisor strategy to the Claude Platform. Pair Opus as an advisor with…; vibecoders using claude, chat gpt and gemini for the same project be like:. Includes 51 additional in-scope items.",
+      "insight": "The dominant thread in AI Agents this cycle was frontier models. Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b... set the pace, with We're bringing the advisor strategy to the Claude Platform. Pair Opus as an advisor with Sonnet or Haiku as an exe…",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b...",
+          "url": "https://x.com/AnthropicAI/status/2041578392852517128",
+          "type": "twitter"
+        },
+        {
+          "title": "We're bringing the advisor strategy to the Claude Platform. Pair Opus as an advisor with Sonnet or Haiku as an execut...",
+          "url": "https://x.com/claudeai/status/2042308622181339453",
+          "type": "twitter"
+        },
+        {
+          "title": "vibecoders using claude, chat gpt and gemini for the same project be like:",
+          "url": "https://v.redd.it/u1cfthf9weug1",
+          "type": "reddit"
+        },
+        {
+          "title": "The Mythos Preview \"Safety\" Gaslight: Anthropic is just hiding insane compute costs. Open models are already doing this.",
+          "url": "https://www.reddit.com/gallery/1sgoy17",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "ai-agents",
+        "frontier-models"
+      ]
+    },
+    {
+      "title": "Image/Video GenAI: Last week in Generative Image & Video",
+      "slug": "image-video-genai-2",
+      "summary": "Key signals this cycle: Last week in Generative Image & Video; FlowInOne - A new Multimodal image model . Released on Huggingface; Could HappyHorse be Z-video in disguise, from Alibaba?. Includes 8 additional in-scope items.",
+      "insight": "The dominant thread in Image/Video GenAI this cycle was workflow-oriented visual tooling and model quality. Last week in Generative Image & Video anchors the story, while FlowInOne - A new Multimodal image model . Released on Huggingface shows where the field is extending next. Practical takeaway: pay attention to too…",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Last week in Generative Image &amp; Video",
+          "url": "https://reddit.com/r/StableDiffusion/comments/1sfj9dt/last_week_in_generative_image_video/",
+          "type": "reddit"
+        },
+        {
+          "title": "FlowInOne - A new Multimodal image model . Released on Huggingface",
+          "url": "https://www.reddit.com/gallery/1sh04s4",
+          "type": "reddit"
+        },
+        {
+          "title": "Could HappyHorse be Z-video in disguise, from Alibaba?",
+          "url": "https://reddit.com/r/StableDiffusion/comments/1sfnod2/could_happyhorse_be_zvideo_in_disguise_from/",
+          "type": "reddit"
+        },
+        {
+          "title": "DFlash speculative decoding on Apple Silicon : 85 tok/s, 3.3x on Qwen3.5-9B (MLX, M5 Max)",
+          "url": "https://v.redd.it/qnwcms262lug1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "stablediffusion",
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "3D Gaussian Splatting: 🚨Two lines of code. A full explorable 3D scene generated in seconds from a text prompt. It's called WorldGen -- an o...",
+      "slug": "gaussian-splatting-3",
+      "summary": "Key signals this cycle: 🚨Two lines of code. A full explorable 3D scene generated in seconds from a text prompt.…; Procedural infinite weather (rain, snow, fog) for Gaussian splat scenes — fully GPU-driven; Turn Any Screen into 3D in Real Time. Includes 9 additional in-scope items.",
+      "insight": "The dominant thread in 3D Gaussian Splatting this cycle was practical scene-editing and reconstruction workflow progress. 🚨Two lines of code. A full explorable 3D scene generated in seconds from a text prompt. It's called WorldGen -- an o... is the clearest signal, with Procedural infinite weather (rain, snow, fog) f…",
+      "image_url": "https://pbs.twimg.com/media/HFckIl5a8AEYra9.png",
+      "sources": [
+        {
+          "title": "🚨Two lines of code. A full explorable 3D scene generated in seconds from a text prompt. It's called WorldGen -- an o...",
+          "url": "https://x.com/sukh_saroy/status/2042140688503206183",
+          "type": "twitter"
+        },
+        {
+          "title": "Procedural infinite weather (rain, snow, fog) for Gaussian splat scenes — fully GPU-driven",
+          "url": "https://v.redd.it/2mh7hjb1p4ug1",
+          "type": "reddit"
+        },
+        {
+          "title": "Turn Any Screen into 3D in Real Time",
+          "url": "https://v.redd.it/29s0p2mzveug1",
+          "type": "reddit"
+        },
+        {
+          "title": "Somebody built Photoshop AGAIN but it’s for Gaussian splats and 3D worlds 🎨 Part 2",
+          "url": "https://v.redd.it/t28wq6894ktg1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "gaussian-splatting"
+      ]
+    },
+    {
+      "title": "AI Agents — Applications & Builds: We just gave every Hermes Agent a free cloud browser. Use the Browser Use ecosystem in Hermes Agent for free > Unl...",
+      "slug": "ai-agents-applications-and-builds",
+      "summary": "Key signals this cycle: We just gave every Hermes Agent a free cloud browser. Use the Browser Use ecosystem in He…; I made a USB-Clawd who gets my attention when Claude Code finishes a response; Did you know you can get your claude through hermes without any fancy tricks? Just type /…. Includes 62 additional in-scope items.",
+      "insight": "The dominant thread in AI Agents this cycle was applications & builds. We just gave every Hermes Agent a free cloud browser. Use the Browser Use ecosystem in Hermes Agent for free > Unl... set the pace, with I made a USB-Clawd who gets my attention when Claude Code finishes a response reinforcing the same direction. P…",
+      "image_url": "https://pbs.twimg.com/amplify_video_thumb/2042076531506475011/img/j8ElfsSKTJ7QXJhu.jpg",
+      "sources": [
+        {
+          "title": "We just gave every Hermes Agent a free cloud browser. Use the Browser Use ecosystem in Hermes Agent for free &gt; Unl...",
+          "url": "https://x.com/browser_use/status/2042077879186698386",
+          "type": "twitter"
+        },
+        {
+          "title": "I made a USB-Clawd who gets my attention when Claude Code finishes a response https://t.co/DYDyt7p0rk",
+          "url": "https://x.com/BenJames_____/status/2041157626155741272",
+          "type": "twitter"
+        },
+        {
+          "title": "Did you know you can get your claude through hermes without any fancy tricks? Just type /claude-code &lt;prompt&gt; I...",
+          "url": "https://x.com/Teknium/status/2040603975343542503",
+          "type": "twitter"
+        },
+        {
+          "title": "Hermes bros don’t have any 3090s /model google/gemma-4-31b-it:free Openrouter has Gemma 31b for “free” at 25t/s Which...",
+          "url": "https://x.com/LottoLabs/status/2041927553452273948",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents",
+        "applications-and-builds"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "We're bringing the advisor strategy to the Claude Platform. Pair Opus as an advisor with Sonnet or Haiku as an execut...",
+      "summary": "We're bringing the advisor strategy to the Claude Platform. Pair Opus as an advisor with Sonnet or Haiku as an executor, and get near Opus-level intelligence in your agents at a fraction of the cost.",
+      "sources": [
+        {
+          "title": "We're bringing the advisor strategy to the Claude Platform. Pair Opus as an advisor with Sonnet or Haiku as an execut...",
+          "url": "https://x.com/claudeai/status/2042308622181339453",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
+      "summary": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open source model agnostic framework. He studied the architecture, focused on the multi-agent orchestration layer (the coordinator that breaks goals int…",
+      "sources": [
+        {
+          "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
+          "url": "https://x.com/ivanburazin/status/2040112100597506107",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "I made a USB-Clawd who gets my attention when Claude Code finishes a response",
+      "summary": "I made a USB-Clawd who gets my attention when Claude Code finishes a response",
+      "sources": [
+        {
+          "title": "I made a USB-Clawd who gets my attention when Claude Code finishes a response https://t.co/DYDyt7p0rk",
+          "url": "https://x.com/BenJames_____/status/2041157626155741272",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Did you know you can get your claude through hermes without any fancy tricks? Just type /claude-code <prompt> I...",
+      "summary": "Did you know you can get your claude through hermes without any fancy tricks? Just type /claude-code <prompt> In a new session. Hermes Agent can pilot a claude code session for you like it’s nothing. Give it a try It also doesn’t break all the self improvemen…",
+      "sources": [
+        {
+          "title": "Did you know you can get your claude through hermes without any fancy tricks? Just type /claude-code &lt;prompt&gt; I...",
+          "url": "https://x.com/Teknium/status/2040603975343542503",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "vibecoders using claude, chat gpt and gemini for the same project be like:",
+      "summary": "Pending summary",
+      "sources": [
+        {
+          "title": "vibecoders using claude, chat gpt and gemini for the same project be like:",
+          "url": "https://v.redd.it/u1cfthf9weug1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "chatgpt",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "The Mythos Preview \"Safety\" Gaslight: Anthropic is just hiding insane compute costs. Open models are already doing this.",
+      "summary": "To save you from digging through their 244-page system card, I highly recommend checking out this video breakdown \\Link:[ perfectly breaks down why the \"safety risk\" excuse in my meme above is really just about astronomical compute costs. Anthropic is heavily…",
+      "sources": [
+        {
+          "title": "The Mythos Preview \"Safety\" Gaslight: Anthropic is just hiding insane compute costs. Open models are already doing this.",
+          "url": "https://www.reddit.com/gallery/1sgoy17",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "FlowInOne - A new Multimodal image model . Released on Huggingface",
+      "summary": "Model: Github: Paper: FlowInOne, a framework that reformulates multimodal generation as a purely visual flow, converting all inputs into visual prompts and enabling a clean image-in, image-out pipeline governed by a single flow matching model. This vision-cen…",
+      "sources": [
+        {
+          "title": "FlowInOne - A new Multimodal image model . Released on Huggingface",
+          "url": "https://www.reddit.com/gallery/1sh04s4",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "stablediffusion",
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "Could HappyHorse be Z-video in disguise, from Alibaba?",
+      "summary": "Previously, someone asked if there would be a Z-video four months ago. Today, bdsqlsz says he knows it is from a Chinese company. Someone in the comments mentioned Z-video too. The github repo for HappyHorse says that it is going to be fully open-source, 15B…",
+      "sources": [
+        {
+          "title": "Could HappyHorse be Z-video in disguise, from Alibaba?",
+          "url": "https://reddit.com/r/StableDiffusion/comments/1sfnod2/could_happyhorse_be_zvideo_in_disguise_from/",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "stablediffusion",
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "Procedural infinite weather (rain, snow, fog) for Gaussian splat scenes — fully GPU-driven",
+      "summary": "We've been working on weather effects for Gaussian splat scenes in the PlayCanvas engine, and just landed support for procedural weather particles + scene fog. Weather particles: Rain and snow are rendered as Gaussian splats themselves — they go through the s…",
+      "sources": [
+        {
+          "title": "Procedural infinite weather (rain, snow, fog) for Gaussian splat scenes — fully GPU-driven",
+          "url": "https://v.redd.it/2mh7hjb1p4ug1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "gaussiansplatting",
+        "gaussian-splatting"
+      ]
+    },
+    {
+      "title": "DFlash speculative decoding on Apple Silicon : 85 tok/s, 3.3x on Qwen3.5-9B (MLX, M5 Max)",
+      "summary": "I'm building a native MLX implementation of DFlash (paper) for Apple Silicon. A small draft model generates 16 tokens in parallel via block diffusion, the target verifies them in one forward pass. Output is bit-for-bit identical to baseline (greedy exact argm…",
+      "sources": [
+        {
+          "title": "DFlash speculative decoding on Apple Silicon : 85 tok/s, 3.3x on Qwen3.5-9B (MLX, M5 Max)",
+          "url": "https://v.redd.it/qnwcms262lug1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "image-video-genai",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Turn Any Screen into 3D in Real Time",
+      "summary": "I’m building a system that turns anything on your screen into depth and lets you watch it in VR/XR. Everything runs locally, in real time. Just press play. It adds real-time depth to whatever you’re seeing. Movies, streams, games, even your desktop. This is a…",
+      "sources": [
+        {
+          "title": "Turn Any Screen into 3D in Real Time",
+          "url": "https://v.redd.it/29s0p2mzveug1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "gaussiansplatting",
+        "gaussian-splatting"
+      ]
+    },
+    {
+      "title": "Decided to make my own stable diffusion",
+      "summary": "don't complain about quality, in doing all of this on a CPU, using CFG with a bigru encoder, 32x32 images with 8x4x4 latent, 128 base channels for VAE and Unet",
+      "sources": [
+        {
+          "title": "Decided to make my own stable diffusion",
+          "url": "https://i.redd.it/v78zbl92pkug1.jpeg",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "stablediffusion",
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "Somebody built Photoshop AGAIN but it’s for Gaussian splats and 3D worlds 🎨 Part 2",
+      "summary": "Hey guys, for those who saw my last post, this is an update to that! and for those seeing it for the first time, I've been making updates and this the latest version! You can now brush select which areas you'd like to color grade apart from an overall ability…",
+      "sources": [
+        {
+          "title": "Somebody built Photoshop AGAIN but it’s for Gaussian splats and 3D worlds 🎨 Part 2",
+          "url": "https://v.redd.it/t28wq6894ktg1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "gaussiansplatting",
+        "gaussian-splatting"
+      ]
+    },
+    {
+      "title": "National University of Singapore Presents \"DMax\": A New Paradigm For Diffusion Language Models (dLLMs) Enabling Aggressive Parallel Decodin…",
+      "summary": "##TL;DR: DMax cleverly mitigates error accumulation by reforming decoding as a progressive self-refinement process, allowing the model to correct its own erroneous predictions during generation. --- ##Abstract: >We present DMax, a new paradigm for efficient d…",
+      "sources": [
+        {
+          "title": "National University of Singapore Presents \"DMax\": A New Paradigm For Diffusion Language Models (dLLMs) Enabling Aggressive Parallel Decoding.",
+          "url": "https://v.redd.it/buzbtk1hdeug1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "Creating a full 360° Gaussian Splat from just One 360° Equirectangular Picture via Apple SHARP",
+      "summary": "Hey guys, I’ve been working on a Windows tool called SHARP 360 to Splat. It takes a single 360° panorama from a phone or 360 camera and converts it into a Gaussian Splat scene, without needing a full multi-image capture workflow. The tool extracts multiple pe…",
+      "sources": [
+        {
+          "title": "Creating a full 360° Gaussian Splat from just One 360° Equirectangular Picture via Apple SHARP",
+          "url": "https://v.redd.it/hyuv07g5vetg1",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "gaussiansplatting",
+        "gaussian-splatting"
+      ]
+    }
+  ]
+}
