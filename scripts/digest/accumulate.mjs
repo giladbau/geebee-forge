@@ -1,11 +1,10 @@
 import path from 'node:path';
 import { ensureDir, writeJson } from './shared/fs.mjs';
 import { ensureDigestStateLayout, getStatePaths, loadConfig } from './shared/config.mjs';
-import { loadPool, loadState, markAccumulationRun, mergePoolItems, savePool, saveState } from './shared/pool.mjs';
+import { filterItemsNewerThan, loadPool, loadState, markAccumulationRun, mergePoolItems, savePool, saveState } from './shared/pool.mjs';
 import { compactTimestamp, nowIso } from './shared/time.mjs';
 import { filterDigestItems } from './shared/subjects.mjs';
 import { collectRedditSource } from './sources/reddit.mjs';
-import { collectHuggingFaceDailyPapers } from './sources/huggingface-papers.mjs';
 import { collectXFollowing } from './sources/x-following.mjs';
 import { collectXBookmarks } from './sources/x-bookmarks.mjs';
 
@@ -30,8 +29,7 @@ const allItems = [];
 const collectors = [
   ['reddit', () => collectRedditSource(config.sources.reddit, { fetchedAt: runAt, rawRefBase: rawRunDir })],
   ['x_following', () => collectXFollowing(config.sources.x_following, { fetchedAt: runAt, rawRefBase: rawRunDir })],
-  ['x_bookmarks', () => collectXBookmarks(config.sources.x_bookmarks, { fetchedAt: runAt, rawRefBase: rawRunDir })],
-  ['huggingface_daily_papers', () => collectHuggingFaceDailyPapers(config.sources.huggingface_daily_papers, { fetchedAt: runAt, rawRefBase: rawRunDir })]
+  ['x_bookmarks', () => collectXBookmarks(config.sources.x_bookmarks, { fetchedAt: runAt, rawRefBase: rawRunDir })]
 ];
 
 for (const [name, runCollector] of collectors) {
@@ -50,22 +48,34 @@ for (const [name, runCollector] of collectors) {
   }
 }
 
-const filtered = filterDigestItems(allItems, config.subjects);
+if (config.sources.huggingface_daily_papers?.mode === 'compile') {
+  sourceHealth.huggingface_daily_papers = 'skipped: compile-only';
+}
+
+const state = await loadState(paths.activeState);
+const freshItems = filterItemsNewerThan(allItems, state.last_compile_at);
+const filtered = filterDigestItems(freshItems, config.subjects);
 
 await writeJson(path.join(rawRunDir, 'run.json'), {
   run_at: runAt,
   mode: 'accumulate',
   collected_items: allItems.length,
+  fresh_items: freshItems.length,
   accepted_items: filtered.accepted.length,
-  subject_counts: filtered.subject_counts
+  subject_counts: filtered.subject_counts,
+  since_last_compile_at: state.last_compile_at
 });
 
 const pool = await loadPool(paths.activePool);
-const existingFiltered = filterDigestItems(pool.items, config.subjects);
+const carryoverItems = (pool.items || []).filter((item) => {
+  if (item.source !== 'huggingface_daily_papers') return true;
+  return config.sources.huggingface_daily_papers?.mode !== 'compile';
+});
+const carryoverFresh = filterItemsNewerThan(carryoverItems, state.last_compile_at);
+const existingFiltered = filterDigestItems(carryoverFresh, config.subjects);
 const merged = mergePoolItems({ items: existingFiltered.accepted }, filtered.accepted);
 await savePool(paths.activePool, merged);
 
-const state = await loadState(paths.activeState);
 const nextState = markAccumulationRun(state, {
   at: runAt,
   sourceHealth,

@@ -5,7 +5,8 @@ import {
 	resetPool,
 	createEmptyState,
 	markAccumulationRun,
-	markCompileRun
+	markCompileRun,
+	filterItemsNewerThan
 } from '../../../scripts/digest/shared/pool.mjs';
 
 describe('digest pool helpers', () => {
@@ -63,5 +64,19 @@ describe('digest pool helpers', () => {
 				'ai-agents': 2
 			}
 		});
+	});
+
+	it('drops items already published at or before the last compile cutoff', () => {
+		const items = [
+			{ id: 'before', published_at: '2026-04-09T08:49:41.731Z' },
+			{ id: 'equal', published_at: '2026-04-09T09:00:00.000Z' },
+			{ id: 'after', published_at: '2026-04-09T09:00:00.001Z' },
+			{ id: 'unknown' }
+		];
+
+		expect(filterItemsNewerThan(items, '2026-04-09T09:00:00.000Z').map((item) => item.id)).toEqual([
+			'after',
+			'unknown'
+		]);
 	});
 });
