@@ -1,0 +1,308 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Growing Tree | GeeBee Forge">
+  <main class="tree-page">
+    <h1 class="sr-only">Growing Tree</h1>
+    <canvas id="tree-canvas" aria-label="Animated growing tree"></canvas>
+    <div class="overlay" aria-hidden="true">
+      <span class="eyebrow">Canvas Study</span>
+      <strong>Growing Tree</strong>
+      <span>15 seconds from trunk to leaves.</span>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  :global(body) {
+    background: #d7edff;
+  }
+
+  .tree-page {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .overlay {
+    position: fixed;
+    left: 1.25rem;
+    bottom: 1.25rem;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: #264058;
+    box-shadow: 0 12px 30px rgba(38, 64, 88, 0.12);
+  }
+
+  .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.72;
+  }
+
+  .overlay strong {
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .overlay span:last-child {
+    font-size: 0.88rem;
+    opacity: 0.8;
+  }
+
+  @media (max-width: 640px) {
+    .overlay {
+      left: 0.9rem;
+      right: 0.9rem;
+      bottom: 0.9rem;
+    }
+  }
+</style>
+
+<script is:inline>
+  const canvas = document.getElementById('tree-canvas');
+  const ctx = canvas.getContext('2d');
+
+  const TOTAL_DURATION = 15000;
+  const TRUNK_DURATION = 2800;
+  const MAX_DEPTH = 7;
+  const LEAF_GROW_MS = 900;
+
+  let width = 0;
+  let height = 0;
+  let dpr = 1;
+  let root = null;
+  let animationStart = performance.now();
+
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+  const lerp = (start, end, amount) => start + (end - start) * amount;
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+  const easeOutSine = (t) => Math.sin((t * Math.PI) / 2);
+  const rand = (min, max) => min + Math.random() * (max - min);
+
+  function buildLeaves(x, y, angle, depth, readyAt) {
+    const leaves = [];
+    const count = Math.floor(rand(4, 8));
+    const tangentX = Math.cos(angle);
+    const tangentY = Math.sin(angle);
+    const normalX = -tangentY;
+    const normalY = tangentX;
+
+    for (let i = 0; i < count; i += 1) {
+      const spread = rand(-18, 18) * (1 + depth * 0.02);
+      const lift = rand(6, 26);
+      const size = rand(4.5, 9.5) * (1 - depth * 0.025);
+      const hue = rand(98, 132);
+      const sat = rand(34, 58);
+      const light = rand(40, 61);
+      leaves.push({
+        x: x + normalX * spread + tangentX * rand(-6, 6),
+        y: y + normalY * spread - lift,
+        radius: size,
+        hue,
+        sat,
+        light,
+        alpha: rand(0.22, 0.4),
+        delay: readyAt + rand(40, 340),
+      });
+    }
+
+    return leaves;
+  }
+
+  function buildBranch({ x, y, angle, length, width, depth, delay, duration }) {
+    const x2 = x + Math.cos(angle) * length;
+    const y2 = y + Math.sin(angle) * length;
+    const lightness = Math.min(48, 25 + depth * 3.5);
+
+    const branch = {
+      x1: x,
+      y1: y,
+      x2,
+      y2,
+      angle,
+      length,
+      width,
+      depth,
+      delay,
+      duration,
+      color: `hsl(${28 - depth * 0.5}, 42%, ${lightness}%)`,
+      children: [],
+      leaves: [],
+      finalTime: delay + duration,
+    };
+
+    if (depth >= MAX_DEPTH || length < 20 || width < 1.1) {
+      branch.leaves = buildLeaves(x2, y2, angle, depth, branch.finalTime);
+      branch.finalTime = Math.max(
+        branch.finalTime,
+        ...branch.leaves.map((leaf) => leaf.delay + LEAF_GROW_MS),
+      );
+      return branch;
+    }
+
+    const branchCount = depth < 2 ? 2 : (Math.random() < 0.75 ? 2 : 3);
+    const spreadBase = lerp(0.34, 0.72, depth / MAX_DEPTH);
+
+    for (let i = 0; i < branchCount; i += 1) {
+      const side = branchCount === 1 ? 0 : i - (branchCount - 1) / 2;
+      const spread = side * spreadBase + rand(-0.12, 0.12);
+      const childAngle = angle + spread + rand(-0.06, 0.06);
+      const childLength = length * rand(0.62, 0.8);
+      const childWidth = width * rand(0.64, 0.76);
+      const childDelay = delay + duration * rand(0.7, 0.92);
+      const childDuration = duration * rand(0.72, 0.9);
+      const child = buildBranch({
+        x: x2,
+        y: y2,
+        angle: childAngle,
+        length: childLength,
+        width: childWidth,
+        depth: depth + 1,
+        delay: childDelay,
+        duration: childDuration,
+      });
+      branch.children.push(child);
+      branch.finalTime = Math.max(branch.finalTime, child.finalTime);
+    }
+
+    return branch;
+  }
+
+  function buildTree() {
+    const trunkLength = height * 0.24;
+    const trunkWidth = Math.max(10, Math.min(20, width * 0.012));
+
+    root = buildBranch({
+      x: width * 0.5,
+      y: height + height * 0.03,
+      angle: -Math.PI / 2,
+      length: trunkLength,
+      width: trunkWidth,
+      depth: 0,
+      delay: 0,
+      duration: TRUNK_DURATION,
+    });
+
+    const scale = (TOTAL_DURATION * 0.98) / root.finalTime;
+    rescaleTree(root, scale);
+  }
+
+  function rescaleTree(branch, scale) {
+    branch.delay *= scale;
+    branch.duration *= scale;
+    branch.finalTime = branch.delay + branch.duration;
+    for (const leaf of branch.leaves) {
+      leaf.delay *= scale;
+      branch.finalTime = Math.max(branch.finalTime, leaf.delay + LEAF_GROW_MS);
+    }
+    for (const child of branch.children) {
+      rescaleTree(child, scale);
+      branch.finalTime = Math.max(branch.finalTime, child.finalTime);
+    }
+  }
+
+  function drawSky() {
+    const sky = ctx.createLinearGradient(0, 0, 0, height);
+    sky.addColorStop(0, '#dff2ff');
+    sky.addColorStop(0.55, '#bfe0fb');
+    sky.addColorStop(1, '#eef8ff');
+    ctx.fillStyle = sky;
+    ctx.fillRect(0, 0, width, height);
+
+    const glow = ctx.createRadialGradient(width * 0.22, height * 0.2, 0, width * 0.22, height * 0.2, width * 0.38);
+    glow.addColorStop(0, 'rgba(255, 248, 220, 0.55)');
+    glow.addColorStop(1, 'rgba(255, 248, 220, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, width, height);
+
+    const ground = ctx.createLinearGradient(0, height * 0.75, 0, height);
+    ground.addColorStop(0, 'rgba(130, 176, 108, 0)');
+    ground.addColorStop(1, 'rgba(117, 158, 92, 0.14)');
+    ctx.fillStyle = ground;
+    ctx.fillRect(0, height * 0.75, width, height * 0.25);
+  }
+
+  function drawLeaves(leaves, elapsed) {
+    for (const leaf of leaves) {
+      const progress = clamp((elapsed - leaf.delay) / LEAF_GROW_MS, 0, 1);
+      if (progress <= 0) continue;
+
+      const eased = easeOutSine(progress);
+      ctx.beginPath();
+      ctx.fillStyle = `hsla(${leaf.hue}, ${leaf.sat}%, ${leaf.light}%, ${leaf.alpha + eased * 0.3})`;
+      ctx.shadowColor = `hsla(${leaf.hue}, ${leaf.sat}%, ${leaf.light + 10}%, 0.35)`;
+      ctx.shadowBlur = 8 * eased;
+      ctx.arc(leaf.x, leaf.y, leaf.radius * eased, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+  }
+
+  function drawBranch(branch, elapsed) {
+    const progress = clamp((elapsed - branch.delay) / branch.duration, 0, 1);
+    if (progress <= 0) return;
+
+    const eased = easeOutCubic(progress);
+    const currentX = lerp(branch.x1, branch.x2, eased);
+    const currentY = lerp(branch.y1, branch.y2, eased);
+
+    ctx.beginPath();
+    ctx.moveTo(branch.x1, branch.y1);
+    ctx.lineTo(currentX, currentY);
+    ctx.strokeStyle = branch.color;
+    ctx.lineWidth = branch.width;
+    ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(72, 42, 23, 0.1)';
+    ctx.shadowBlur = branch.width * 0.55;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    if (progress >= 1 && branch.leaves.length) {
+      drawLeaves(branch.leaves, elapsed);
+    }
+
+    for (const child of branch.children) {
+      drawBranch(child, elapsed);
+    }
+  }
+
+  function frame(now) {
+    const elapsed = now - animationStart;
+    drawSky();
+    drawBranch(root, elapsed);
+    requestAnimationFrame(frame);
+  }
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildTree();
+    animationStart = performance.now();
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  requestAnimationFrame(frame);
+</script>
