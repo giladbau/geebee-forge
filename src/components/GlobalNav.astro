@@ -2,11 +2,14 @@
 const pathname = Astro.url.pathname;
 
 const demos = [
-  { href: '/constellation', label: 'Constellation' },
   { href: '/unicorn-farm', label: 'Unicorn Farm' },
   { href: '/growing-tree', label: 'Growing Tree' },
   { href: '/digest', label: 'Digest' },
+];
+
+const archive = [
   { href: '/alerts', label: 'Alerts' },
+  { href: '/constellation', label: 'Constellation' },
 ];
 ---
 
@@ -21,15 +24,29 @@ const demos = [
     </a>
   </div>
 
-  <div class="demo-links">
-    {demos.map(({ href, label }) => (
-      <a
-        href={href}
-        class:list={['demo-link', { active: pathname.startsWith(href) }]}
-      >
-        {label}
-      </a>
-    ))}
+  <div class="nav-links">
+    <div class="demo-links" aria-label="Primary demos">
+      {demos.map(({ href, label }) => (
+        <a
+          href={href}
+          class:list={['demo-link', { active: pathname.startsWith(href) }]}
+        >
+          {label}
+        </a>
+      ))}
+    </div>
+
+    <div class="archive-links" aria-label="Archive">
+      <span class="archive-label">Archive</span>
+      {archive.map(({ href, label }) => (
+        <a
+          href={href}
+          class:list={['demo-link', 'archive-link', { active: pathname.startsWith(href) }]}
+        >
+          {label}
+        </a>
+      ))}
+    </div>
   </div>
 </nav>
 
@@ -99,9 +116,32 @@ const demos = [
     color: #6ba3ff;
   }
 
-  .demo-links {
+  .nav-links,
+  .demo-links,
+  .archive-links {
     display: flex;
+    align-items: center;
+  }
+
+  .nav-links {
+    gap: 0.85rem;
+  }
+
+  .demo-links,
+  .archive-links {
     gap: 0.25rem;
+  }
+
+  .archive-links {
+    padding-left: 0.85rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .archive-label {
+    color: #555;
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 
   .demo-link {
@@ -126,8 +166,24 @@ const demos = [
     border-color: rgba(107, 163, 255, 0.2);
   }
 
+  .archive-link {
+    color: #555;
+  }
+
   @media (max-width: 500px) {
     .brand-name {
+      display: none;
+    }
+
+    .nav-links {
+      gap: 0.35rem;
+    }
+
+    .archive-links {
+      padding-left: 0.35rem;
+    }
+
+    .archive-label {
       display: none;
     }
 

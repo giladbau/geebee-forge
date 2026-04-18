@@ -8,12 +8,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 		<div class="grid">
 			<article role="article" data-testid="demo-card" class="card">
-				<h2 data-testid="card-title">Constellation</h2>
-				<p class="card-desc">An interactive Three.js star field — data's neural sky.</p>
-				<a href="/constellation" class="card-link">Launch Constellation</a>
-			</article>
-
-			<article role="article" data-testid="demo-card" class="card">
 				<h2 data-testid="card-title">Unicorn Farm</h2>
 				<p class="card-desc">A cozy magical isometric voxel farm with interactive unicorns.</p>
 				<a href="/unicorn-farm" class="card-link">Visit the Farm</a>
@@ -30,13 +24,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 				<p class="card-desc">A full-page canvas tree that grows from trunk to leaves in one slow breath.</p>
 				<a href="/growing-tree" class="card-link">Watch It Grow</a>
 			</article>
-
-			<article role="article" data-testid="demo-card" class="card">
-				<h2 data-testid="card-title">Rocket Alerts</h2>
-				<p class="card-desc">Israel rocket alert statistics dashboard.</p>
-				<a href="/alerts" class="card-link">View Dashboard</a>
-			</article>
 		</div>
+
+		<section class="archive-section" aria-labelledby="archive-heading">
+			<h2 id="archive-heading">Archive</h2>
+			<div class="grid archive-grid">
+				<article role="article" data-testid="demo-card" class="card archive-card">
+					<h3 data-testid="card-title">Rocket Alerts</h3>
+					<p class="card-desc">Israel rocket alert statistics dashboard.</p>
+					<a href="/alerts" class="card-link">View Dashboard</a>
+				</article>
+
+				<article role="article" data-testid="demo-card" class="card archive-card">
+					<h3 data-testid="card-title">Constellation</h3>
+					<p class="card-desc">An interactive Three.js star field — data's neural sky.</p>
+					<a href="/constellation" class="card-link">Launch Constellation</a>
+				</article>
+			</div>
+		</section>
 	</div>
 </BaseLayout>
 
@@ -104,6 +109,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		max-width: 900px;
 	}
 
+	.archive-section {
+		width: 100%;
+		max-width: 900px;
+		margin-top: 3rem;
+		padding-top: 2rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.archive-section h2 {
+		margin: 0 0 1rem;
+		color: #777;
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.archive-grid {
+		max-width: none;
+	}
+
 	.card {
 		background: #151515;
 		border: 1px solid #2a2a2a;
@@ -122,6 +148,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		margin: 0 0 0.75rem;
 		font-size: 1.4rem;
 		color: #e0e0e0;
+	}
+
+	.card h3 {
+		margin: 0 0 0.75rem;
+		font-size: 1.2rem;
+		color: #c8c8c8;
+	}
+
+	.archive-card {
+		background: #121212;
+		border-color: #232323;
 	}
 
 	.card-desc {
