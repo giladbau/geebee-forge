@@ -812,4 +812,70 @@ describe('digest render', () => {
 
     expect(digest.hero_topics[0].sources.map((source) => source.url)).toContain('https://github.com/example/gaussian-tool');
   });
+
+  it('cleans host-prefixed url source labels in rendered notables', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-19',
+      publishedAt: '2026-04-19T06:01:09.037Z',
+      items: [
+        {
+          id: 'reddit:design-extract',
+          source: 'reddit',
+          title: 'I built a Claude Code plugin that extracts any website\'s full design system',
+          summary: 'The tool extracts a site design system and also links the project repo for implementation details.',
+          url: 'https://i.redd.it/najpel0wzbvg1.png',
+          sources: [
+            { title: 'Reddit image', url: 'https://i.redd.it/najpel0wzbvg1.png', type: 'reddit' },
+            { title: 'stripe.com: `https://stripe.com`', url: 'https://stripe.com/', type: 'project' },
+            { title: 'GitHub repo', url: 'https://github.com/Manavarya09/design-extract', type: 'github' }
+          ],
+          tags: ['claudeai'],
+          subject_primary: 'ai-agents',
+          subject_matches: ['ai-agents'],
+          subject_match_score: 2,
+          engagement: { score: 320 }
+        }
+      ],
+      heroTopicTargetMax: 0,
+      notableTargetMax: 1
+    });
+
+    expect(digest.notable[0].sources[1]).toEqual({
+      title: 'stripe.com',
+      url: 'https://stripe.com',
+      type: 'project'
+    });
+  });
+
+  it('publishes corroborated 3D world-generation reddit media posts as a real hero topic', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-19',
+      publishedAt: '2026-04-19T06:01:09.037Z',
+      items: [
+        {
+          id: 'reddit:hy-world',
+          source: 'reddit',
+          title: 'Tencent HY-World 2.0 open-source multimodal 3D world generation from Tencent Hunyuan',
+          summary: 'HY-World 2.0 is a multimodal world model that can generate persistent, explorable 3D environments with engine-compatible exports.',
+          url: 'https://v.redd.it/g91l2x98w7vg1',
+          sources: [
+            { title: 'Reddit video', url: 'https://v.redd.it/g91l2x98w7vg1', type: 'reddit' },
+            { title: '3d-models.hunyuan.tencent.com', url: 'https://3d-models.hunyuan.tencent.com/world/', type: 'official' }
+          ],
+          tags: ['stablediffusion'],
+          subject_primary: 'generative-3d-worlds',
+          subject_matches: ['generative-3d-worlds'],
+          subject_match_score: 6,
+          engagement: { score: 481 }
+        }
+      ],
+      heroTopicTargetMax: 1,
+      notableTargetMax: 0
+    });
+
+    expect(digest.hero_topics).toHaveLength(1);
+    expect(digest.hero_topics[0].title).toBe('Generative 3D Worlds: Explorable World Models');
+    expect(digest.hero_topics[0].summary).not.toMatch(/\bSource\b|##|\\"/);
+    expect(digest.hero_topics[0].sources.map((source) => source.url)).toContain('https://3d-models.hunyuan.tencent.com/world');
+  });
 });

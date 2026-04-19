@@ -42,10 +42,18 @@ function itemText(item) {
   ].join(' '), 600).toLowerCase();
 }
 
-function canonicalUrl(value) {
+function canonicalUrl(value, depth = 0) {
   if (!value) return '';
   try {
-    const url = new URL(value);
+    const url = new URL(decodeBasicEntities(value));
+    if (depth < 2) {
+      for (const param of ['u', 'url', 'target', 'dest', 'destination', 'redirect', 'redirect_url']) {
+        const nested = url.searchParams.get(param);
+        if (nested && /^https?:\/\//i.test(decodeBasicEntities(nested).trim())) {
+          return canonicalUrl(nested, depth + 1);
+        }
+      }
+    }
     url.hash = '';
     for (const param of [...url.searchParams.keys()]) {
       if (/^(utm_|fbclid|gclid|ref$|ref_src$)/i.test(param)) {
@@ -215,7 +223,7 @@ function substanceScore(item) {
   let score = 0;
 
   const highSignalPatterns = [
-    /\b(project|paper|model|benchmark|framework|release|launch|agents?|tool use|orchestration|memory|coding|image|video|diffusion|segmentation|gaussian|splat|reconstruction|rendering)\b/,
+    /\b(project|paper|model|benchmark|framework|release|launch|agents?|tool use|orchestration|memory|coding|image|video|diffusion|segmentation|gaussian|splat|reconstruction|rendering|world model|world generation|3d worlds?|navigable|explorable)\b/,
     /\b(system card|evaluation|evals?|safety|dataset|open source|github|arxiv|technical report|research)\b/
   ];
 
@@ -273,14 +281,14 @@ function detectAiSubtheme(item) {
   if (/\b(paper|benchmark|evaluation|evals?|safety|alignment|system card|analysis|study|research|arxiv)\b/.test(text)) {
     return { id: 'research-and-evals', label: 'Research & Evals' };
   }
-  if (/\b(glasswing|mythos|opus|sonnet|gpt|gemini|muse spark|release|launch|preview|frontier model|model update)\b/.test(text)) {
-    return { id: 'frontier-models', label: 'Frontier Models' };
-  }
   if (/\b(claude code|coding agent|code agents?|ide|cli|terminal|developer tool|devtool|debugging|repository|repo|pull request|code review)\b/.test(text)) {
     return { id: 'developer-tools', label: 'Developer Tools' };
   }
   if (/\b(harness|orchestration|deployment|managed agents|framework|tooling|infrastructure|platform|mcp|runtime|tracing)\b/.test(text)) {
     return { id: 'tooling-and-platforms', label: 'Tooling & Platforms' };
+  }
+  if (/\b(glasswing|mythos|opus|sonnet|gpt|gemini|muse spark|release|launch|preview|frontier model|model update)\b/.test(text)) {
+    return { id: 'frontier-models', label: 'Frontier Models' };
   }
   if (/\b(openclaw|hermes agent|assistant app|agent app|agent platform|workspace agent|workflow app|agent workspace|marketplace|desktop app|mini app)\b/.test(text)) {
     return { id: 'agent-apps-and-platforms', label: 'Agent Apps & Platforms' };
@@ -422,9 +430,50 @@ function presentableItems(group) {
 }
 
 function normalizeSource(source, fallbackType = 'unknown') {
+  const rawUrl = source?.url ?? 'about:blank';
+  const url = canonicalUrl(rawUrl) || rawUrl;
+  const originalHost = (() => {
+    try {
+      return new URL(rawUrl).hostname.replace(/^www\./, '').toLowerCase();
+    } catch {
+      return '';
+    }
+  })();
+  const normalizedHost = (() => {
+    try {
+      return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
+    } catch {
+      return '';
+    }
+  })();
+  const rawTitle = decodeBasicEntities(source?.title ?? 'Source item')
+    .replace(/`+/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const normalizedTitle = rawTitle.replace(/[:\-–—]+$/g, '').trim();
+
+  const title = (() => {
+    const escapedHost = normalizedHost ? normalizedHost.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') : '';
+    if (!normalizedTitle) return normalizedHost || 'Source item';
+    if (originalHost && normalizedHost && originalHost !== normalizedHost && normalizedTitle.toLowerCase() === originalHost) {
+      return normalizedHost;
+    }
+    if (normalizedHost && normalizedTitle.toLowerCase() === normalizedHost) return normalizedHost;
+    if (normalizedHost && escapedHost) {
+      const hostPrefixedUrl = normalizedTitle.match(new RegExp(`^${escapedHost}:\\s*(https?:\\/\\/.+)$`, 'i'));
+      if (hostPrefixedUrl && canonicalUrl(hostPrefixedUrl[1]) === url) return normalizedHost;
+    }
+    if (canonicalUrl(normalizedTitle) === url) return normalizedHost || 'Source item';
+    if (/^(source|link|article|read more|view post)$/i.test(normalizedTitle)) return normalizedHost || normalizedTitle;
+    if (normalizedHost && escapedHost && new RegExp(`^${escapedHost}:\\s*(source|link|article|read more|view post)$`, 'i').test(normalizedTitle)) {
+      return normalizedHost;
+    }
+    return cleanText(normalizedTitle, 140) || normalizedHost || 'Source item';
+  })();
+
   return {
-    title: cleanText(source?.title ?? 'Source item', 140) || 'Source item',
-    url: source?.url ?? 'about:blank',
+    title,
+    url,
     type: source?.type ?? fallbackType
   };
 }
@@ -453,6 +502,12 @@ function inferThemeLabel(group) {
     return '3D Reconstruction';
   }
 
+  if (group.subjectId === 'generative-3d-worlds') {
+    if (/\b(explorable|navigable|navigation|persistent|spatial consistency|world model)\b/.test(text)) return 'Explorable World Models';
+    if (/\b(engine|unity|unreal|mesh|export|asset|game)\b/.test(text)) return 'Engine-Ready 3D Worlds';
+    return 'Interactive 3D Worlds';
+  }
+
   return null;
 }
 
@@ -463,7 +518,10 @@ function buildHeroTitle(group) {
 }
 
 function leadingSentence(value) {
-  const cleaned = cleanText(value, 260);
+  const cleaned = cleanText(value, 260)
+    .replace(/^(full link:\s*)+/i, '')
+    .replace(/^(?:🔥\s*)?breaking:\s*/i, '')
+    .trim();
   if (!cleaned) return '';
   const candidates = cleaned
     .split(/(?<=[.!?])\s+/)
@@ -474,10 +532,18 @@ function leadingSentence(value) {
 }
 
 function itemDigestLine(item) {
-  const summary = leadingSentence(item.summary || item.snippet || '');
+  const rawSummary = String(item.summary || item.snippet || '');
+  const cleanedTitle = cleanText(item.title, 140)
+    .replace(/^(full link:\s*)+/i, '')
+    .replace(/^(?:🔥\s*)?breaking:\s*/i, '')
+    .trim();
+  if (/\[(source|link)\]\(https?:\/\/|(?:^|\n)#+\s|(?:^|\n)\d+\.\s|https?:\/\/\S+\s*\n|\bfull link:\b/i.test(rawSummary)) {
+    if (cleanedTitle) return `${cleanedTitle}.`;
+  }
+
+  const summary = leadingSentence(rawSummary);
   if (summary && !/^https?:\/\//i.test(summary)) return summary;
-  const title = cleanText(item.title, 140);
-  return title ? `${title}.` : '';
+  return cleanedTitle ? `${cleanedTitle}.` : '';
 }
 
 function buildHeroSummary(group) {
@@ -529,6 +595,10 @@ function buildHeroInsight(group, supporting) {
 
   if (group.subjectId === 'gaussian-splatting') {
     return cleanText(`This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. ${sourcePhrase} points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.`, 420);
+  }
+
+  if (group.subjectId === 'generative-3d-worlds') {
+    return cleanText(`This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. ${sourcePhrase} is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.`, 420);
   }
 
   return cleanText(`This matters because ${subjectLabel} activity is producing enough signal to affect near-term tooling and research choices. ${sourcePhrase} suggests it is worth tracking into the next cycle.`, 420);

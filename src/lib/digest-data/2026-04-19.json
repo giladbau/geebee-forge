@@ -3,44 +3,31 @@
   "published_at": "2026-04-19T06:01:09.037Z",
   "hero_topics": [
     {
-      "title": "AI Agents: Research & Evals",
-      "slug": "ai-agents-research-and-evals",
-      "summary": "This AI Agents theme centers on research & evals. We built autonomous AI agents that propose ideas, run experiments, and iterate on an open research problem: how to train a strong model using only a weaker model's supervision. New Anthropic Fellows research: developing an Automated Alignment Researcher. The cluster includes 3 more in-scope items across 2 source domains.",
-      "insight": "This matters because evaluation work is becoming the control surface for agent progress: better tests shape what builders trust, deploy, and regulate. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
-      "image_url": null,
-      "sources": [
-        {
-          "title": "Anthropic's Autonomous AI Agents Outperform Human Researchers on Weak-to-Strong Supervision",
-          "url": "https://alignment.anthropic.com/2026/automated-w2s-researcher/",
-          "type": "reddit"
-        },
-        {
-          "title": "New Anthropic Fellows research: developing an Automated Alignment Researcher. We ran an experiment to learn whether C...",
-          "url": "https://x.com/AnthropicAI/status/2044138481790648323",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents",
-        "research-and-evals"
-      ]
-    },
-    {
       "title": "Image/Video GenAI: Model Releases",
       "slug": "image-video-genai-model-releases",
-      "summary": "This Image/Video GenAI theme centers on model releases. I curate a weekly multimodal AI roundup, here are the open-source image & video highlights from the last week: Numina - Finally makes AI video generators count objects correctly. Nucleus-Image is a text-to-image generation model built on a sparse mixture-of-experts (MoE) diffusion transformer architecture. The cluster includes 7 more in-scope items.",
+      "summary": "This Image/Video GenAI theme centers on model releases. Last week in Generative Image & Video. IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3). DFlash speculative decoding on Apple Silicon: 4.1x on Qwen3.5-9B, now open source (MLX, M5 Max). The cluster includes 6 more in-scope items across 13 source domains.",
       "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
       "image_url": null,
       "sources": [
         {
           "title": "Last week in Generative Image & Video",
-          "url": "https://reddit.com/r/StableDiffusion/comments/1slz1rq/last_week_in_generative_image_video/",
+          "url": "https://reddit.com/r/stablediffusion/comments/1slz1rq/last_week_in_generative_image_video",
           "type": "reddit"
         },
         {
-          "title": "Nucleus-Image Released",
-          "url": "https://reddit.com/r/StableDiffusion/comments/1slpfch/nucleusimage_released/",
-          "type": "reddit"
+          "title": "github.com: GitHub",
+          "url": "https://github.com/h-embodvis/numina",
+          "type": "github"
+        },
+        {
+          "title": "h-embodvis.github.io: Project",
+          "url": "https://h-embodvis.github.io/numina",
+          "type": "project"
+        },
+        {
+          "title": "gordonchen19.github.io: Project",
+          "url": "https://gordonchen19.github.io/prompt-relay",
+          "type": "project"
         }
       ],
       "tags": [
@@ -51,37 +38,224 @@
     {
       "title": "AI Agents: Frontier Models",
       "slug": "ai-agents-frontier-models",
-      "summary": "This AI Agents theme centers on frontier models. Gemini Robotics ER-1.6 enhances reasoning to help robots navigate real-world tasks. Anthropic is set to release Claude Opus 4.7 and a new AI design tool as early as this week. Enhancement suite for Google Gemini and AI Studio The cluster includes 23 more in-scope items across 4 source domains.",
+      "summary": "This AI Agents theme centers on frontier models. Mythos is Mostly Hype... (also the bugs it found were mostly unexploitable and exaggerated...). AI Security Institute Findings on Claude Mythos Preview. OpenAI rolls out GPT-5.4-Cyber to limited group for testing, seeks to rival Claude Mythos. The cluster includes 19 more in-scope items across 14 source domains.",
       "insight": "This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
       "image_url": null,
       "sources": [
         {
-          "title": "Gemini Robotics ER-1.6 enhances reasoning to help robots navigate real-world tasks",
-          "url": "https://blog.google/innovation-and-ai/models-and-research/google-deepmind/gemini-robotics-er-1-6/",
+          "title": "Mythos is Mostly Hype... (also the bugs it found were mostly unexploitable and exaggerated...)",
+          "url": "https://reddit.com/r/claude/comments/1sj94lq/mythos_is_mostly_hype_also_the_bugs_it_found_were",
           "type": "reddit"
         },
         {
-          "title": "Anthropic is set to release Claude Opus 4.7 and a new AI design tool as early as this week",
-          "url": "https://www.theinformation.com/briefings/exclusive-anthropic-preps-opus-4-7-model-ai-design-tool",
-          "type": "reddit"
+          "title": "tomshardware.com",
+          "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/anthropics-claude-mythos-isnt-a-sentient-super-hacker-its-a-sales-pitch-claims-of-thousands-of-severe-zero-days-rely-on-just-198-manual-reviews",
+          "type": "project"
         },
         {
-          "title": "Enhancement suite for Google Gemini and AI Studio",
-          "url": "https://x.com/tom_doerr/status/2043432669006958615",
-          "type": "twitter"
+          "title": "aisle.com",
+          "url": "https://aisle.com/blog/ai-cybersecurity-after-mythos-the-jagged-frontier",
+          "type": "project"
         },
         {
-          "title": "It Mythos was truly as advanced and dangerous as they claim they wouldn’t announce it in the way they have done",
-          "url": "https://reddit.com/r/claude/comments/1sj9rko/it_mythos_was_truly_as_advanced_and_dangerous_as/",
-          "type": "reddit"
+          "title": "www-cdn.anthropic.com: verbose 250-page report",
+          "url": "https://www-cdn.anthropic.com/8b8380204f74670be75e81c820ca8dda846ab289.pdf",
+          "type": "official"
         }
       ],
       "tags": [
-        "singularity",
+        "claude",
         "ai-agents",
         "frontier-models"
       ]
+    },
+    {
+      "title": "Generative 3D Worlds: Explorable World Models",
+      "slug": "generative-3d-worlds-explorable-world-models",
+      "summary": "This Generative 3D Worlds theme centers on explorable world models. Today, we released Lyra 2.0, a framework for generating persistent, explorable 3D worlds at scale, from NVIDIA Research. Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan. The signal spans 3 source domains.",
+      "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The multi-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
+      "image_url": "https://pbs.twimg.com/amplify_video_thumb/2044436411076509696/img/Ur9JSiE-nI1M9Sqj.jpg",
+      "sources": [
+        {
+          "title": "Today, we released Lyra 2.0, a framework for generating persistent, explorable 3D worlds at scale, from NVIDIA Resear...",
+          "url": "https://x.com/nvidiaaidev/status/2044445645109436672",
+          "type": "twitter"
+        },
+        {
+          "title": "Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan",
+          "url": "https://v.redd.it/g91l2x98w7vg1",
+          "type": "reddit"
+        },
+        {
+          "title": "x.com",
+          "url": "https://x.com/dylantfwang/status/2043952886166761519",
+          "type": "twitter"
+        },
+        {
+          "title": "3d-models.hunyuan.tencent.com",
+          "url": "https://3d-models.hunyuan.tencent.com/world",
+          "type": "official"
+        }
+      ],
+      "tags": [
+        "generative-3d-worlds"
+      ]
+    },
+    {
+      "title": "3D Gaussian Splatting: Tools & Reconstruction",
+      "slug": "gaussian-splatting-tools-reconstruction",
+      "summary": "This 3D Gaussian Splatting theme centers on tools & reconstruction. RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting.",
+      "insight": "This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. The multi-source signal points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting",
+          "url": "https://www.reddit.com/gallery/1sjsckx",
+          "type": "reddit"
+        },
+        {
+          "title": "github.com",
+          "url": "https://github.com/warpgatelabs/rsr/releases",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "gaussiansplatting",
+        "gaussian-splatting"
+      ]
     }
   ],
-  "notable": []
+  "notable": [
+    {
+      "title": "Claude vs GPT in a bomberman-style 1v1 game",
+      "summary": "A few weeks ago, ARC-AGI 3 was released. For those unfamiliar, it’s a benchmark designed to study agentic intelligence through interactive environments. I'm a big fan of these kinds of benchmarks as IMO they reveal so much more about the capabilities and limi…",
+      "sources": [
+        {
+          "title": "Claude vs GPT in a bomberman-style 1v1 game",
+          "url": "https://v.redd.it/cjtrksby34vg1",
+          "type": "reddit"
+        },
+        {
+          "title": "github.com: github",
+          "url": "https://github.com/klemenvod/tokenbrawl",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "claudeai",
+        "ai-agents",
+        "generative-3d-worlds"
+      ]
+    },
+    {
+      "title": "TUI to see where Claude Code tokens actually go",
+      "summary": "been spending $200+/day on claude code and had zero visibility into what was eating the tokens. ccusage shows cost per model per day which is great but i wanted to know - is it the debugging thats expensive? the brainstorming? which project is burning the mos…",
+      "sources": [
+        {
+          "title": "TUI to see where Claude Code tokens actually go",
+          "url": "https://i.redd.it/c9a6wzpte1vg1.jpeg",
+          "type": "reddit"
+        },
+        {
+          "title": "github.com",
+          "url": "https://github.com/agentseal/codeburn",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "claudeai",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Claude + Playwright to teardown websites and unearth dark pattern trackers & feature flags (oss)",
+      "summary": "i'm building agents for procurement & one thread has been to let claude systematically deconstruct a website so agents can navigate them. but as i've been doing this, like a piñata, interesting things keep falling off -- from trackers, to interesting feature…",
+      "sources": [
+        {
+          "title": "Claude + Playwright to teardown websites and unearth dark pattern trackers & feature flags (oss)",
+          "url": "https://i.redd.it/tyertc28sdvg1.png",
+          "type": "reddit"
+        },
+        {
+          "title": "github.com: oss repo",
+          "url": "https://github.com/hayabhay/teardown",
+          "type": "github"
+        },
+        {
+          "title": "teardown.fyi: website",
+          "url": "https://teardown.fyi",
+          "type": "project"
+        }
+      ],
+      "tags": [
+        "claudeai",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Why Claude Code Max burns limits 40% faster with 20K less usable context. Proxy evidence inside.",
+      "summary": "TL;DR: Claude Code v2.1.100+ silently adds ~20K invisible tokens to every request, server-side. This eats your limits faster AND may degrade output quality. Downgrade to v2.1.98 for immediate relief. Proxy evidence below. --- I run Claude Code Max (5x plan) h…",
+      "sources": [
+        {
+          "title": "Why Claude Code Max burns limits 40% faster with 20K less usable context. Proxy evidence inside.",
+          "url": "https://reddit.com/r/claudeai/comments/1sj8o9l/why_claude_code_max_burns_limits_40_faster_with",
+          "type": "reddit"
+        },
+        {
+          "title": "github.com",
+          "url": "https://github.com/anthropics/claude-code/issues/46917",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "claudeai",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "I built a Claude Code plugin that extracts any website's full design system",
+      "summary": "Just type `/extract-design` ` in Claude Code and it pulls the entire design language — colors, fonts, spacing, shadows, components, everything. The main output is a markdown file specifically structured for Claude to understand. So you can extract a site's de…",
+      "sources": [
+        {
+          "title": "I built a Claude Code plugin that extracts any website's full design system",
+          "url": "https://i.redd.it/najpel0wzbvg1.png",
+          "type": "reddit"
+        },
+        {
+          "title": "stripe.com",
+          "url": "https://stripe.com",
+          "type": "project"
+        },
+        {
+          "title": "github.com",
+          "url": "https://github.com/manavarya09/design-extract",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "claudeai",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Hot Experts in your VRAM! Dynamic expert cache in llama.cpp for 27% faster CPU +GPU token generation with Qwen3.5-122B-A10B compared to lay…",
+      "summary": "Claude cooked on the code, but I wrote this post myself, caveman style. I wanted to play with Qwen3.5-122B, but I don't have a unified memory system to work with, and 15 tok/s was rough. 23 tok/s is still rough but honestly noticeably faster when streaming re…",
+      "sources": [
+        {
+          "title": "Hot Experts in your VRAM! Dynamic expert cache in llama.cpp for 27% faster CPU +GPU token generation with Qwen3.5-122B-A10B compared to lay…",
+          "url": "https://reddit.com/r/localllama/comments/1slue0z/hot_experts_in_your_vram_dynamic_expert_cache_in",
+          "type": "reddit"
+        },
+        {
+          "title": "github.com",
+          "url": "https://github.com/parmesanparty/llama.cpp",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "ai-agents"
+      ]
+    }
+  ]
 }

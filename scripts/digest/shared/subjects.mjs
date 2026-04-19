@@ -33,6 +33,44 @@ const DEFAULT_SUBJECTS_CONFIG = {
       exclude_terms: []
     },
     {
+      id: 'generative-3d-worlds',
+      label: 'Generative 3D Worlds',
+      include_terms: [
+        '3d world generation',
+        '3d world model',
+        '3d world models',
+        'generative 3d world',
+        'generative 3d worlds',
+        'world generation',
+        'world model',
+        'world models',
+        'explorable 3d world',
+        'explorable 3d worlds',
+        'persistent 3d world',
+        'persistent 3d worlds',
+        'interactive 3d world',
+        'interactive 3d worlds',
+        'navigable 3d environment',
+        'navigable 3d environments'
+      ],
+      adjacent_terms: [
+        'spatial persistence',
+        'spatial consistency',
+        'scene generation',
+        '3d scene generation',
+        'interactive scenes',
+        'navigable environments',
+        'free navigation',
+        'engine-ready',
+        'engine compatible',
+        'game engine',
+        'digital twin',
+        'world expansion',
+        'video world modeling'
+      ],
+      exclude_terms: []
+    },
+    {
       id: 'ai-agents',
       label: 'AI Agents',
       include_terms: [
