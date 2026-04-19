@@ -12,6 +12,7 @@ const config = await loadConfig();
 await ensureDigestStateLayout();
 
 const pool = await loadPool(paths.activePool);
+const state = await loadState(paths.activeState);
 const filteredPool = filterDigestItems(pool.items, config.subjects);
 if (filteredPool.accepted.length === 0 && !config.compile.allow_empty_publish) {
 	console.error(JSON.stringify({
@@ -31,6 +32,7 @@ await archiveIssueInput(issueDir, filteredPool);
 const digest = buildPreviewDigest({
 	issueDate: issueId,
 	publishedAt,
+	compileWindowStartAt: state.last_compile_at,
 	items: filteredPool.accepted,
 	heroTopicTargetMax: config.compile.hero_topic_target_max,
 	notableTargetMax: config.compile.notable_target_max,
@@ -47,7 +49,6 @@ try {
 	});
 	await archivePublishResult(issueDir, publishResult);
 
-	const state = await loadState(paths.activeState);
 	const nextState = markCompileRun(state, { at: publishedAt, publishCommit: `digest: publish ${issueId}` });
 	await saveState(paths.activeState, nextState);
 	await savePool(paths.activePool, resetPool());

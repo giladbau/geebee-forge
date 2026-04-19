@@ -30,6 +30,46 @@ describe('digest normalization', () => {
 		expect(item.dedupe_keys).toContain('reddit:abc123');
 	});
 
+	it('keeps external evidence links embedded in reddit selftext', () => {
+		const item = normalizeRedditPost({
+			id: '1sll638',
+			title: 'Tencent HY-World 2.0 appears to be dropping',
+			url_overridden_by_dest: 'https://v.redd.it/g91l2x98w7vg1',
+			permalink: '/r/StableDiffusion/comments/1sll638/tencent_hyworld_20_appears_to_be_dropping_on/',
+			author: 'thefi3nd',
+			created_utc: 1776199877,
+			score: 481,
+			selftext: 'Tencent Hunyuan posted an engine-ready World Model [Source](https://x.com/DylanTFWang/status/2043952886166761519). Launch page: https://3d-models.hunyuan.tencent.com/world/'
+		}, { fetchedAt: '2026-04-15T21:01:07Z', subreddit: 'StableDiffusion', rawRef: 'raw/run/reddit.json' });
+
+		expect(item.sources).toEqual([
+			{ title: 'Tencent HY-World 2.0 appears to be dropping', url: 'https://v.redd.it/g91l2x98w7vg1', type: 'reddit' },
+			{ title: 'x.com', url: 'https://x.com/DylanTFWang/status/2043952886166761519', type: 'twitter' },
+			{ title: '3d-models.hunyuan.tencent.com', url: 'https://3d-models.hunyuan.tencent.com/world/', type: 'official' }
+		]);
+		expect(item.dedupe_keys).toContain('url:https://3d-models.hunyuan.tencent.com/world/');
+	});
+
+	it('unwraps redirect wrappers and cleans code-style markdown labels', () => {
+		const item = normalizeRedditPost({
+			id: '1wrapper',
+			title: 'Wrapper-heavy source post',
+			permalink: '/r/Claude/comments/1wrapper/wrapper_heavy_source_post/',
+			author: 'testuser',
+			created_utc: 1776199877,
+			score: 220,
+			selftext: 'Free access: [Mirror](https://clearthis.page/?u=https%3A%2F%2Fwww.tomshardware.com%2Fstory) and `/extract-design` [`https://stripe.com`](https://stripe.com)'
+		}, { fetchedAt: '2026-04-15T21:01:07Z', subreddit: 'Claude', rawRef: 'raw/run/reddit.json' });
+
+		expect(item.sources).toEqual([
+			{ title: 'Wrapper-heavy source post', url: 'https://reddit.com/r/Claude/comments/1wrapper/wrapper_heavy_source_post/', type: 'reddit' },
+			{ title: 'tomshardware.com: Mirror', url: 'https://www.tomshardware.com/story', type: 'project' },
+			{ title: 'stripe.com', url: 'https://stripe.com/', type: 'project' }
+		]);
+		expect(item.dedupe_keys).toContain('url:https://www.tomshardware.com/story');
+		expect(item.dedupe_keys).not.toContain('url:https://clearthis.page/?u=https%3A%2F%2Fwww.tomshardware.com%2Fstory');
+	});
+
 	it('normalizes an X post into the canonical item shape', () => {
 		const item = normalizeXPost({
 			id: '2031558590754894104',

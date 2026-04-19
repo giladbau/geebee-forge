@@ -38,6 +38,11 @@
 
 	let activeTag = $state<string | null>(null);
 	let showFavorites = $state(false);
+	let expandedText = $state<Set<string>>(new Set());
+
+	const HERO_SUMMARY_LIMIT = 360;
+	const HERO_INSIGHT_LIMIT = 300;
+	const NOTABLE_SUMMARY_LIMIT = 260;
 
 	// --- Favorites (localStorage-backed) ---
 	function slugify(text: string): string {
@@ -85,6 +90,35 @@
 
 	function isFavorited(id: string): boolean {
 		return favorites.has(id);
+	}
+
+	function textKey(digest: Digest, kind: string, itemId: string): string {
+		return `${digest.filename}:${kind}:${itemId}`;
+	}
+
+	function isExpanded(key: string): boolean {
+		return expandedText.has(key);
+	}
+
+	function toggleExpanded(key: string) {
+		if (expandedText.has(key)) {
+			expandedText.delete(key);
+		} else {
+			expandedText.add(key);
+		}
+		expandedText = new Set(expandedText);
+	}
+
+	function needsExpansion(text: string, limit: number): boolean {
+		return text.length > limit;
+	}
+
+	function displayText(text: string, key: string, limit: number): string {
+		if (!needsExpansion(text, limit) || isExpanded(key)) return text;
+		const clipped = text.slice(0, limit);
+		const lastSpace = clipped.lastIndexOf(' ');
+		const cutAt = lastSpace > limit * 0.7 ? lastSpace : limit;
+		return `${text.slice(0, cutAt).trimEnd()}...`;
 	}
 
 	const latest = $derived(digests[0]);
@@ -183,6 +217,8 @@
 			<!-- Hero Topics -->
 			<section class="heroes">
 				{#each latest.hero_topics as topic}
+					{@const summaryKey = textKey(latest, 'hero-summary', heroId(topic))}
+					{@const insightKey = textKey(latest, 'hero-insight', heroId(topic))}
 					<div class="hero-card" id={topic.slug} class:hidden-by-filter={!heroMatchesTag(topic)}>
 						<button
 							class="star-btn"
@@ -198,11 +234,27 @@
 								</a>
 							</div>
 						{/if}
-						<p class="hero-summary">{topic.summary}</p>
+						<p class="hero-summary">{displayText(topic.summary, summaryKey, HERO_SUMMARY_LIMIT)}</p>
+						{#if needsExpansion(topic.summary, HERO_SUMMARY_LIMIT)}
+							<button
+								type="button"
+								class="expand-toggle"
+								aria-expanded={isExpanded(summaryKey)}
+								onclick={() => toggleExpanded(summaryKey)}
+							>{isExpanded(summaryKey) ? 'Show less' : 'Read full summary'}</button>
+						{/if}
 
 						<div class="insight-box">
 							<span class="insight-label">Analyst Note</span>
-							<p>{topic.insight}</p>
+							<p>{displayText(topic.insight, insightKey, HERO_INSIGHT_LIMIT)}</p>
+							{#if needsExpansion(topic.insight, HERO_INSIGHT_LIMIT)}
+								<button
+									type="button"
+									class="expand-toggle in-box"
+									aria-expanded={isExpanded(insightKey)}
+									onclick={() => toggleExpanded(insightKey)}
+								>{isExpanded(insightKey) ? 'Show less' : 'Read full analysis'}</button>
+							{/if}
 						</div>
 
 						<div class="meta-row">
@@ -235,6 +287,7 @@
 					<h3 class="section-heading">Also Notable</h3>
 					<div class="notable-list">
 						{#each latest.notable as item}
+							{@const notableSummaryKey = textKey(latest, 'notable-summary', notableId(item))}
 							<div class="notable-item" class:hidden-by-filter={!notableMatchesTag(item)}>
 								<div class="notable-main">
 									<div class="notable-title-row">
@@ -246,7 +299,15 @@
 											aria-label={isFavorited(notableId(item)) ? `Remove ${item.title} from favorites` : `Add ${item.title} to favorites`}
 										>★</button>
 									</div>
-									<p class="notable-summary">{item.summary}</p>
+									<p class="notable-summary">{displayText(item.summary, notableSummaryKey, NOTABLE_SUMMARY_LIMIT)}</p>
+									{#if needsExpansion(item.summary, NOTABLE_SUMMARY_LIMIT)}
+										<button
+											type="button"
+											class="expand-toggle compact"
+											aria-expanded={isExpanded(notableSummaryKey)}
+											onclick={() => toggleExpanded(notableSummaryKey)}
+										>{isExpanded(notableSummaryKey) ? 'Show less' : 'Read more'}</button>
+									{/if}
 								</div>
 								<div class="notable-meta">
 									<div class="sources">
@@ -286,6 +347,8 @@
 
 				<section class="heroes">
 					{#each digest.hero_topics as topic}
+						{@const summaryKey = textKey(digest, 'hero-summary', heroId(topic))}
+						{@const insightKey = textKey(digest, 'hero-insight', heroId(topic))}
 						<div class="hero-card" id={topic.slug} class:hidden-by-filter={!heroMatchesTag(topic)}>
 							<button
 								class="star-btn"
@@ -301,11 +364,27 @@
 									</a>
 								</div>
 							{/if}
-							<p class="hero-summary">{topic.summary}</p>
+							<p class="hero-summary">{displayText(topic.summary, summaryKey, HERO_SUMMARY_LIMIT)}</p>
+							{#if needsExpansion(topic.summary, HERO_SUMMARY_LIMIT)}
+								<button
+									type="button"
+									class="expand-toggle"
+									aria-expanded={isExpanded(summaryKey)}
+									onclick={() => toggleExpanded(summaryKey)}
+								>{isExpanded(summaryKey) ? 'Show less' : 'Read full summary'}</button>
+							{/if}
 
 							<div class="insight-box">
 								<span class="insight-label">Analyst Note</span>
-								<p>{topic.insight}</p>
+								<p>{displayText(topic.insight, insightKey, HERO_INSIGHT_LIMIT)}</p>
+								{#if needsExpansion(topic.insight, HERO_INSIGHT_LIMIT)}
+									<button
+										type="button"
+										class="expand-toggle in-box"
+										aria-expanded={isExpanded(insightKey)}
+										onclick={() => toggleExpanded(insightKey)}
+									>{isExpanded(insightKey) ? 'Show less' : 'Read full analysis'}</button>
+								{/if}
 							</div>
 
 							<div class="meta-row">
@@ -337,6 +416,7 @@
 						<h3 class="section-heading">Also Notable</h3>
 						<div class="notable-list">
 							{#each digest.notable as item}
+								{@const notableSummaryKey = textKey(digest, 'notable-summary', notableId(item))}
 								<div class="notable-item" class:hidden-by-filter={!notableMatchesTag(item)}>
 									<div class="notable-main">
 										<div class="notable-title-row">
@@ -348,7 +428,15 @@
 												aria-label={isFavorited(notableId(item)) ? `Remove ${item.title} from favorites` : `Add ${item.title} to favorites`}
 											>★</button>
 										</div>
-										<p class="notable-summary">{item.summary}</p>
+										<p class="notable-summary">{displayText(item.summary, notableSummaryKey, NOTABLE_SUMMARY_LIMIT)}</p>
+										{#if needsExpansion(item.summary, NOTABLE_SUMMARY_LIMIT)}
+											<button
+												type="button"
+												class="expand-toggle compact"
+												aria-expanded={isExpanded(notableSummaryKey)}
+												onclick={() => toggleExpanded(notableSummaryKey)}
+											>{isExpanded(notableSummaryKey) ? 'Show less' : 'Read more'}</button>
+										{/if}
 									</div>
 									<div class="notable-meta">
 										<div class="sources">
@@ -402,7 +490,7 @@
 	.digest-page {
 		max-width: 780px;
 		margin: 0 auto;
-		padding: 2rem 1.5rem 4rem;
+		padding: 4rem 1.5rem 4rem;
 		min-height: 100vh;
 	}
 
@@ -595,6 +683,37 @@
 		font-size: 0.9rem;
 		line-height: 1.65;
 		margin: 0 0 1.25rem;
+	}
+
+	.expand-toggle {
+		display: inline-flex;
+		align-items: center;
+		color: #6ba3ff;
+		background: transparent;
+		border: 1px solid #24344f;
+		border-radius: 6px;
+		padding: 0.25rem 0.55rem;
+		margin: -0.55rem 0 1.25rem;
+		font-family: inherit;
+		font-size: 0.74rem;
+		line-height: 1.2;
+		cursor: pointer;
+		transition: color 0.15s, border-color 0.15s, background 0.15s;
+	}
+
+	.expand-toggle:hover {
+		color: #c8dcff;
+		border-color: #3b5f96;
+		background: rgba(107, 163, 255, 0.08);
+	}
+
+	.expand-toggle.in-box {
+		margin: 0.7rem 0 0;
+	}
+
+	.expand-toggle.compact {
+		margin: -0.25rem 0 0.6rem;
+		font-size: 0.7rem;
 	}
 
 	/* Insight Box */

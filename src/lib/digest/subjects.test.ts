@@ -15,6 +15,13 @@ const config = {
       exclude_terms: []
     },
     {
+      id: 'generative-3d-worlds',
+      label: 'Generative 3D Worlds',
+      include_terms: ['3d world generation', 'generative 3d worlds', 'world model', 'explorable 3d worlds', 'persistent 3d worlds'],
+      adjacent_terms: ['navigable environments', 'spatial persistence', 'world generation', 'interactive scenes'],
+      exclude_terms: []
+    },
+    {
       id: 'ai-agents',
       label: 'AI Agents',
       include_terms: ['ai agents', 'agentic', 'claude', 'gpt', 'hermes', 'openclaw'],
@@ -65,6 +72,23 @@ describe('digest subject classification', () => {
     expect(result.item.subject_primary).toBe('gaussian-splatting');
   });
 
+  it('accepts notable explorable 3D world-generation releases as a first-class subject', () => {
+    const item = {
+      id: 'x:lyra-2',
+      title: 'NVIDIA releases Lyra 2.0 for persistent, explorable 3D worlds',
+      summary: 'A NVIDIA Research framework for generating large-scale 3D world models with spatial persistence and navigation.',
+      tags: ['nvidia-research'],
+      url: 'https://x.com/NVIDIAAIDev/status/2044445645109436672'
+    };
+
+    const result = classifyDigestItem(item, config);
+
+    expect(result.accepted).toBe(true);
+    expect(result.item.subject_primary).toBe('generative-3d-worlds');
+    expect(result.item.subject_matches).toContain('generative-3d-worlds');
+    expect(result.item.filter_reason).toBe('Matched Generative 3D Worlds');
+  });
+
   it('keeps notable classic CV items in scope for image/video coverage', () => {
     const item = {
       id: 'paper:1',
@@ -94,6 +118,21 @@ describe('digest subject classification', () => {
     expect(result.accepted).toBe(false);
     expect(result.item.filter_decision).toBe('rejected');
     expect(result.item.subject_matches).toEqual([]);
+  });
+
+  it('keeps legitimate OpenClaw and Hermes Agent platform posts in scope', () => {
+    const item = {
+      id: 'x:platform',
+      title: 'OpenClaw desktop app now supports file attachments for Hermes Agent workflows',
+      summary: 'A release update for an agent app/workspace product.',
+      tags: ['agents'],
+      url: 'https://example.com/openclaw-release'
+    };
+
+    const result = classifyDigestItem(item, config);
+
+    expect(result.accepted).toBe(true);
+    expect(result.item.subject_primary).toBe('ai-agents');
   });
 
   it('collects subject counts from accepted pool items', () => {
