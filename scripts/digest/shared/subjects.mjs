@@ -44,7 +44,7 @@ const DEFAULT_SUBJECTS_CONFIG = {
         'gpt',
         'gemini',
         'openclaw',
-        'hermes'
+        'hermes agent'
       ],
       adjacent_terms: [
         'tool use',

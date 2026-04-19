@@ -96,6 +96,21 @@ describe('digest subject classification', () => {
     expect(result.item.subject_matches).toEqual([]);
   });
 
+  it('keeps legitimate OpenClaw and Hermes Agent platform posts in scope', () => {
+    const item = {
+      id: 'x:platform',
+      title: 'OpenClaw desktop app now supports file attachments for Hermes Agent workflows',
+      summary: 'A release update for an agent app/workspace product.',
+      tags: ['agents'],
+      url: 'https://example.com/openclaw-release'
+    };
+
+    const result = classifyDigestItem(item, config);
+
+    expect(result.accepted).toBe(true);
+    expect(result.item.subject_primary).toBe('ai-agents');
+  });
+
   it('collects subject counts from accepted pool items', () => {
     const counts = collectSubjectCounts([
       { id: '1', subject_primary: 'ai-agents' },

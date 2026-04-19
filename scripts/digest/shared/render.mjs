@@ -2,12 +2,18 @@ import { validateDigestContract } from './contract.mjs';
 import { getDefaultSubjectsConfig, getSubjectLabel } from './subjects.mjs';
 
 function decodeBasicEntities(value) {
-  return String(value || '')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>');
+  let decoded = String(value || '');
+  for (let index = 0; index < 3; index += 1) {
+    const next = decoded
+      .replace(/&amp;/g, '&')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>');
+    if (next === decoded) break;
+    decoded = next;
+  }
+  return decoded;
 }
 
 function cleanText(value, maxLength = 320) {
@@ -30,19 +36,108 @@ function itemText(item) {
     item?.title,
     item?.summary,
     item?.snippet,
-    ...(item?.tags || [])
+    item?.url,
+    ...(item?.tags || []),
+    ...(item?.sources || []).flatMap((source) => [source?.title, source?.url, source?.type])
   ].join(' '), 600).toLowerCase();
 }
 
-function qualityAdjustment(item) {
-  const text = itemText(item);
+function canonicalUrl(value) {
+  if (!value) return '';
+  try {
+    const url = new URL(value);
+    url.hash = '';
+    for (const param of [...url.searchParams.keys()]) {
+      if (/^(utm_|fbclid|gclid|ref$|ref_src$)/i.test(param)) {
+        url.searchParams.delete(param);
+      }
+    }
+    return url.toString().replace(/\/$/, '').toLowerCase();
+  } catch {
+    return String(value).trim().replace(/\/$/, '').toLowerCase();
+  }
+}
+
+function sourceUrls(item) {
+  return uniqueBy([
+    item?.url,
+    ...(item?.sources || []).map((source) => source?.url)
+  ].filter(Boolean).map(canonicalUrl), (value) => value);
+}
+
+function sourceDomains(item) {
+  return uniqueBy(sourceUrls(item).map((url) => {
+    try {
+      return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+      return '';
+    }
+  }).filter(Boolean), (value) => value);
+}
+
+function sourceTypes(item) {
+  return uniqueBy((item?.sources || []).map((source) => String(source?.type || '').toLowerCase()).filter(Boolean), (value) => value);
+}
+
+function isRedditMediaOnly(item) {
+  const urls = sourceUrls(item);
+  if (urls.length === 0) return false;
+  return urls.every((url) => {
+    try {
+      const parsed = new URL(url);
+      const host = parsed.hostname.replace(/^www\./, '');
+      return host === 'i.redd.it' || host === 'v.redd.it' || parsed.pathname.includes('/gallery/');
+    } catch {
+      return /(?:^|\/)(?:i|v)\.redd\.it|reddit\.com\/gallery/i.test(url);
+    }
+  });
+}
+
+function trustworthySourceScore(item) {
+  const domains = sourceDomains(item);
+  const types = sourceTypes(item);
   let score = 0;
 
-  const highSignalPatterns = [
-    /\b(project|paper|model|benchmark|framework|release|launch|agents?|tool use|orchestration|memory|coding|image|video|diffusion|segmentation|gaussian|splat|reconstruction|rendering)\b/,
-    /\bgithub\b/,
-    /\barxiv\b/
+  const trustedDomainPatterns = [
+    /\barxiv\.org$/,
+    /\bgithub\.com$/,
+    /\bhuggingface\.co$/,
+    /\banthropic\.com$/,
+    /\bopenai\.com$/,
+    /\bdeepmind\.google$/,
+    /\bgoogle(?:blog)?\.com$/,
+    /\bblog\.google$/,
+    /\bmicrosoft\.com$/,
+    /\bmeta\.com$/,
+    /\bnvidia\.com$/,
+    /\btencent\.com$/,
+    /\bapple\.com$/,
+    /\bai\.google$/,
+    /\.edu$/
   ];
+
+  for (const domain of domains) {
+    if (trustedDomainPatterns.some((pattern) => pattern.test(domain))) score += 220;
+    if (/github|arxiv|huggingface/.test(domain)) score += 120;
+  }
+
+  for (const type of types) {
+    if (/(official|paper|github|project|blog|research|release|documentation|docs|huggingface)/.test(type)) score += 160;
+    if (/(reddit|twitter|x)/.test(type)) score += 20;
+  }
+
+  if (item.source === 'huggingface_daily_papers') score += 260;
+  if (item.source === 'x' && item.source_subtype === 'bookmarks') score += 180;
+  if (item.source === 'x') score += 110;
+  if (item.source === 'reddit') score -= 40;
+  if (isRedditMediaOnly(item)) score -= 420;
+
+  return score;
+}
+
+function lowSignalPenalty(item) {
+  const text = itemText(item);
+  let penalty = 0;
 
   const lowSignalPatterns = [
     /\baccus(?:e|ing|ation|ed)\b/,
@@ -51,19 +146,86 @@ function qualityAdjustment(item) {
     /\bsociopath\b/,
     /\bpathological liar\b/,
     /\bdrama\b/,
-    /\bgossip\b/
+    /\bgossip\b/,
+    /\bfuck(?:ing)?\b/,
+    /\bjailbreak\b/,
+    /\bmostly hype\b/,
+    /\bsales pitch\b/,
+    /\bgolden age is over\b/,
+    /\babsolutely no way\b/,
+    /\bmajor drop in intelligence\b/,
+    /\bstatus update\b/,
+    /\bis (?:claude|chatgpt|gpt|gemini) down\b/,
+    /\bclaude is down\b/,
+    /\bclaude has been poor lately\b/,
+    /\bmeme\b/,
+    /\bmanager watching\b/,
+    /\bhad enough\b/,
+    /\bonly reliable use case\b/,
+    /\bhas \d+k github stars\b/,
+    /\bcool,? i need to join\b/,
+    /\bcheck my piece\b/,
+    /\bama\b/,
+    /\bannouncement\b/,
+    /\bjoin(?:ing)? us\b/,
+    /\bwho is\b/,
+    /\bbeginner guide\b/,
+    /\bnot an experienced dev\b/,
+    /\bpersonal use initially\b/,
+    /\bno terminal\b/,
+    /\bno tech talk\b/,
+    /\bfound me a flat\b/,
+    /\bfrom my phone\b/,
+    /\bproperty hunt\b/,
+    /\bcheck it out\b/,
+    /\bmini app\b/,
+    /\bteaser\b/,
+    /\blaunching tomorrow\b/,
+    /\bappears to be dropping\b/,
+    /\b(model|claude|gpt|gemini).{0,40}\b(?:dumber|nerfed|lobotomized|worse|broken)\b/,
+    /\b(?:dumber|nerfed|lobotomized|broken).{0,40}\b(model|claude|gpt|gemini)\b/,
+    /\bcomplaint thread\b/,
+    /\bquietly switched\b/,
+    /\bsilently regressed\b/,
+    /\btheory\b/,
+    /\breportedly dropping\b/,
+    /\bbreaking\b/,
+    /\bwhenever people\b/,
+    /\brubs hands together\b/,
+    /\btiddies\b/,
+    /\banyone else\b/,
+    /\bwhy (?:is|does|do)\b/
+  ];
+
+  for (const pattern of lowSignalPatterns) {
+    if (pattern.test(text)) penalty -= 360;
+  }
+
+  if (/^@\w+/.test(String(item?.title || '').trim())) penalty -= 300;
+
+  if (item.source === 'reddit' && isRedditMediaOnly(item) && (item.summary || item.snippet || '').length < 180) {
+    penalty -= 260;
+  }
+
+  return penalty;
+}
+
+function substanceScore(item) {
+  const text = itemText(item);
+  let score = 0;
+
+  const highSignalPatterns = [
+    /\b(project|paper|model|benchmark|framework|release|launch|agents?|tool use|orchestration|memory|coding|image|video|diffusion|segmentation|gaussian|splat|reconstruction|rendering)\b/,
+    /\b(system card|evaluation|evals?|safety|dataset|open source|github|arxiv|technical report|research)\b/
   ];
 
   for (const pattern of highSignalPatterns) {
-    if (pattern.test(text)) score += 120;
+    if (pattern.test(text)) score += 90;
   }
 
-  for (const pattern of lowSignalPatterns) {
-    if (pattern.test(text)) score -= 500;
-  }
-
-  if ((item.summary || item.snippet || '').length > 120) score += 60;
-  if ((item.sources || []).some((source) => /paper|github|project/i.test(`${source?.type || ''} ${source?.url || ''} ${source?.title || ''}`))) score += 80;
+  const summaryLength = (item.summary || item.snippet || '').length;
+  if (summaryLength > 120) score += 80;
+  if (summaryLength > 360) score += 40;
 
   return score;
 }
@@ -72,20 +234,20 @@ function engagementScore(item) {
   const engagement = item.engagement || {};
   const rawMetric = engagement.likes || engagement.score || engagement.upvotes || 0;
   if (!rawMetric) return 0;
-  return Math.round(Math.log10(rawMetric + 1) * 120);
+  return Math.min(280, Math.round(Math.log10(rawMetric + 1) * 70));
 }
 
 function rankScore(item) {
   const sourceBase = item.source === 'x'
-    ? (item.source_subtype === 'bookmarks' ? 500 : 250)
+    ? (item.source_subtype === 'bookmarks' ? 240 : 160)
     : item.source === 'huggingface_daily_papers'
-      ? 200
+      ? 260
       : item.source === 'reddit'
-        ? 100
+        ? 40
         : 0;
   const metric = engagementScore(item);
   const subjectBonus = (item.subject_match_score || 0) * 50;
-  return sourceBase + metric + subjectBonus + qualityAdjustment(item);
+  return sourceBase + metric + subjectBonus + trustworthySourceScore(item) + substanceScore(item) + lowSignalPenalty(item);
 }
 
 function uniqueBy(items, keyFn) {
@@ -102,14 +264,26 @@ function uniqueBy(items, keyFn) {
 
 function detectAiSubtheme(item) {
   const text = itemText(item);
+  if (/\b(prompt tokens?|token (?:spend|usage|burn)|context window|billing|cost|spend|spending|usage(?: tracking)?|monitoring|observability|visibility|metering|tui|dashboard|telemetry)\b/.test(text)) {
+    return { id: 'cost-and-monitoring', label: 'Cost & Monitoring' };
+  }
+  if (/\b(parenting|parent|family|families|children|kids|education|school|teacher|consumer|personal assistant|home)\b/.test(text)) {
+    return { id: 'consumer-applications', label: 'Consumer Applications' };
+  }
+  if (/\b(paper|benchmark|evaluation|evals?|safety|alignment|system card|analysis|study|research|arxiv)\b/.test(text)) {
+    return { id: 'research-and-evals', label: 'Research & Evals' };
+  }
   if (/\b(glasswing|mythos|opus|sonnet|gpt|gemini|muse spark|release|launch|preview|frontier model|model update)\b/.test(text)) {
     return { id: 'frontier-models', label: 'Frontier Models' };
   }
-  if (/\b(paper|benchmark|evaluation|safety|analysis|study|research|arxiv|openclaw)\b/.test(text)) {
-    return { id: 'research-and-evals', label: 'Research & Evals' };
+  if (/\b(claude code|coding agent|code agents?|ide|cli|terminal|developer tool|devtool|debugging|repository|repo|pull request|code review)\b/.test(text)) {
+    return { id: 'developer-tools', label: 'Developer Tools' };
   }
-  if (/\b(harness|orchestration|deployment|managed agents|framework|tooling|infrastructure|platform|mcp)\b/.test(text)) {
+  if (/\b(harness|orchestration|deployment|managed agents|framework|tooling|infrastructure|platform|mcp|runtime|tracing)\b/.test(text)) {
     return { id: 'tooling-and-platforms', label: 'Tooling & Platforms' };
+  }
+  if (/\b(openclaw|hermes agent|assistant app|agent app|agent platform|workspace agent|workflow app|agent workspace|marketplace|desktop app|mini app)\b/.test(text)) {
+    return { id: 'agent-apps-and-platforms', label: 'Agent Apps & Platforms' };
   }
   return { id: 'applications-and-builds', label: 'Applications & Builds' };
 }
@@ -153,14 +327,57 @@ function buildGroups(items, subjectConfig) {
     .map((group) => {
       const sorted = [...group.items].sort((a, b) => rankScore(b) - rankScore(a));
       const topScore = sorted[0] ? rankScore(sorted[0]) : 0;
+      const solidItems = sorted.filter((item) => trustworthySourceScore(item) + substanceScore(item) > 240).length;
+      const lowSignalItems = sorted.filter((item) => lowSignalPenalty(item) < 0 || isRedditMediaOnly(item)).length;
+      const corroborationBonus = Math.min(260, Math.max(0, solidItems - 1) * 100);
+      const sourceDiversityBonus = Math.min(160, uniqueBy(sorted.flatMap(sourceDomains), (value) => value).length * 35);
       return {
         ...group,
         items: sorted,
         topScore,
-        groupScore: topScore + sorted.length * 25
+        groupScore: topScore + sorted.length * 20 + corroborationBonus + sourceDiversityBonus - lowSignalItems * 35
       };
     })
     .sort((a, b) => b.groupScore - a.groupScore || a.subjectLabel.localeCompare(b.subjectLabel));
+}
+
+function nonSocialDomains(group) {
+  return uniqueBy(
+    presentableItems(group)
+      .flatMap(sourceDomains)
+      .filter((domain) => !['x.com', 'reddit.com', 'i.redd.it', 'v.redd.it'].includes(domain)),
+    (value) => value
+  );
+}
+
+function isPublishableHeroGroup(group) {
+  const editorialItems = presentableItems(group);
+  if (editorialItems.length === 0) return false;
+
+  const lead = editorialItems[0];
+  const leadScore = trustworthySourceScore(lead) + substanceScore(lead);
+  const hasExternalEvidence = nonSocialDomains(group).length > 0;
+  const lowSignalLead = lowSignalPenalty(lead) < 0;
+
+  if (lowSignalLead && editorialItems.length === 1) return false;
+  if (lowSignalLead && !hasExternalEvidence && leadScore < 480) return false;
+  if (isRedditMediaOnly(lead) && leadScore < 420) return false;
+
+  return true;
+}
+
+function isStrongExtraHeroGroup(group) {
+  const editorialItems = presentableItems(group);
+  const strongItems = editorialItems.filter((item) => trustworthySourceScore(item) + substanceScore(item) >= 420);
+  const lowSignalItems = editorialItems.filter((item) => lowSignalPenalty(item) < 0);
+  const externalDomainCount = nonSocialDomains(group).length;
+  const hasExternalEvidence = externalDomainCount > 0;
+  const socialOnly = editorialItems.length > 0 && !hasExternalEvidence;
+
+  if (!isPublishableHeroGroup(group)) return false;
+  if (socialOnly && strongItems.length < 2) return false;
+  if (lowSignalItems.length >= Math.ceil(editorialItems.length / 2) && externalDomainCount < 2) return false;
+  return strongItems.length >= 2 || externalDomainCount >= 2;
 }
 
 function selectHeroGroups(groups, heroTopicTargetMax) {
@@ -170,6 +387,7 @@ function selectHeroGroups(groups, heroTopicTargetMax) {
   for (const group of groups) {
     if (selected.length >= heroTopicTargetMax) break;
     if (usedSubjects.has(group.subjectId)) continue;
+    if (!isPublishableHeroGroup(group)) continue;
     selected.push(group);
     usedSubjects.add(group.subjectId);
   }
@@ -177,53 +395,150 @@ function selectHeroGroups(groups, heroTopicTargetMax) {
   for (const group of groups) {
     if (selected.length >= heroTopicTargetMax) break;
     if (selected.some((entry) => entry.groupKey === group.groupKey)) continue;
+    if (!isStrongExtraHeroGroup(group)) continue;
     selected.push(group);
   }
 
   return selected;
 }
 
+function evidenceScore(item) {
+  return trustworthySourceScore(item) + substanceScore(item) + Math.round(engagementScore(item) * 0.5) + lowSignalPenalty(item);
+}
+
+function presentableItems(group) {
+  const filtered = group.items.filter((item) => {
+    const trustAndSubstance = trustworthySourceScore(item) + substanceScore(item);
+    if (lowSignalPenalty(item) < 0 && trustAndSubstance < 360) return false;
+    if (isRedditMediaOnly(item) && trustAndSubstance < 260) return false;
+    return rankScore(item) > 160;
+  });
+
+  const sorted = (filtered.length > 0 ? filtered : group.items.slice(0, 1))
+    .slice()
+    .sort((a, b) => evidenceScore(b) - evidenceScore(a) || rankScore(b) - rankScore(a));
+
+  return sorted;
+}
+
+function normalizeSource(source, fallbackType = 'unknown') {
+  return {
+    title: cleanText(source?.title ?? 'Source item', 140) || 'Source item',
+    url: source?.url ?? 'about:blank',
+    type: source?.type ?? fallbackType
+  };
+}
+
 function buildSupportingSources(group) {
   return uniqueBy(
-    group.items.flatMap((item) => item.sources || [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }]),
-    (source) => `${source.title}|${source.url}`
+    presentableItems(group).flatMap((item) => (item.sources || [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }]).map((source) => normalizeSource(source, item.source ?? 'unknown'))),
+    (source) => `${cleanText(source.title, 120)}|${canonicalUrl(source.url)}`
   ).slice(0, 4);
+}
+
+function inferThemeLabel(group) {
+  if (group.subthemeLabel) return group.subthemeLabel;
+
+  const text = group.items.map(itemText).join(' ');
+  if (group.subjectId === 'image-video-genai') {
+    if (/\b(video|image).{0,40}\b(editing|workflow|tool|control|post-processing|outpaint|lora)\b/.test(text)) return 'Tools & Workflows';
+    if (/\b(model|release|diffusion|moe|vae|transformer|nucleus)\b/.test(text)) return 'Model Releases';
+    if (/\b(paper|benchmark|research|arxiv)\b/.test(text)) return 'Research & Methods';
+    return 'Visual AI Updates';
+  }
+
+  if (group.subjectId === 'gaussian-splatting') {
+    if (/\b(mesh|viewer|renderer|rendering|workflow|tool|desktop|vr)\b/.test(text)) return 'Tools & Reconstruction';
+    if (/\b(world|scene|dynamic|reconstruction|4d|3d)\b/.test(text)) return 'Scene Reconstruction';
+    return '3D Reconstruction';
+  }
+
+  return null;
+}
+
+function buildHeroTitle(group) {
+  const themeLabel = inferThemeLabel(group);
+  const title = themeLabel ? `${group.subjectLabel}: ${themeLabel}` : group.subjectLabel;
+  return cleanText(title, 64).replace(/…$/, '').trim();
+}
+
+function leadingSentence(value) {
+  const cleaned = cleanText(value, 260);
+  if (!cleaned) return '';
+  const candidates = cleaned
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => cleanText(sentence, 220))
+    .filter(Boolean);
+  const preferred = candidates.find((sentence) => !/^(hey\b|hi\b|hello\b|we(?:'re| are)\b the team\b|source\b)/i.test(sentence));
+  return preferred || candidates[0] || '';
+}
+
+function itemDigestLine(item) {
+  const summary = leadingSentence(item.summary || item.snippet || '');
+  if (summary && !/^https?:\/\//i.test(summary)) return summary;
+  const title = cleanText(item.title, 140);
+  return title ? `${title}.` : '';
 }
 
 function buildHeroSummary(group) {
   const extraCount = Math.max(group.items.length - 1, 0);
-  const topTitles = uniqueBy(group.items.map((item) => cleanText(item.title, 90)).filter(Boolean), (value) => value).slice(0, 3);
+  const themeLabel = (inferThemeLabel(group) || group.subjectLabel).toLowerCase();
+  const editorialItems = presentableItems(group);
+  const topLines = uniqueBy(editorialItems.map(itemDigestLine).filter(Boolean), (value) => value).slice(0, 3);
+  const sourceCount = uniqueBy(editorialItems.flatMap(sourceDomains), (value) => value).length;
 
-  if (group.items.length >= 2) {
-    const synthesized = cleanText(`Key signals this cycle: ${topTitles.join('; ')}.`, 420);
-    return extraCount > 0 ? `${synthesized} Includes ${extraCount} additional in-scope item${extraCount === 1 ? '' : 's'}.` : synthesized;
+  if (topLines.length >= 2) {
+    const details = topLines.join(' ');
+    const suffix = extraCount > topLines.length - 1
+      ? ` The cluster includes ${extraCount - (topLines.length - 1)} more in-scope item${extraCount - (topLines.length - 1) === 1 ? '' : 's'}${sourceCount > 1 ? ` across ${sourceCount} source domains` : ''}.`
+      : sourceCount > 1
+        ? ` The signal spans ${sourceCount} source domains.`
+        : '';
+    return cleanText(`This ${group.subjectLabel} theme centers on ${themeLabel}. ${details}${suffix}`, 560);
   }
 
-  const lead = group.items[0];
-  const leadSummary = cleanText(lead?.summary ?? lead?.snippet ?? '', 260);
-  if (leadSummary) return leadSummary;
-  return cleanText(`Lead item: ${lead?.title ?? 'Untitled item'}.`, 180) || 'Pending summary.';
+  if (topLines.length === 1) {
+    return cleanText(`This ${group.subjectLabel} theme centers on ${themeLabel}. ${topLines[0]}`, 420);
+  }
+
+  return 'Pending summary.';
 }
 
 function buildHeroInsight(group, supporting) {
-  const lead = group.items[0];
-  const secondary = group.items[1];
   const subjectLabel = group.subjectLabel;
-  const sourceTypes = uniqueBy(supporting, (source) => source.type).length;
+  const sourceCount = supporting.length;
+  const sourcePhrase = `The ${sourceCount <= 1 ? 'single-source' : 'multi-source'} signal`;
 
   if (group.subjectId === 'ai-agents' && group.subthemeLabel) {
-    return cleanText(`The dominant thread in ${subjectLabel} this cycle was ${group.subthemeLabel.toLowerCase()}. ${lead?.title ?? 'The lead item'} set the pace${secondary ? `, with ${secondary.title} reinforcing the same direction` : ''}. Practical takeaway: watch how these signals change agent capability, deployment, or operating risk.`, 320);
+    const analysisBySubtheme = {
+      'cost-and-monitoring': 'This matters because agent adoption is moving from experiments to managed operations, where usage visibility, cost control, and auditability decide whether teams can keep agents in production.',
+      'consumer-applications': 'This matters because agentic systems are moving into personal and family contexts, where usefulness depends as much on trust, boundaries, and workflow fit as raw model capability.',
+      'developer-tools': 'This matters because coding agents are becoming part of the developer toolchain, so reliability, context handling, and repository-level feedback loops are becoming product requirements.',
+      'frontier-models': 'This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions.',
+      'research-and-evals': 'This matters because evaluation work is becoming the control surface for agent progress: better tests shape what builders trust, deploy, and regulate.',
+      'tooling-and-platforms': 'This matters because orchestration and runtime tooling turn isolated agent demos into repeatable systems that teams can debug, govern, and scale.',
+      'agent-apps-and-platforms': 'This matters because agent-native products live or die on whether they turn model capability into repeatable user workflows. The signal is worth tracking for evidence that agent apps are becoming sticky products instead of one-off demos.',
+      'applications-and-builds': 'This matters because practical agent use cases are widening, but the durable signal is whether they solve repeated workflows instead of one-off demos.'
+    };
+    return cleanText(`${analysisBySubtheme[group.subthemeId] || analysisBySubtheme['applications-and-builds']} ${sourcePhrase} is worth tracking for changes in capability, deployment friction, or operating risk.`, 420);
   }
 
   if (group.subjectId === 'image-video-genai') {
-    return cleanText(`The dominant thread in ${subjectLabel} this cycle was workflow-oriented visual tooling and model quality. ${lead?.title ?? 'The lead item'} anchors the story${secondary ? `, while ${secondary.title} shows where the field is extending next` : ''}. Practical takeaway: pay attention to tools that improve controllability, editing, and production readiness.`, 320);
+    return cleanText(`This matters because visual generation is shifting from novelty outputs toward controllable production workflows. ${sourcePhrase} suggests builders should watch tools that improve editing precision, repeatability, and model integration.`, 420);
   }
 
   if (group.subjectId === 'gaussian-splatting') {
-    return cleanText(`The dominant thread in ${subjectLabel} this cycle was practical scene-editing and reconstruction workflow progress. ${lead?.title ?? 'The lead item'} is the clearest signal${secondary ? `, with ${secondary.title} adding adjacent research context` : ''}. Practical takeaway: the space still looks early, but tools are getting closer to usable pipelines.`, 320);
+    return cleanText(`This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. ${sourcePhrase} points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.`, 420);
   }
 
-  return cleanText(`The dominant thread in ${subjectLabel} this cycle was ${lead?.title ?? 'the lead item'}. ${secondary ? `${secondary.title} provided supporting evidence. ` : ''}This theme surfaced across ${sourceTypes} source type${sourceTypes === 1 ? '' : 's'}, suggesting it is worth tracking into the next cycle.`, 320);
+  return cleanText(`This matters because ${subjectLabel} activity is producing enough signal to affect near-term tooling and research choices. ${sourcePhrase} suggests it is worth tracking into the next cycle.`, 420);
+}
+
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
 }
 
 function buildHeroTopic(group, index) {
@@ -234,11 +549,11 @@ function buildHeroTopic(group, index) {
     group.subjectId,
     group.subthemeId
   ].filter(Boolean), (value) => value).slice(0, 8);
-  const titlePrefix = group.subthemeLabel ? `${group.subjectLabel} — ${group.subthemeLabel}` : group.subjectLabel;
+  const title = buildHeroTitle(group);
 
   return {
-    title: `${titlePrefix}: ${cleanText(lead.title ?? `Topic ${index + 1}`, 120)}`,
-    slug: lead.slug ?? `${group.subjectId}-${group.subthemeId || index + 1}`,
+    title,
+    slug: slugify(`${group.subjectId}-${group.subthemeId || inferThemeLabel(group) || index + 1}`),
     summary: buildHeroSummary(group),
     insight: buildHeroInsight(group, supporting),
     image_url: lead.image_url ?? null,
@@ -247,19 +562,32 @@ function buildHeroTopic(group, index) {
   };
 }
 
-function buildNotableItems(items, notableTargetMax) {
+function buildNotableItems(items, notableTargetMax, heroCoveredUrls = new Set()) {
   const perSubjectCounts = new Map();
   const output = [];
 
   for (const item of items) {
     if (output.length >= notableTargetMax) break;
+    const itemUrls = sourceUrls(item);
+    if (itemUrls.some((url) => heroCoveredUrls.has(url))) continue;
+    const itemRank = rankScore(item);
+    const trustAndSubstance = trustworthySourceScore(item) + substanceScore(item);
+    const domains = sourceDomains(item);
+    const xOnly = domains.length > 0 && domains.every((domain) => domain === 'x.com');
+    const summaryLength = cleanText(item.summary ?? item.snippet ?? '', 320).length;
+    if (itemRank < 340) continue;
+    if (trustAndSubstance < 220) continue;
+    if (isRedditMediaOnly(item) && trustAndSubstance < 420) continue;
+    if (lowSignalPenalty(item) < 0 && trustAndSubstance < 520) continue;
+    if (xOnly && trustAndSubstance < 420) continue;
+    if (summaryLength < 90 && trustAndSubstance < 360) continue;
     const subject = item.subject_primary || 'unknown';
     const count = perSubjectCounts.get(subject) || 0;
     if (count >= 6) continue;
     output.push({
       title: cleanText(item.title ?? `Untitled notable ${output.length + 1}`, 140),
       summary: cleanText(item.summary ?? item.snippet ?? '', 260) || 'Pending summary',
-      sources: item.sources ?? [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }],
+      sources: (item.sources ?? [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }]).map((source) => normalizeSource(source, item.source ?? 'unknown')),
       tags: uniqueBy([...(item.tags || []), ...(item.subject_matches || []), item.subject_primary].filter(Boolean), (value) => value)
     });
     perSubjectCounts.set(subject, count + 1);
@@ -268,9 +596,31 @@ function buildNotableItems(items, notableTargetMax) {
   return output;
 }
 
+function toDateLabel(value) {
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) return null;
+  return new Date(parsed).toISOString().slice(0, 10);
+}
+
+function inferWindowStart(items, fallbackDate) {
+  const dates = items
+    .map((item) => Date.parse(item?.published_at))
+    .filter((value) => !Number.isNaN(value));
+  if (dates.length === 0) return fallbackDate;
+  return new Date(Math.min(...dates)).toISOString();
+}
+
+function buildWeekLabel({ issueDate, publishedAt, compileWindowStartAt, items }) {
+  const end = toDateLabel(publishedAt) || issueDate;
+  const inferredStart = inferWindowStart(items, `${issueDate}T00:00:00.000Z`);
+  const start = toDateLabel(compileWindowStartAt) || toDateLabel(inferredStart) || issueDate;
+  return `${start} to ${end}`;
+}
+
 export function buildPreviewDigest({
   issueDate,
   publishedAt,
+  compileWindowStartAt = null,
   items,
   heroTopicTargetMax = 4,
   notableTargetMax = 15,
@@ -279,14 +629,13 @@ export function buildPreviewDigest({
   const ranked = [...items].sort((a, b) => rankScore(b) - rankScore(a));
   const groups = buildGroups(ranked, subjectConfig);
   const heroGroups = selectHeroGroups(groups, heroTopicTargetMax);
-  const usedLeadIds = new Set(heroGroups.map((group) => group.items[0]?.id).filter(Boolean));
-  const remainingItems = ranked.filter((item) => !usedLeadIds.has(item.id));
-
   const hero_topics = heroGroups.map((group, index) => buildHeroTopic(group, index));
-  const notable = buildNotableItems(remainingItems, notableTargetMax);
+  const heroCoveredUrls = new Set(heroGroups.flatMap((group) => presentableItems(group).flatMap(sourceUrls)).map(canonicalUrl).filter(Boolean));
+  const remainingItems = ranked.filter((item) => !sourceUrls(item).some((url) => heroCoveredUrls.has(url)));
+  const notable = buildNotableItems(remainingItems, notableTargetMax, heroCoveredUrls);
 
   const digest = {
-    week: `${issueDate} to ${issueDate}`,
+    week: buildWeekLabel({ issueDate, publishedAt, compileWindowStartAt, items }),
     published_at: publishedAt,
     hero_topics,
     notable

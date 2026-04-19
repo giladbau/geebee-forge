@@ -1,93 +1,45 @@
 {
-  "week": "2026-04-19 to 2026-04-19",
+  "week": "2026-04-12 to 2026-04-19",
   "published_at": "2026-04-19T06:01:09.037Z",
   "hero_topics": [
     {
-      "title": "AI Agents — Applications & Builds: Jesse Genet on Agentic Parenting Jesse Genet joins a16z's Sarah Wang and Katherine Boyle to discuss her journey from ...",
-      "slug": "ai-agents-applications-and-builds",
-      "summary": "Key signals this cycle: Jesse Genet on Agentic Parenting Jesse Genet joins a16z's Sarah Wang and Katherine Boyle…; TUI to see where Claude Code tokens actually go; Claude Code + Obsidian?. Includes 55 additional in-scope items.",
-      "insight": "The dominant thread in AI Agents this cycle was applications & builds. Jesse Genet on Agentic Parenting Jesse Genet joins a16z's Sarah Wang and Katherine Boyle to discuss her journey from ... set the pace, with TUI to see where Claude Code tokens actually go reinforcing the same direction. Practical takeaway: watch ho…",
-      "image_url": "https://pbs.twimg.com/amplify_video_thumb/2043717608760102912/img/frkobussW5i25fDt.jpg",
+      "title": "AI Agents: Research & Evals",
+      "slug": "ai-agents-research-and-evals",
+      "summary": "This AI Agents theme centers on research & evals. We built autonomous AI agents that propose ideas, run experiments, and iterate on an open research problem: how to train a strong model using only a weaker model's supervision. New Anthropic Fellows research: developing an Automated Alignment Researcher. The cluster includes 3 more in-scope items across 2 source domains.",
+      "insight": "This matters because evaluation work is becoming the control surface for agent progress: better tests shape what builders trust, deploy, and regulate. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": null,
       "sources": [
         {
-          "title": "Jesse Genet on Agentic Parenting Jesse Genet joins a16z's Sarah Wang and Katherine Boyle to discuss her journey from ...",
-          "url": "https://x.com/a16z/status/2043732774595748198",
-          "type": "twitter"
-        },
-        {
-          "title": "TUI to see where Claude Code tokens actually go",
-          "url": "https://i.redd.it/c9a6wzpte1vg1.jpeg",
+          "title": "Anthropic's Autonomous AI Agents Outperform Human Researchers on Weak-to-Strong Supervision",
+          "url": "https://alignment.anthropic.com/2026/automated-w2s-researcher/",
           "type": "reddit"
         },
         {
-          "title": "Claude Code + Obsidian?",
-          "url": "https://reddit.com/r/ClaudeAI/comments/1skw2vb/claude_code_obsidian/",
-          "type": "reddit"
-        },
-        {
-          "title": "Why do we need more RAM when we can just do memory swap on Apple Silicon? https://t.co/0JKqVncly1",
-          "url": "https://x.com/thesamuelnam/status/2045267266410008760",
+          "title": "New Anthropic Fellows research: developing an Automated Alignment Researcher. We ran an experiment to learn whether C...",
+          "url": "https://x.com/AnthropicAI/status/2044138481790648323",
           "type": "twitter"
         }
       ],
       "tags": [
         "ai-agents",
-        "applications-and-builds"
+        "research-and-evals"
       ]
     },
     {
-      "title": "3D Gaussian Splatting: Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyu…",
-      "slug": "gaussian-splatting-2",
-      "summary": "Key signals this cycle: Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world…; 3D Gaussian Splatting to Mesh 3.0 is out! Here's what changed and what we're still workin…; RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian…. Includes 2 additional in-scope items.",
-      "insight": "The dominant thread in 3D Gaussian Splatting this cycle was practical scene-editing and reconstruction workflow progress. Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan is the clearest signal, with 3D Gaussian Splatting to Mesh 3.0 is out! Here…",
+      "title": "Image/Video GenAI: Model Releases",
+      "slug": "image-video-genai-model-releases",
+      "summary": "This Image/Video GenAI theme centers on model releases. I curate a weekly multimodal AI roundup, here are the open-source image & video highlights from the last week: Numina - Finally makes AI video generators count objects correctly. Nucleus-Image is a text-to-image generation model built on a sparse mixture-of-experts (MoE) diffusion transformer architecture. The cluster includes 7 more in-scope items.",
+      "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
       "image_url": null,
       "sources": [
         {
-          "title": "Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan",
-          "url": "https://v.redd.it/g91l2x98w7vg1",
-          "type": "reddit"
-        },
-        {
-          "title": "3D Gaussian Splatting to Mesh 3.0 is out! Here's what changed and what we're still working on",
-          "url": "https://v.redd.it/1xlgn15k3xug1",
-          "type": "reddit"
-        },
-        {
-          "title": "RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting",
-          "url": "https://www.reddit.com/gallery/1sjsckx",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "stablediffusion",
-        "gaussian-splatting"
-      ]
-    },
-    {
-      "title": "Image/Video GenAI: Forget about VAEs? SenseNova's NEO-unify achieves 31.5 PSNR without an encoder – Native Image Gen is coming.",
-      "slug": "image-video-genai-3",
-      "summary": "Key signals this cycle: Forget about VAEs? SenseNova's NEO-unify achieves 31.5 PSNR without an encoder – Native I…; Nucleus-Image Released; Last week in Generative Image & Video. Includes 8 additional in-scope items.",
-      "insight": "The dominant thread in Image/Video GenAI this cycle was workflow-oriented visual tooling and model quality. Forget about VAEs? SenseNova's NEO-unify achieves 31.5 PSNR without an encoder – Native Image Gen is coming. anchors the story, while Nucleus-Image Released shows where the field is extending next. Practical tak…",
-      "image_url": null,
-      "sources": [
-        {
-          "title": "Forget about VAEs? SenseNova's NEO-unify achieves 31.5 PSNR without an encoder – Native Image Gen is coming.",
-          "url": "https://www.reddit.com/gallery/1skv88l",
+          "title": "Last week in Generative Image & Video",
+          "url": "https://reddit.com/r/StableDiffusion/comments/1slz1rq/last_week_in_generative_image_video/",
           "type": "reddit"
         },
         {
           "title": "Nucleus-Image Released",
           "url": "https://reddit.com/r/StableDiffusion/comments/1slpfch/nucleusimage_released/",
-          "type": "reddit"
-        },
-        {
-          "title": "Last week in Generative Image &amp; Video",
-          "url": "https://reddit.com/r/StableDiffusion/comments/1slz1rq/last_week_in_generative_image_video/",
-          "type": "reddit"
-        },
-        {
-          "title": "IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3)",
-          "url": "https://v.redd.it/ozjbemhf4vug1",
           "type": "reddit"
         }
       ],
@@ -97,251 +49,39 @@
       ]
     },
     {
-      "title": "AI Agents — Frontier Models: New Anthropic Fellows research: developing an Automated Alignment Researcher. We ran an experiment to learn whether C...",
+      "title": "AI Agents: Frontier Models",
       "slug": "ai-agents-frontier-models",
-      "summary": "Key signals this cycle: New Anthropic Fellows research: developing an Automated Alignment Researcher. We ran an e…; Major drop in intelligence across most major models.; Claude vs GPT in a bomberman-style 1v1 game. Includes 31 additional in-scope items.",
-      "insight": "The dominant thread in AI Agents this cycle was frontier models. New Anthropic Fellows research: developing an Automated Alignment Researcher. We ran an experiment to learn whether C... set the pace, with Major drop in intelligence across most major models. reinforcing the same direction. Practical takeaway: watch how…",
+      "summary": "This AI Agents theme centers on frontier models. Gemini Robotics ER-1.6 enhances reasoning to help robots navigate real-world tasks. Anthropic is set to release Claude Opus 4.7 and a new AI design tool as early as this week. Enhancement suite for Google Gemini and AI Studio The cluster includes 23 more in-scope items across 4 source domains.",
+      "insight": "This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
       "image_url": null,
       "sources": [
         {
-          "title": "New Anthropic Fellows research: developing an Automated Alignment Researcher. We ran an experiment to learn whether C...",
-          "url": "https://x.com/AnthropicAI/status/2044138481790648323",
+          "title": "Gemini Robotics ER-1.6 enhances reasoning to help robots navigate real-world tasks",
+          "url": "https://blog.google/innovation-and-ai/models-and-research/google-deepmind/gemini-robotics-er-1-6/",
+          "type": "reddit"
+        },
+        {
+          "title": "Anthropic is set to release Claude Opus 4.7 and a new AI design tool as early as this week",
+          "url": "https://www.theinformation.com/briefings/exclusive-anthropic-preps-opus-4-7-model-ai-design-tool",
+          "type": "reddit"
+        },
+        {
+          "title": "Enhancement suite for Google Gemini and AI Studio",
+          "url": "https://x.com/tom_doerr/status/2043432669006958615",
           "type": "twitter"
         },
         {
-          "title": "Major drop in intelligence across most major models.",
-          "url": "https://reddit.com/r/LocalLLaMA/comments/1sm08m6/major_drop_in_intelligence_across_most_major/",
-          "type": "reddit"
-        },
-        {
-          "title": "Claude vs GPT in a bomberman-style 1v1 game",
-          "url": "https://v.redd.it/cjtrksby34vg1",
-          "type": "reddit"
-        },
-        {
-          "title": "There is absolutely no way this is the same Opus 4.6 from a month ago",
-          "url": "https://reddit.com/r/claude/comments/1sk36n3/there_is_absolutely_no_way_this_is_the_same_opus/",
+          "title": "It Mythos was truly as advanced and dangerous as they claim they wouldn’t announce it in the way they have done",
+          "url": "https://reddit.com/r/claude/comments/1sj9rko/it_mythos_was_truly_as_advanced_and_dangerous_as/",
           "type": "reddit"
         }
       ],
       "tags": [
+        "singularity",
         "ai-agents",
         "frontier-models"
       ]
     }
   ],
-  "notable": [
-    {
-      "title": "OpenClaw has 250K GitHub stars. The only reliable use case I've found is daily news digests.",
-      "summary": "So I run cloud infra where people spin up Linux VMs. We made a video a while back showing how to deploy OpenClaw on an isolated VM in like 7 minutes, and it kind of took off. We've had roughly a thousand OpenClaw deploys since then. I've also talked to a bunc…",
-      "sources": [
-        {
-          "title": "OpenClaw has 250K GitHub stars. The only reliable use case I've found is daily news digests.",
-          "url": "https://reddit.com/r/LocalLLaMA/comments/1skce14/openclaw_has_250k_github_stars_the_only_reliable/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "localllama",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Major drop in intelligence across most major models.",
-      "summary": "As of mid Apr 2026, I have noticed every model has had a major intelligence drop. And no I'm not talking about just ChatGPT. Everything from Claude(Even Sonnet along with Opus), Gemini, z.ai, Grok all seem to ignore basic instructions, struggle at simple task…",
-      "sources": [
-        {
-          "title": "Major drop in intelligence across most major models.",
-          "url": "https://reddit.com/r/LocalLLaMA/comments/1sm08m6/major_drop_in_intelligence_across_most_major/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "localllama",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "TUI to see where Claude Code tokens actually go",
-      "summary": "been spending $200+/day on claude code and had zero visibility into what was eating the tokens. ccusage shows cost per model per day which is great but i wanted to know - is it the debugging thats expensive? the brainstorming? which project is burning the mos…",
-      "sources": [
-        {
-          "title": "TUI to see where Claude Code tokens actually go",
-          "url": "https://i.redd.it/c9a6wzpte1vg1.jpeg",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Claude vs GPT in a bomberman-style 1v1 game",
-      "summary": "A few weeks ago, ARC-AGI 3 was released. For those unfamiliar, it’s a benchmark designed to study agentic intelligence through interactive environments. I'm a big fan of these kinds of benchmarks as IMO they reveal so much more about the capabilities and limi…",
-      "sources": [
-        {
-          "title": "Claude vs GPT in a bomberman-style 1v1 game",
-          "url": "https://v.redd.it/cjtrksby34vg1",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "There is absolutely no way this is the same Opus 4.6 from a month ago",
-      "summary": "It's just not possible. Today I had it make a schedule for me. It got the date wrong, thinking today was the 13th (it's the 12th). I told it \"hey that's in the future.\" It apologized, then immediately spit out the exact same schedule. These are problems GPT-3…",
-      "sources": [
-        {
-          "title": "There is absolutely no way this is the same Opus 4.6 from a month ago",
-          "url": "https://reddit.com/r/claude/comments/1sk36n3/there_is_absolutely_no_way_this_is_the_same_opus/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claude",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Best Local LLMs - Apr 2026",
-      "summary": "We're back with another Best Local LLMs Megathread! We have continued feasting in the months since the previous thread with the much anticipated release of the Qwen3.5 and Gemma4 series. If that wasn't enough, we are having some scarcely believable moments wi…",
-      "sources": [
-        {
-          "title": "Best Local LLMs - Apr 2026",
-          "url": "https://reddit.com/r/LocalLLaMA/comments/1sknx6n/best_local_llms_apr_2026/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "localllama",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Nucleus-Image Released",
-      "summary": "Nucleus-Image is a text-to-image generation model built on a sparse mixture-of-experts (MoE) diffusion transformer architecture. It scales to 17B total parameters across 64 routed experts per layer while activating only \\~2B parameters per forward pass, estab…",
-      "sources": [
-        {
-          "title": "Nucleus-Image Released",
-          "url": "https://reddit.com/r/StableDiffusion/comments/1slpfch/nucleusimage_released/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "stablediffusion",
-        "image-video-genai",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "3D Gaussian Splatting to Mesh 3.0 is out! Here's what changed and what we're still working on",
-      "summary": "Hey r/GaussianSplatting, we're the team behind KIRI Engine. We just shipped 3D Gaussian Splatting to Mesh 3.0 as a feature update inside KIRI Engine and wanted to share what actually changed, not just the release notes version. 3D Gaussian Splatting to Mesh 3…",
-      "sources": [
-        {
-          "title": "3D Gaussian Splatting to Mesh 3.0 is out! Here's what changed and what we're still working on",
-          "url": "https://v.redd.it/1xlgn15k3xug1",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "gaussiansplatting",
-        "gaussian-splatting"
-      ]
-    },
-    {
-      "title": "Last week in Generative Image & Video",
-      "summary": "I curate a weekly multimodal AI roundup, here are the open-source image & video highlights from the last week: Numina - Finally makes AI video generators count objects correctly. Ask for three cats, get three cats. Reads attention during generation, catches c…",
-      "sources": [
-        {
-          "title": "Last week in Generative Image &amp; Video",
-          "url": "https://reddit.com/r/StableDiffusion/comments/1slz1rq/last_week_in_generative_image_video/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "stablediffusion",
-        "image-video-genai"
-      ]
-    },
-    {
-      "title": "RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting",
-      "summary": "Announcing the latest from Warpgate Labs: Today I am proud to release RSR: Rapid Splat Renderer. A lean, mean Windows viewer for 3DGS scenes written in C++ with Direct3D 12 and OpenXR. Wanted something hardcore that opens scenes fast and renders them well in…",
-      "sources": [
-        {
-          "title": "RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting",
-          "url": "https://www.reddit.com/gallery/1sjsckx",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "gaussiansplatting",
-        "gaussian-splatting"
-      ]
-    },
-    {
-      "title": "IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3)",
-      "summary": "I’m not sure how many people are aware of this. Up until now, I had been using IC-LoRA-Detailer as a standard LoRA, adding it with low strength during the render. However, seeing the great results from IC-LoRA-Outpaint made me think that the 'IC' prefix might…",
-      "sources": [
-        {
-          "title": "IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3)",
-          "url": "https://v.redd.it/ozjbemhf4vug1",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "stablediffusion",
-        "image-video-genai"
-      ]
-    },
-    {
-      "title": "Me whenever people on the PC building subreddits ask me why I need >32GB of system RAM.",
-      "summary": "I need 64 GB to offload parts of the diffusion model I’m using to generate bouncing anime tiddies, okay!?",
-      "sources": [
-        {
-          "title": "Me whenever people on the PC building subreddits ask me why I need &gt;32GB of system RAM.",
-          "url": "https://i.redd.it/wz56j09u6uug1.gif",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "stablediffusion",
-        "image-video-genai"
-      ]
-    },
-    {
-      "title": "rubs hands together",
-      "summary": "First got into A1111 diffusion with a 1080ti, then comfy with a 5070 and after a year with that I’ve decided to step it up a little bit. Excited to see what I can do now! No more runpods it was getting expensive!",
-      "sources": [
-        {
-          "title": "*rubs hands together*",
-          "url": "https://i.redd.it/mjrsnzrylevg1.jpeg",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "stablediffusion",
-        "image-video-genai"
-      ]
-    },
-    {
-      "title": "DFlash speculative decoding on Apple Silicon: 4.1x on Qwen3.5-9B, now open source (MLX, M5 Max)",
-      "summary": "A few days ago I posted early results from a native MLX implementation of DFlash. Since then I rewrote the benchmark methodology, fixed numerical issues, and open sourced the whole thing. A small draft model generates 16 tokens in parallel via block diffusion…",
-      "sources": [
-        {
-          "title": "DFlash speculative decoding on Apple Silicon: 4.1x on Qwen3.5-9B, now open source (MLX, M5 Max)",
-          "url": "https://v.redd.it/lszhzb05bzug1",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "localllama",
-        "image-video-genai",
-        "ai-agents"
-      ]
-    }
-  ]
+  "notable": []
 }
