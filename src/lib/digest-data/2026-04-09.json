@@ -3,48 +3,55 @@
   "published_at": "2026-04-09T08:49:41.731Z",
   "hero_topics": [
     {
-      "title": "AI Agents: Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b...",
-      "slug": "ai-agents-1",
-      "summary": "Key signals this cycle: Introducing Project Glasswing: an urgent initiative to help secure the world’s most criti…; After the Claude Code source code leak, a former PM extracted its multi-agent orchestrati…; Meta is back! Muse Spark scores 52 on the Artificial Analysis Intelligence Index, behind…. Includes 91 additional in-scope items.",
-      "insight": "Why it matters: AI Agents produced 92 in-scope items across 2 source types in this cycle. Lead signal: Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b....",
-      "image_url": null,
+      "title": "AI Agents: Research & Evals",
+      "slug": "ai-agents-research-and-evals",
+      "summary": "While textual frequency has been validated as relevant to human cognition in reading speed, its relatedness to Large Language Models (LLMs) is seldom studied. ([Adam's Law: Textual Frequency Law on Large Language Models](https://huggingface.co/papers/2604.02176)) Large language models are increasingly deployed as autonomous agents executing multi-step workflows in real-world software environments. ([Claw-Eval: Toward Trustworthy Evaluation of Autonomous Agents](https://huggingface.co/papers/2604.06132)) OpenClaw, the most widely deployed personal AI agent in early 2026, operates with full local system access and integrates with sensitive services such as Gmail, Stripe, and the filesystem. ([Your Agent, Their Asset: A Real-World Safety Analysis of OpenClaw](https://huggingface.co/papers/2604.04759)) The rapid growth of scientific literature has made it increasingly difficult for researchers to efficiently discover, evaluate, and synthesize relevant work. ([Paper Circle: An Open-source Multi-agent Research Discovery and Analysis Framework](https://huggingface.co/papers/2604.06170)) Additional coverage spans 8 more items across 3 source domains.",
+      "insight": "This matters because evaluation work is becoming the control surface for agent progress: better tests shape what builders trust, deploy, and regulate. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.04759.png",
       "sources": [
         {
-          "title": "Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b...",
-          "url": "https://x.com/AnthropicAI/status/2041578392852517128",
-          "type": "twitter"
+          "title": "Adam's Law: Textual Frequency Law on Large Language Models",
+          "url": "https://huggingface.co/papers/2604.02176",
+          "type": "paper"
         },
         {
-          "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
-          "url": "https://x.com/ivanburazin/status/2040112100597506107",
-          "type": "twitter"
-        },
-        {
-          "title": "Meta is back! Muse Spark scores 52 on the Artificial Analysis Intelligence Index, behind only Gemini 3.1 Pro, GPT-5.4...",
-          "url": "https://x.com/ArtificialAnlys/status/2041913043379220801",
-          "type": "twitter"
+          "title": "Claw-Eval: Toward Trustworthy Evaluation of Autonomous Agents",
+          "url": "https://huggingface.co/papers/2604.06132",
+          "type": "paper"
         },
         {
           "title": "Your Agent, Their Asset: A Real-World Safety Analysis of OpenClaw",
           "url": "https://huggingface.co/papers/2604.04759",
           "type": "paper"
+        },
+        {
+          "title": "Paper Circle: An Open-source Multi-agent Research Discovery and Analysis Framework",
+          "url": "https://huggingface.co/papers/2604.06170",
+          "type": "paper"
         }
       ],
       "tags": [
-        "ai-agents"
+        "CIK taxonomy",
+        "attack success rate",
+        "personal AI agent",
+        "sandboxed evaluations",
+        "agent architecture",
+        "defense strategies",
+        "malicious injections",
+        "legitimate updates"
       ]
     },
     {
-      "title": "Image/Video GenAI: Last week in Generative Image & Video",
-      "slug": "image-video-genai-2",
-      "summary": "Key signals this cycle: Last week in Generative Image & Video; Vanast: Virtual Try-On with Human Image Animation via Synthetic Triplet Supervision; Think in Strokes, Not Pixels: Process-Driven Image Generation via Interleaved Reasoning. Includes 12 additional in-scope items.",
-      "insight": "Why it matters: Image/Video GenAI produced 13 in-scope items across 2 source types in this cycle. Lead signal: Last week in Generative Image & Video.",
-      "image_url": null,
+      "title": "Image/Video GenAI: Tools & Workflows",
+      "slug": "image-video-genai-tools-workflows",
+      "summary": "Diffusion large language models (dLLMs) are emerging as a compelling alternative to dominant autoregressive models, replacing strictly sequential token generation with iterative denoising and parallel generation dynamic…. ([DARE: Diffusion Large Language Models Alignment and Reinforcement Executor](https://huggingface.co/papers/2604.04215)) We present Vanast, a unified framework that generates garment-transferred human animation videos directly from a single human image, garment images, and a pose guidance video. ([Vanast: Virtual Try-On with Human Image Animation via Synthetic Triplet Supervision](https://huggingface.co/papers/2604.04934)) Humans paint images incrementally: they plan a global layout, sketch a coarse draft, inspect, and refine details, and most importantly, each step is grounded in the evolving visual states. ([Think in Strokes, Not Pixels: Process-Driven Image Generation via Interleaved Reasoning](https://huggingface.co/papers/2604.04746)) Additional coverage spans 7 more items across 3 source domains.",
+      "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.04215.png",
       "sources": [
         {
-          "title": "Last week in Generative Image & Video",
-          "url": "https://reddit.com/r/StableDiffusion/comments/1sfj9dt/last_week_in_generative_image_video/",
-          "type": "reddit"
+          "title": "DARE: Diffusion Large Language Models Alignment and Reinforcement Executor",
+          "url": "https://huggingface.co/papers/2604.04215",
+          "type": "paper"
         },
         {
           "title": "Vanast: Virtual Try-On with Human Image Animation via Synthetic Triplet Supervision",
@@ -57,28 +64,29 @@
           "type": "paper"
         },
         {
-          "title": "DARE: Diffusion Large Language Models Alignment and Reinforcement Executor",
-          "url": "https://huggingface.co/papers/2604.04215",
+          "title": "General Multimodal Protein Design Enables DNA-Encoding of Chemistry",
+          "url": "https://huggingface.co/papers/2604.05181",
           "type": "paper"
         }
       ],
       "tags": [
-        "stablediffusion",
-        "image-video-genai"
+        "diffusion large language models",
+        "autoregressive models",
+        "sequential token generation",
+        "iterative denoising",
+        "parallel generation dynamics",
+        "post-training pipelines",
+        "reinforcement learning",
+        "preference optimization"
       ]
     },
     {
-      "title": "3D Gaussian Splatting: Somebody built Photoshop AGAIN but it’s for Gaussian splats and 3D worlds 🎨 Part 2",
-      "slug": "gaussian-splatting-3",
-      "summary": "Key signals this cycle: Somebody built Photoshop AGAIN but it’s for Gaussian splats and 3D worlds 🎨 Part 2; Fast Spatial Memory with Elastic Test-Time Training. Includes 1 additional in-scope item.",
-      "insight": "Why it matters: 3D Gaussian Splatting produced 2 in-scope items across 2 source types in this cycle. Lead signal: Somebody built Photoshop AGAIN but it’s for Gaussian splats and 3D worlds 🎨 Part 2.",
-      "image_url": null,
+      "title": "3D Gaussian Splatting: Tools & Reconstruction",
+      "slug": "gaussian-splatting-tools-reconstruction",
+      "summary": "Large Chunk Test-Time Training (LaCT) has shown strong performance on long-context 3D reconstruction, but its fully plastic inference-time updates remain vulnerable to catastrophic forgetting and overfitting. ([Fast Spatial Memory with Elastic Test-Time Training](https://huggingface.co/papers/2604.07350))",
+      "insight": "This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. The single-source signal points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.07350.png",
       "sources": [
-        {
-          "title": "Somebody built Photoshop AGAIN but it’s for Gaussian splats and 3D worlds 🎨 Part 2",
-          "url": "https://v.redd.it/t28wq6894ktg1",
-          "type": "reddit"
-        },
         {
           "title": "Fast Spatial Memory with Elastic Test-Time Training",
           "url": "https://huggingface.co/papers/2604.07350",
@@ -86,191 +94,60 @@
         }
       ],
       "tags": [
-        "gaussiansplatting",
-        "gaussian-splatting"
+        "test-time training",
+        "catastrophic forgetting",
+        "overfitting",
+        "elastic weight consolidation",
+        "fast-weight updates",
+        "Fisher-weighted elastic prior",
+        "anchor state",
+        "exponential moving average"
+      ]
+    },
+    {
+      "title": "AI Agents: Applications & Builds",
+      "slug": "ai-agents-applications-and-builds",
+      "summary": "RL training of multi-turn LLM agents is inherently unstable, and reasoning quality directly determines task performance. ([RAGEN-2: Reasoning Collapse in Agentic RL](https://huggingface.co/papers/2604.06268)) We present MegaTrain, a memory-centric system that efficiently trains 100B+ parameter large language models at full precision on a single GPU. ([MegaTrain: Full Precision Training of 100B+ Parameter Large Language Models on a Single GPU](https://huggingface.co/papers/2604.05091)) Graphics Program Synthesis is pivotal for interpreting and editing visual data, effectively facilitating the reverse-engineering of static visuals into editable TikZ code. ([Scientific Graphics Program Synthesis via Dual Self-Consistency Reinforcement Learning](https://huggingface.co/papers/2604.06079)) Modeling long-range spatiotemporal dynamics in functional Magnetic Resonance Imaging (fMRI) remains a key challenge due to the high dimensionality of the four-dimensional signals. ([Can Natural Image Autoencoders Compactly Tokenize fMRI Volumes for Long-Range Dynamics Modeling?](https://huggingface.co/papers/2604.03619)) Additional coverage spans 15 more items across 4 source domains.",
+      "insight": "This matters because practical agent use cases are widening, but the durable signal is whether they solve repeated workflows instead of one-off demos. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.06268.png",
+      "sources": [
+        {
+          "title": "RAGEN-2: Reasoning Collapse in Agentic RL",
+          "url": "https://huggingface.co/papers/2604.06268",
+          "type": "paper"
+        },
+        {
+          "title": "MegaTrain: Full Precision Training of 100B+ Parameter Large Language Models on a Single GPU",
+          "url": "https://huggingface.co/papers/2604.05091",
+          "type": "paper"
+        },
+        {
+          "title": "Scientific Graphics Program Synthesis via Dual Self-Consistency Reinforcement Learning",
+          "url": "https://huggingface.co/papers/2604.06079",
+          "type": "paper"
+        },
+        {
+          "title": "Can Natural Image Autoencoders Compactly Tokenize fMRI Volumes for Long-Range Dynamics Modeling?",
+          "url": "https://huggingface.co/papers/2604.03619",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "entropy",
+        "mutual information",
+        "template collapse",
+        "signal-to-noise ratio",
+        "reward variance",
+        "reasoning quality",
+        "input dependence",
+        "task performance"
       ]
     }
   ],
   "notable": [
     {
-      "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
-      "summary": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open source model agnostic framework. He studied the architecture, focused on the multi-agent orchestration layer (the coordinator that breaks goals int…",
-      "sources": [
-        {
-          "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
-          "url": "https://x.com/ivanburazin/status/2040112100597506107",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Meta is back! Muse Spark scores 52 on the Artificial Analysis Intelligence Index, behind only Gemini 3.1 Pro, GPT-5.4...",
-      "summary": "Meta is back! Muse Spark scores 52 on the Artificial Analysis Intelligence Index, behind only Gemini 3.1 Pro, GPT-5.4, and Claude Opus 4.6. Muse Spark is the first new release since Llama 4 in April 2025 and also Meta's first release that is not open weights…",
-      "sources": [
-        {
-          "title": "Meta is back! Muse Spark scores 52 on the Artificial Analysis Intelligence Index, behind only Gemini 3.1 Pro, GPT-5.4...",
-          "url": "https://x.com/ArtificialAnlys/status/2041913043379220801",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Your Agent, Their Asset: A Real-World Safety Analysis of OpenClaw",
-      "summary": "OpenClaw, the most widely deployed personal AI agent in early 2026, operates with full local system access and integrates with sensitive services such as Gmail, Stripe, and the filesystem. While these broad privileges enable high levels of automation and powe…",
-      "sources": [
-        {
-          "title": "Your Agent, Their Asset: A Real-World Safety Analysis of OpenClaw",
-          "url": "https://huggingface.co/papers/2604.04759",
-          "type": "paper"
-        }
-      ],
-      "tags": [
-        "CIK taxonomy",
-        "attack success rate",
-        "personal AI agent",
-        "sandboxed evaluations",
-        "agent architecture",
-        "defense strategies",
-        "malicious injections",
-        "legitimate updates",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "I made a USB-Clawd who gets my attention when Claude Code finishes a response",
-      "summary": "I made a USB-Clawd who gets my attention when Claude Code finishes a response",
-      "sources": [
-        {
-          "title": "I made a USB-Clawd who gets my attention when Claude Code finishes a response",
-          "url": "https://x.com/BenJames_____/status/2041157626155741272",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Introducing Claude Managed Agents: everything you need to build and deploy agents at scale. It pairs an agent harness...",
-      "summary": "Introducing Claude Managed Agents: everything you need to build and deploy agents at scale. It pairs an agent harness tuned for performance with production infrastructure, so you can go from prototype to launch in days. Now in public beta on the Claude Platfo…",
-      "sources": [
-        {
-          "title": "Introducing Claude Managed Agents: everything you need to build and deploy agents at scale. It pairs an agent harness...",
-          "url": "https://x.com/claudeai/status/2041927687460024721",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "M5 Max 128GB, 17 models, 23 prompts: Qwen 3.5 122B is still a local king",
-      "summary": "The last Llama (Scout/Maverick) was released a year ago. Since then US based releases have been super rare: Granite 3.3, GPT-OSS 20B & 120B, Nemotron 3 Nano / Super and now Gemma 4. Can't even compare to the solid Chinese open model output or Qwens, DeepSeeks…",
-      "sources": [
-        {
-          "title": "M5 Max 128GB, 17 models, 23 prompts: Qwen 3.5 122B is still a local king",
-          "url": "https://reddit.com/r/LocalLLaMA/comments/1sfr6u4/m5_max_128gb_17_models_23_prompts_qwen_35_122b_is/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "localllama",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Burned 5B tokens with Claude Code in March to build a financial research agent.",
-      "summary": "TL;DR: I built a financial research harness with Claude Code, full stack and open-source under Apache 2.0 (github.com/ginlix-ai/langalpha). Sharing the design decisions around context management, tools and data, and more in case it's useful to others building…",
-      "sources": [
-        {
-          "title": "Burned 5B tokens with Claude Code in March to build a financial research agent.",
-          "url": "https://www.reddit.com/gallery/1sfxapw",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Video-MME-v2: Towards the Next Stage in Benchmarks for Comprehensive Video Understanding",
-      "summary": "With the rapid advancement of video understanding, existing benchmarks are becoming increasingly saturated, exposing a critical discrepancy between inflated leaderboard scores and real-world model capabilities. To address this widening gap, we introduce Video…",
-      "sources": [
-        {
-          "title": "Video-MME-v2: Towards the Next Stage in Benchmarks for Comprehensive Video Understanding",
-          "url": "https://huggingface.co/papers/2604.05015",
-          "type": "paper"
-        }
-      ],
-      "tags": [
-        "video understanding",
-        "video MLLMs",
-        "progressive tri-level hierarchy",
-        "group-based non-linear evaluation",
-        "human annotation pipeline",
-        "multimodal reasoning",
-        "visual information aggregation",
-        "temporal dynamics modeling",
-        "high-level reasoning",
-        "hierarchical bottleneck",
-        "thinking-based reasoning",
-        "textual cues",
-        "subtitles",
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "CLAUDE OPUS 4.6 THINKING REDUCED BY 67% - Data shows Claude Opus 4.6 now thinks 67% less than before, dubbed “AI shri...",
-      "summary": "CLAUDE OPUS 4.6 THINKING REDUCED BY 67% - Data shows Claude Opus 4.6 now thinks 67% less than before, dubbed “AI shrinkflation” - Same price but noticeably dumber; users report more guardrails and restricted output - Anthropic stayed silent until public data…",
-      "sources": [
-        {
-          "title": "CLAUDE OPUS 4.6 THINKING REDUCED BY 67% - Data shows Claude Opus 4.6 now thinks 67% less than before, dubbed “AI shri...",
-          "url": "https://x.com/RoundtableSpace/status/2041897604708233650",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Adam's Law: Textual Frequency Law on Large Language Models",
-      "summary": "While textual frequency has been validated as relevant to human cognition in reading speed, its relatedness to Large Language Models (LLMs) is seldom studied. We propose a novel research direction in terms of textual data frequency, which is an understudied t…",
-      "sources": [
-        {
-          "title": "Adam's Law: Textual Frequency Law on Large Language Models",
-          "url": "https://huggingface.co/papers/2604.02176",
-          "type": "paper"
-        }
-      ],
-      "tags": [
-        "Textual Frequency Law",
-        "Textual Frequency Distillation",
-        "Curriculum Textual Frequency Training",
-        "Large Language Models",
-        "prompting",
-        "fine-tuning",
-        "sentence-level frequency",
-        "input paraphraser",
-        "story completion",
-        "agentic tool calling",
-        "math reasoning",
-        "machine translation",
-        "commonsense reasoning",
-        "ai-agents"
-      ]
-    },
-    {
       "title": "How Well Do Agentic Skills Work in the Wild: Benchmarking LLM Skill Usage in Realistic Settings",
-      "summary": "Agent skills, which are reusable, domain-specific knowledge artifacts, have become a popular mechanism for extending LLM-based agents, yet formally benchmarking skill usage performance remains scarce. Existing skill benchmarking efforts focus on overly ideali…",
+      "summary": "Agent skills, which are reusable, domain-specific knowledge artifacts, have become a popular mechanism for extending LLM-based agents, yet formally benchmarking skill usage performance remains scarce. Existing skill benchmarking efforts focus on overly idealized conditions, where LLMs are directly provided with hand-crafted, narrowly-tailored task-specific skills for each task, whereas in many realistic settings, the LLM agent may have….…",
       "sources": [
         {
           "title": "How Well Do Agentic Skills Work in the Wild: Benchmarking LLM Skill Usage in Realistic Settings",
@@ -290,67 +167,110 @@
       ]
     },
     {
-      "title": "Using a non-hermetic agent and having trouble with GPT 5.4 or your Codex sub? The rumors are true: it works a lot bet...",
-      "summary": "Using a non-hermetic agent and having trouble with GPT 5.4 or your Codex sub? The rumors are true: it works a lot better with the Hermes special sauce. Download Hermes Agent v0.8.0 today!",
+      "title": "Experience Transfer for Multimodal LLM Agents in Minecraft Game",
+      "summary": "Multimodal LLM agents operating in complex game environments must continually reuse past experience to solve new tasks efficiently. In this work, we propose Echo, a transfer-oriented memory framework that enables agents to derive actionable knowledge from prior interactions rather than treating memory as a passive repository of static records. To make transfer explicit, Echo decomposes reusable knowledge into five dimensions: structure….…",
       "sources": [
         {
-          "title": "Using a non-hermetic agent and having trouble with GPT 5.4 or your Codex sub? The rumors are true: it works a lot bet...",
-          "url": "https://x.com/NousResearch/status/2041997227711750298",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "Today we're releasing the Factory desktop app. A native interface for autonomous AI agents that work across every par...",
-      "summary": "Today we're releasing the Factory desktop app. A native interface for autonomous AI agents that work across every part of your software business.",
-      "sources": [
-        {
-          "title": "Today we're releasing the Factory desktop app. A native interface for autonomous AI agents that work across every par...",
-          "url": "https://x.com/FactoryAI/status/2041928406158471299",
-          "type": "twitter"
-        }
-      ],
-      "tags": [
-        "ai-agents"
-      ]
-    },
-    {
-      "title": "GBQA: A Game Benchmark for Evaluating LLMs as Quality Assurance Engineers",
-      "summary": "The autonomous discovery of bugs remains a significant challenge in modern software development. Compared to code generation, the complexity of dynamic runtime environments makes bug discovery considerably harder for large language models (LLMs). In this pape…",
-      "sources": [
-        {
-          "title": "GBQA: A Game Benchmark for Evaluating LLMs as Quality Assurance Engineers",
-          "url": "https://huggingface.co/papers/2604.02648",
+          "title": "Experience Transfer for Multimodal LLM Agents in Minecraft Game",
+          "url": "https://huggingface.co/papers/2604.05533",
           "type": "paper"
         }
       ],
       "tags": [
-        "large language models",
-        "autonomous bug discovery",
-        "runtime environments",
-        "multi-agent system",
-        "ReAct loop",
-        "memory mechanism",
-        "game development",
-        "software engineering",
+        "multimodal LLM agents",
+        "transfer-oriented memory framework",
+        "In-Context Analogy Learning",
+        "knowledge decomposition",
+        "experience transfer",
+        "recurrent patterns",
+        "contextual examples",
+        "Minecraft",
+        "object-unlocking tasks",
+        "chain-unlocking phenomenon",
         "ai-agents"
       ]
     },
     {
-      "title": "An actress Milla Jovovich just released a free open-source AI memory system that scored 100% on LongMemEval, beating every paid solution",
-      "summary": "Pending summary",
+      "title": "Neural Computers",
+      "summary": "We propose a new frontier: Neural Computers (NCs) -- an emerging machine form that unifies computation, memory, and I/O in a learned runtime state. Unlike conventional computers, which execute explicit programs, agents, which act over external execution environments, and world models, which learn environment dynamics, NCs aim to make the model itself the running computer. Our long-term goal is the Completely Neural Computer (CNC): the…. ([Neural Computers](https://huggingface.co/papers/2604.06425))",
       "sources": [
         {
-          "title": "An actress Milla Jovovich just released a free open-source AI memory system that scored 100% on LongMemEval, beating every paid solution",
-          "url": "https://github.com/milla-jovovich/mempalace",
-          "type": "reddit"
+          "title": "Neural Computers",
+          "url": "https://huggingface.co/papers/2604.06425",
+          "type": "paper"
         }
       ],
       "tags": [
-        "singularity",
+        "Neural Computers",
+        "learned runtime state",
+        "Completely Neural Computer",
+        "video models",
+        "I/O traces",
+        "screen frames",
+        "interface primitives",
+        "I/O alignment",
+        "short-horizon control",
+        "routine reuse",
+        "symbolic stability",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "REAM: Merging Improves Pruning of Experts in LLMs",
+      "summary": "Mixture-of-Experts (MoE) large language models (LLMs) are among the top-performing architectures. The largest models, often with hundreds of billions of parameters, pose significant memory challenges for deployment. Traditional approaches to reduce memory requirements include weight pruning and quantization. Motivated by the Router-weighted Expert Activation Pruning (REAP) that prunes experts, we propose a novel method, Router-weighted…. ([REAM: Merging Improves Pruning of Experts in LLMs](https://huggingface.co/papers/2604.04356))",
+      "sources": [
+        {
+          "title": "REAM: Merging Improves Pruning of Experts in LLMs",
+          "url": "https://huggingface.co/papers/2604.04356",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "Mixture-of-Experts",
+        "large language models",
+        "weight pruning",
+        "quantization",
+        "Router-weighted Expert Activation Pruning",
+        "Router-weighted Expert Activation Merging",
+        "expert activation merging",
+        "calibration data",
+        "Pareto frontier",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "The Depth Ceiling: On the Limits of Large Language Models in Discovering Latent Planning",
+      "summary": "The viability of chain-of-thought (CoT) monitoring hinges on models being unable to reason effectively in their latent representations. Yet little is known about the limits of such latent reasoning in LLMs. We test these limits by studying whether models can discover multi-step planning strategies without supervision on intermediate steps and execute them latently, within a single forward pass. Using graph path-finding tasks that preci….…",
+      "sources": [
+        {
+          "title": "The Depth Ceiling: On the Limits of Large Language Models in Discovering Latent Planning",
+          "url": "https://huggingface.co/papers/2604.06427",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "chain-of-thought monitoring",
+        "latent representations",
+        "large language models",
+        "multi-step planning strategies",
+        "graph path-finding tasks",
+        "latent planning depth",
+        "few-shot prompting",
+        "model generalization",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
+      "summary": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open source model agnostic framework. He studied the architecture, focused on the multi-agent orchestration layer (the coordinator that breaks goals into tasks, team. ([After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...](https://x.com/ivanburazin/status/2040112100597506107))",
+      "sources": [
+        {
+          "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
+          "url": "https://x.com/ivanburazin/status/2040112100597506107",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
         "ai-agents"
       ]
     }
