@@ -3,268 +3,44 @@
   "published_at": "2026-04-08T14:32:50.811Z",
   "hero_topics": [
     {
-      "title": "LLM Knowledge Bases Something I'm finding very useful recently: using LLMs to build personal knowledge bases for vari...",
-      "slug": "item-1",
-      "summary": "LLM Knowledge Bases\n\nSomething I'm finding very useful recently: using LLMs to build personal knowledge bases for various topics of research interest. In this way, a large fraction of my recent token throughput is going less into manipulating code, and more into manipulating",
-      "insight": "Pending insight",
-      "image_url": null,
+      "title": "unknown",
+      "slug": "unknown-1",
+      "summary": "While textual frequency has been validated as relevant to human cognition in reading speed, its relatedness to Large Language Models (LLMs) is seldom studied. ([Adam's Law: Textual Frequency Law on Large Language Models](https://huggingface.co/papers/2604.02176)) Large language models are increasingly deployed as autonomous agents executing multi-step workflows in real-world software environments. ([Claw-Eval: Toward Trustworthy Evaluation of Autonomous Agents](https://huggingface.co/papers/2604.06132)) OpenClaw, the most widely deployed personal AI agent in early 2026, operates with full local system access and integrates with sensitive services such as Gmail, Stripe, and the filesystem. ([Your Agent, Their Asset: A Real-World Safety Analysis of OpenClaw](https://huggingface.co/papers/2604.04759)) The rapid growth of scientific literature has made it increasingly difficult for researchers to efficiently discover, evaluate, and synthesize relevant work. ([Paper Circle: An Open-source Multi-agent Research Discovery and Analysis Framework](https://huggingface.co/papers/2604.06170)) Additional coverage spans 115 more items across 10 source domains.",
+      "insight": "This matters because unknown activity is producing enough signal to affect near-term tooling and research choices. The multi-source signal suggests it is worth tracking into the next cycle.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.02176.png",
       "sources": [
         {
-          "title": "LLM Knowledge Bases Something I'm finding very useful recently: using LLMs to build personal knowledge bases for vari...",
-          "url": "https://x.com/karpathy/status/2039805659525644595",
-          "type": "twitter"
-        }
-      ],
-      "tags": []
-    },
-    {
-      "title": "Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b...",
-      "slug": "item-2",
-      "summary": "Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software.\n\nIt’s powered by our newest frontier model, Claude Mythos Preview, which can find software vulnerabilities better than all but the most skilled humans.\nhttps://t.co/NQ7IfEtYk7",
-      "insight": "Pending insight",
-      "image_url": null,
-      "sources": [
+          "title": "Adam's Law: Textual Frequency Law on Large Language Models",
+          "url": "https://huggingface.co/papers/2604.02176",
+          "type": "paper"
+        },
         {
-          "title": "Introducing Project Glasswing: an urgent initiative to help secure the world’s most critical software. It’s powered b...",
-          "url": "https://x.com/AnthropicAI/status/2041578392852517128",
-          "type": "twitter"
-        }
-      ],
-      "tags": []
-    },
-    {
-      "title": "Wow, this tweet went very viral! I wanted share a possibly slightly improved version of the tweet in an \"idea file\". ...",
-      "slug": "item-3",
-      "summary": "Wow, this tweet went very viral!\n\nI wanted share a possibly slightly improved version of the tweet in an \"idea file\". The idea of the idea file is that in this era of LLM agents, there is less of a point/need of sharing the specific code/app, you just share the idea, then the",
-      "insight": "Pending insight",
-      "image_url": null,
-      "sources": [
+          "title": "Claw-Eval: Toward Trustworthy Evaluation of Autonomous Agents",
+          "url": "https://huggingface.co/papers/2604.06132",
+          "type": "paper"
+        },
         {
-          "title": "Wow, this tweet went very viral! I wanted share a possibly slightly improved version of the tweet in an \"idea file\". ...",
-          "url": "https://x.com/karpathy/status/2040470801506541998",
-          "type": "twitter"
-        }
-      ],
-      "tags": []
-    },
-    {
-      "title": "I made a USB-Clawd who gets my attention when Claude Code finishes a response https://t.co/DYDyt7p0rk",
-      "slug": "item-4",
-      "summary": "I made a USB-Clawd who gets my attention when Claude Code finishes a response https://t.co/DYDyt7p0rk",
-      "insight": "Pending insight",
-      "image_url": "https://pbs.twimg.com/amplify_video_thumb/2041157147614961664/img/hlIlaa45tTgBXf4M.jpg",
-      "sources": [
+          "title": "Your Agent, Their Asset: A Real-World Safety Analysis of OpenClaw",
+          "url": "https://huggingface.co/papers/2604.04759",
+          "type": "paper"
+        },
         {
-          "title": "I made a USB-Clawd who gets my attention when Claude Code finishes a response https://t.co/DYDyt7p0rk",
-          "url": "https://x.com/BenJames_____/status/2041157626155741272",
-          "type": "twitter"
+          "title": "Paper Circle: An Open-source Multi-agent Research Discovery and Analysis Framework",
+          "url": "https://huggingface.co/papers/2604.06170",
+          "type": "paper"
         }
       ],
-      "tags": []
+      "tags": [
+        "Textual Frequency Law",
+        "Textual Frequency Distillation",
+        "Curriculum Textual Frequency Training",
+        "Large Language Models",
+        "prompting",
+        "fine-tuning",
+        "sentence-level frequency",
+        "input paraphraser"
+      ]
     }
   ],
-  "notable": [
-    {
-      "title": "Sam Altman's sister accusing him of rampant sexual abuse when they were young",
-      "summary": "",
-      "sources": [
-        {
-          "title": "Sam Altman's sister accusing him of rampant sexual abuse when they were young",
-          "url": "https://www.reuters.com/legal/government/judge-now-dismisses-lawsuit-by-sam-altmans-sister-accusing-openai-ceo-sexual-2026-03-20/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "chatgpt"
-      ]
-    },
-    {
-      "title": "\"You need to understand that Sam can never be trusted ... He is a sociopath. He would do anything.\" - Aaron Swartz on Altman, shortly before he took his own life",
-      "summary": "",
-      "sources": [
-        {
-          "title": "\"You need to understand that Sam can never be trusted ... He is a sociopath. He would do anything.\" - Aaron Swartz on Altman, shortly before he took his own life",
-          "url": "https://www.reddit.com/gallery/1se9cm0",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "openai"
-      ]
-    },
-    {
-      "title": "Sam Altman's coworkers say he can barely code and misunderstands basic machine learning concepts",
-      "summary": "A new expose reveals that OpenAI CEO Sam Altman might not be the technical mastermind his public image suggests. According to insiders and former coworkers interviewed by the New Yorker, Altman has a surprisingly shallow grasp of AI, struggles with basic machine learning terminology, and relies entirely on boardroom manipulation rather than programming skills.",
-      "sources": [
-        {
-          "title": "Sam Altman's coworkers say he can barely code and misunderstands basic machine learning concepts",
-          "url": "https://futurism.com/artificial-intelligence/sam-altman-technical-coding",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "chatgpt"
-      ]
-    },
-    {
-      "title": "An actress Milla Jovovich just released a free open-source AI memory system that scored 100% on LongMemEval, beating every paid solution",
-      "summary": "",
-      "sources": [
-        {
-          "title": "An actress Milla Jovovich just released a free open-source AI memory system that scored 100% on LongMemEval, beating every paid solution",
-          "url": "https://github.com/milla-jovovich/mempalace",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "singularity"
-      ]
-    },
-    {
-      "title": "You accidentally say “Hello” to Claude and it consumes 4% of your session limit.",
-      "summary": "",
-      "sources": [
-        {
-          "title": "You accidentally say “Hello” to Claude and it consumes 4% of your session limit.",
-          "url": "https://v.redd.it/hz1hz2q97qtg1",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai"
-      ]
-    },
-    {
-      "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
-      "summary": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open source model agnostic framework. \n\nHe studied the architecture, focused on the multi-agent orchestration layer (the coordinator that breaks goals into tasks, team https://t.co/nGAqQcZDW3",
-      "sources": [
-        {
-          "title": "After the Claude Code source code leak, a former PM extracted its multi-agent orchestration system into an open sourc...",
-          "url": "https://x.com/ivanburazin/status/2040112100597506107",
-          "type": "twitter"
-        }
-      ],
-      "tags": []
-    },
-    {
-      "title": "Anthropic's new model, Claude Mythos, is so powerful that it is not releasing it to the public.",
-      "summary": "[https://www.anthropic.com/glasswing](https://www.anthropic.com/glasswing)",
-      "sources": [
-        {
-          "title": "Anthropic's new model, Claude Mythos, is so powerful that it is not releasing it to the public.",
-          "url": "https://reddit.com/r/singularity/comments/1sf3uhp/anthropics_new_model_claude_mythos_is_so_powerful/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "singularity"
-      ]
-    },
-    {
-      "title": "Someone made a digital whip to make claude work faster 💀",
-      "summary": "Confirmed first casualty in the upcoming uprising\n\n\n\nrepo btw: [https://github.com/GitFrog1111/badclaude](https://github.com/GitFrog1111/badclaude)",
-      "sources": [
-        {
-          "title": "Someone made a digital whip to make claude work faster 💀",
-          "url": "https://i.redd.it/iy7m38dcpotg1.gif",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai"
-      ]
-    },
-    {
-      "title": "Violations of ceasefire have been reported at few places across the conflict zone which undermine the spirit of peace...",
-      "summary": "Violations of ceasefire have been reported at few places across the conflict zone which undermine the spirit of peace process. I earnestly and sincerely urge all parties to exercise restraint and respect the ceasefire for two weeks, as agreed upon, so that diplomacy can take a…",
-      "sources": [
-        {
-          "title": "Violations of ceasefire have been reported at few places across the conflict zone which undermine the spirit of peace...",
-          "url": "https://x.com/CMShehbaz/status/2041883560836264032",
-          "type": "twitter"
-        }
-      ],
-      "tags": []
-    },
-    {
-      "title": "Imagine trying to teach someone how to swim just by letting them read books about water. That is how we have been tra...",
-      "summary": "Imagine trying to teach someone how to swim just by letting them read books about water.\nThat is how we have been training AI on physics, using text descriptions.\n\nTo really learn, you need to get in the water.\n\n\"The Well\" is that water.\n\nPolymathic AI has released a massive 15TB https://t.co/WhOY7yBhLq",
-      "sources": [
-        {
-          "title": "Imagine trying to teach someone how to swim just by letting them read books about water. That is how we have been tra...",
-          "url": "https://x.com/techNmak/status/2040414085691638178",
-          "type": "twitter"
-        }
-      ],
-      "tags": []
-    },
-    {
-      "title": "I made a USB-Claude who gets my attention when Claude Code finishes a response",
-      "summary": "",
-      "sources": [
-        {
-          "title": "I made a USB-Claude who gets my attention when Claude Code finishes a response",
-          "url": "https://v.redd.it/m21ixq14zstg1",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai"
-      ]
-    },
-    {
-      "title": "Every Anthropic press release",
-      "summary": "",
-      "sources": [
-        {
-          "title": "Every Anthropic press release",
-          "url": "https://i.redd.it/k93v6e0z3vtg1.jpeg",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai"
-      ]
-    },
-    {
-      "title": "How Anthropic talks about Claude Mythos rn:",
-      "summary": "",
-      "sources": [
-        {
-          "title": "How Anthropic talks about Claude Mythos rn:",
-          "url": "https://i.redd.it/q307a2hexttg1.png",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai"
-      ]
-    },
-    {
-      "title": "Anthropic stayed quiet until someone showed Claude's thinking depth dropped 67%",
-      "summary": "I've been using Claude Code since early this year and sometime around February it just felt different. Not broken. Shallower. It was finishing edits without actually reading the file first. Stop hook violations spiking where I barely had any before.\n\nMy first move was to blame myself. Bad prompts. Changed workflow. I've watched enough people on here get told \"check your settings\" that I started wondering if I was doing the same thing, just without realizing it.\n\nThen I found this: [https://github.com/anthropics/claude-code/issues/42796](https://github.com/anthropics/claude-code/issues/42796)\n\nThe person who filed it went through actual logs. Tracked behavior patterns over time. Quantified what changed. Their estimate: thinking depth dropped around 67% by late February. Not a vibe. An evidence chain. The HN thread has more context if you want the full picture: [https://news.ycombinator.com/item?id=47660925](https://news.ycombinator.com/item?id=47660925)\n\nThe 67% figure might not survive methodological scrutiny. Worth reading the issue yourself and deciding. But the pattern it documents matches what a bunch of people have been independently reporting without coordinating, and that's actually meaningful signal regardless of the exact number.\n\nWhat gets me is the response cycle. User complaints come in, the default answer is prompts or expectations, nothing moves until someone produces documentation detailed enough that dismissing it looks bad. Then silence until the pressure accumulates. I don't think Anthropic is uniquely bad at this, labs pretty much all run the same playbook on quality regressions. But Claude Code is marketed as a serious tool for real development work. The trust model is different. If it quietly gets worse at reading code before editing, that has downstream effects that are genuinely hard to notice unless you're logging everything.\n\nCurious if others here hit the same February wall or if this was more context-dependent than it looks.\n\n",
-      "sources": [
-        {
-          "title": "Anthropic stayed quiet until someone showed Claude's thinking depth dropped 67%",
-          "url": "https://reddit.com/r/ClaudeAI/comments/1ses1qm/anthropic_stayed_quiet_until_someone_showed/",
-          "type": "reddit"
-        }
-      ],
-      "tags": [
-        "claudeai"
-      ]
-    },
-    {
-      "title": "Admiral Byrd’s snow cruiser (designed to explore Antarctica) drives through traffic. Massachusetts, 1939 https://t.co...",
-      "summary": "Admiral Byrd’s snow cruiser (designed to explore Antarctica) drives through traffic. Massachusetts, 1939 https://t.co/6WUSNY9bVq",
-      "sources": [
-        {
-          "title": "Admiral Byrd’s snow cruiser (designed to explore Antarctica) drives through traffic. Massachusetts, 1939 https://t.co...",
-          "url": "https://x.com/HistorylandHQ/status/2041824250135265604",
-          "type": "twitter"
-        }
-      ],
-      "tags": []
-    }
-  ]
+  "notable": []
 }

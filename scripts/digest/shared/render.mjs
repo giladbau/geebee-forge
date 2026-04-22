@@ -429,9 +429,86 @@ function presentableItems(group) {
   return sorted;
 }
 
+function stripHostPrefix(title, host) {
+  if (!host) return title;
+  const escapedHost = host.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  return title.replace(new RegExp(`^${escapedHost}\\s*[:\\-–—]\\s*`, 'i'), '').trim();
+}
+
+function isGenericLabel(label) {
+  return /^(source|link|article|read more|view post|github|project|paper|repo|repository|homepage|website|site|official|blog|post|page)$/i.test(label);
+}
+
+function titleCaseSlug(segment) {
+  const cleaned = String(segment || '').replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!cleaned) return '';
+  if (/^[a-z0-9.\-]+$/i.test(segment) && /-/.test(segment)) return segment;
+  return cleaned;
+}
+
+function deriveHostLabel(host, pathname) {
+  const segments = String(pathname || '')
+    .split('/')
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  if (!host) return '';
+
+  if (host === 'github.com' && segments.length >= 2) {
+    return `${segments[0]}/${segments[1].replace(/\.git$/, '')}`;
+  }
+
+  if (host === 'huggingface.co') {
+    if (segments[0] === 'papers' && segments[1]) return `HF paper: ${segments.slice(1).join('/')}`;
+    if (segments[0] === 'datasets' && segments[1] && segments[2]) return `${segments[1]}/${segments[2]} (dataset)`;
+    if (segments[0] === 'spaces' && segments[1] && segments[2]) return `${segments[1]}/${segments[2]} (space)`;
+    if (segments.length >= 2 && segments[0] !== 'papers') return `${segments[0]}/${segments[1]}`;
+    if (segments[0]) return segments[0];
+  }
+
+  if (host === 'arxiv.org' && segments[0] === 'abs' && segments[1]) {
+    return `arXiv:${segments[1]}`;
+  }
+
+  if ((host === 'x.com' || host === 'twitter.com') && segments[0]) {
+    return `@${segments[0]}`;
+  }
+
+  if ((host.endsWith('reddit.com') || host === 'redd.it')) {
+    if (segments[0] === 'r' && segments[1]) return `r/${segments[1]}`;
+  }
+
+  if (host.endsWith('.github.io') && segments[0]) {
+    return `${host.replace(/\.github\.io$/, '')}/${segments[0]}`;
+  }
+
+  // Generic: only surface the last path segment when it looks like a short project
+  // slug (few words, ≤ ~30 chars) — URL slugs with many dashes are noisier than the host.
+  if (segments.length > 0) {
+    const last = segments[segments.length - 1].replace(/\.(html?|pdf|md|txt)$/i, '');
+    const pretty = titleCaseSlug(last);
+    const dashCount = (last.match(/-/g) || []).length;
+    const isShortSlug = pretty && pretty.length <= 30 && dashCount <= 2;
+    const isGenericWord = /^(index|home|main|blog|news|research|papers?|post|about|docs?|documentation|release|releases|tag|tags)$/i.test(pretty);
+    if (isShortSlug && !isGenericWord) {
+      return pretty;
+    }
+  }
+
+  return '';
+}
+
 function normalizeSource(source, fallbackType = 'unknown') {
   const rawUrl = source?.url ?? 'about:blank';
   const url = canonicalUrl(rawUrl) || rawUrl;
+  let parsedUrl = null;
+  try {
+    parsedUrl = new URL(url);
+  } catch {
+    parsedUrl = null;
+  }
+  const normalizedHost = parsedUrl ? parsedUrl.hostname.replace(/^www\./, '').toLowerCase() : '';
+  const pathname = parsedUrl ? parsedUrl.pathname : '';
   const originalHost = (() => {
     try {
       return new URL(rawUrl).hostname.replace(/^www\./, '').toLowerCase();
@@ -439,36 +516,34 @@ function normalizeSource(source, fallbackType = 'unknown') {
       return '';
     }
   })();
-  const normalizedHost = (() => {
-    try {
-      return new URL(url).hostname.replace(/^www\./, '').toLowerCase();
-    } catch {
-      return '';
-    }
-  })();
-  const rawTitle = decodeBasicEntities(source?.title ?? 'Source item')
+
+  const rawTitle = decodeBasicEntities(source?.title ?? '')
     .replace(/`+/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-  const normalizedTitle = rawTitle.replace(/[:\-–—]+$/g, '').trim();
+  let normalizedTitle = rawTitle.replace(/[:\-–—]+$/g, '').trim();
+  normalizedTitle = stripHostPrefix(normalizedTitle, normalizedHost);
+  if (originalHost && originalHost !== normalizedHost) {
+    normalizedTitle = stripHostPrefix(normalizedTitle, originalHost);
+  }
+  const lowerTitle = normalizedTitle.toLowerCase();
+
+  const hostLabel = deriveHostLabel(normalizedHost, pathname);
+
+  const titleLooksLikeUrl = canonicalUrl(normalizedTitle) === url;
+  const titleIsHost = lowerTitle === normalizedHost;
+  const titleIsGeneric = isGenericLabel(normalizedTitle);
+  const titleIsSource = /^source item$/i.test(normalizedTitle);
 
   const title = (() => {
-    const escapedHost = normalizedHost ? normalizedHost.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') : '';
-    if (!normalizedTitle) return normalizedHost || 'Source item';
-    if (originalHost && normalizedHost && originalHost !== normalizedHost && normalizedTitle.toLowerCase() === originalHost) {
-      return normalizedHost;
+    if (hostLabel && (!normalizedTitle || titleLooksLikeUrl || titleIsHost || titleIsGeneric || titleIsSource)) {
+      return hostLabel;
     }
-    if (normalizedHost && normalizedTitle.toLowerCase() === normalizedHost) return normalizedHost;
-    if (normalizedHost && escapedHost) {
-      const hostPrefixedUrl = normalizedTitle.match(new RegExp(`^${escapedHost}:\\s*(https?:\\/\\/.+)$`, 'i'));
-      if (hostPrefixedUrl && canonicalUrl(hostPrefixedUrl[1]) === url) return normalizedHost;
-    }
-    if (canonicalUrl(normalizedTitle) === url) return normalizedHost || 'Source item';
-    if (/^(source|link|article|read more|view post)$/i.test(normalizedTitle)) return normalizedHost || normalizedTitle;
-    if (normalizedHost && escapedHost && new RegExp(`^${escapedHost}:\\s*(source|link|article|read more|view post)$`, 'i').test(normalizedTitle)) {
-      return normalizedHost;
-    }
-    return cleanText(normalizedTitle, 140) || normalizedHost || 'Source item';
+    if (!normalizedTitle) return hostLabel || normalizedHost || 'Source item';
+    if (titleLooksLikeUrl) return hostLabel || normalizedHost || 'Source item';
+    if (titleIsHost) return hostLabel || normalizedHost;
+    if (titleIsGeneric) return hostLabel || normalizedHost || normalizedTitle;
+    return cleanText(normalizedTitle, 140) || hostLabel || normalizedHost || 'Source item';
   })();
 
   return {
@@ -531,6 +606,15 @@ function leadingSentence(value) {
   return preferred || candidates[0] || '';
 }
 
+function splitSentences(value, sentenceLimit = 220) {
+  return cleanText(value || '', 520)
+    .replace(/^(full link:\s*)+/i, '')
+    .replace(/^(?:🔥\s*)?breaking:\s*/i, '')
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => cleanText(sentence, sentenceLimit))
+    .filter(Boolean);
+}
+
 function itemDigestLine(item) {
   const rawSummary = String(item.summary || item.snippet || '');
   const cleanedTitle = cleanText(item.title, 140)
@@ -541,33 +625,145 @@ function itemDigestLine(item) {
     if (cleanedTitle) return `${cleanedTitle}.`;
   }
 
-  const summary = leadingSentence(rawSummary);
-  if (summary && !/^https?:\/\//i.test(summary)) return summary;
+  const sentences = splitSentences(rawSummary);
+  const usable = sentences.filter((s) => !/^https?:\/\//i.test(s) && !/^(hey\b|hi\b|hello\b|we(?:'re| are)\b the team\b|source\b)/i.test(s));
+  if (usable.length > 0) {
+    // Prefer first one or two sentences, joined if the first is short
+    const first = usable[0];
+    if (first.length < 120 && usable[1] && first.length + usable[1].length + 1 <= 280) {
+      return `${first} ${usable[1]}`;
+    }
+    return first;
+  }
   return cleanedTitle ? `${cleanedTitle}.` : '';
 }
 
+function pickInlineSource(item) {
+  const sources = Array.isArray(item?.sources) ? item.sources : [];
+  const fallbackSources = sources.length > 0
+    ? sources
+    : [{ title: item?.title ?? 'Source item', url: item?.url ?? 'about:blank', type: item?.source ?? 'unknown' }];
+
+  const score = (source) => {
+    const type = String(source?.type || '').toLowerCase();
+    const host = (() => {
+      try {
+        return new URL(source?.url || '').hostname.replace(/^www\./, '');
+      } catch {
+        return '';
+      }
+    })();
+    if (host === 'i.redd.it' || host === 'v.redd.it' || host === 'preview.redd.it') return -5;
+    if (/official|paper|research|release/.test(type)) return 5;
+    if (/github|huggingface/.test(type)) return 4;
+    if (/project|blog|documentation|docs/.test(type)) return 3;
+    if (/reddit/.test(type)) return 2;
+    if (/twitter/.test(type)) return 1;
+    return 0;
+  };
+
+  const sorted = [...fallbackSources].sort((a, b) => score(b) - score(a));
+  const chosen = sorted[0];
+  if (!chosen || !chosen.url) return null;
+  const normalized = normalizeSource(chosen, item?.source ?? 'unknown');
+  if (!normalized?.url || normalized.url === 'about:blank') return null;
+  return normalized;
+}
+
+function stripTrailingPunctuation(text) {
+  return String(text || '').replace(/[\s.,;:!?]+$/g, '');
+}
+
+function formatDescriptor(text, source) {
+  const base = stripTrailingPunctuation(text || '');
+  if (!base) return '';
+  const withStop = /[.!?]$/.test(text) ? text : `${base}.`;
+  if (!source) return withStop;
+  return `${withStop} ([${source.title}](${source.url}))`;
+}
+
+function plainTextLength(value) {
+  return String(value || '').replace(/\[([^\]]+)\]\((?:https?:\/\/[^)]+)\)/g, '$1').length;
+}
+
+function truncatePreservingLinks(text, limit) {
+  const value = String(text || '');
+  if (plainTextLength(value) <= limit) return value;
+
+  const linkPattern = /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
+  let result = '';
+  let plainCount = 0;
+  let index = 0;
+
+  while (index < value.length && plainCount < limit) {
+    linkPattern.lastIndex = index;
+    const match = linkPattern.exec(value);
+    if (match && match.index === index) {
+      const [full, label] = match;
+      if (plainCount + label.length > limit) break;
+      result += full;
+      plainCount += label.length;
+      index += full.length;
+    } else {
+      result += value[index];
+      plainCount += 1;
+      index += 1;
+    }
+  }
+
+  const lastSpace = result.lastIndexOf(' ');
+  if (lastSpace > result.length * 0.7) result = result.slice(0, lastSpace);
+  return `${result.replace(/[\s,;:]+$/g, '').trimEnd()}…`;
+}
+
+function joinWithinLimit(sentences, limit) {
+  let acc = '';
+  for (const sentence of sentences) {
+    if (!sentence) continue;
+    const candidate = acc ? `${acc} ${sentence}` : sentence;
+    if (plainTextLength(candidate) > limit) break;
+    acc = candidate;
+  }
+  return acc || sentences.find(Boolean) || '';
+}
+
+function buildItemDescriptor(item) {
+  const text = itemDigestLine(item);
+  if (!text) return null;
+  const source = pickInlineSource(item);
+  return formatDescriptor(text, source);
+}
+
 function buildHeroSummary(group) {
-  const extraCount = Math.max(group.items.length - 1, 0);
-  const themeLabel = (inferThemeLabel(group) || group.subjectLabel).toLowerCase();
   const editorialItems = presentableItems(group);
-  const topLines = uniqueBy(editorialItems.map(itemDigestLine).filter(Boolean), (value) => value).slice(0, 3);
+  if (editorialItems.length === 0) return 'Pending summary.';
+
+  const seen = new Set();
+  const descriptors = [];
+  for (const item of editorialItems) {
+    const descriptor = buildItemDescriptor(item);
+    if (!descriptor) continue;
+    const key = descriptor.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    descriptors.push(descriptor);
+    if (descriptors.length >= 5) break;
+  }
+
+  if (descriptors.length === 0) return 'Pending summary.';
+
+  const body = joinWithinLimit(descriptors, 1000);
+  const extraCount = Math.max(editorialItems.length - descriptors.length, 0);
   const sourceCount = uniqueBy(editorialItems.flatMap(sourceDomains), (value) => value).length;
 
-  if (topLines.length >= 2) {
-    const details = topLines.join(' ');
-    const suffix = extraCount > topLines.length - 1
-      ? ` The cluster includes ${extraCount - (topLines.length - 1)} more in-scope item${extraCount - (topLines.length - 1) === 1 ? '' : 's'}${sourceCount > 1 ? ` across ${sourceCount} source domains` : ''}.`
-      : sourceCount > 1
-        ? ` The signal spans ${sourceCount} source domains.`
-        : '';
-    return cleanText(`This ${group.subjectLabel} theme centers on ${themeLabel}. ${details}${suffix}`, 560);
+  let tail = '';
+  if (extraCount >= 3 || (extraCount >= 1 && sourceCount >= 4)) {
+    tail = ` Additional coverage spans ${extraCount} more item${extraCount === 1 ? '' : 's'}${sourceCount > 1 ? ` across ${sourceCount} source domains` : ''}.`;
+  } else if (sourceCount >= 4) {
+    tail = ` Signal spans ${sourceCount} source domains.`;
   }
 
-  if (topLines.length === 1) {
-    return cleanText(`This ${group.subjectLabel} theme centers on ${themeLabel}. ${topLines[0]}`, 420);
-  }
-
-  return 'Pending summary.';
+  return truncatePreservingLinks(`${body}${tail}`, 1100);
 }
 
 function buildHeroInsight(group, supporting) {
@@ -654,9 +850,13 @@ function buildNotableItems(items, notableTargetMax, heroCoveredUrls = new Set())
     const subject = item.subject_primary || 'unknown';
     const count = perSubjectCounts.get(subject) || 0;
     if (count >= 6) continue;
+    const rawSummary = cleanText(item.summary ?? item.snippet ?? '', 440) || '';
+    const summaryBase = rawSummary || `${cleanText(item.title ?? '', 160)}.`;
+    const inlineSource = pickInlineSource(item);
+    const summary = truncatePreservingLinks(formatDescriptor(summaryBase, inlineSource) || 'Pending summary', 500);
     output.push({
       title: cleanText(item.title ?? `Untitled notable ${output.length + 1}`, 140),
-      summary: cleanText(item.summary ?? item.snippet ?? '', 260) || 'Pending summary',
+      summary,
       sources: (item.sources ?? [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }]).map((source) => normalizeSource(source, item.source ?? 'unknown')),
       tags: uniqueBy([...(item.tags || []), ...(item.subject_matches || []), item.subject_primary].filter(Boolean), (value) => value)
     });
@@ -686,6 +886,8 @@ function buildWeekLabel({ issueDate, publishedAt, compileWindowStartAt, items })
   const start = toDateLabel(compileWindowStartAt) || toDateLabel(inferredStart) || issueDate;
   return `${start} to ${end}`;
 }
+
+export { normalizeSource };
 
 export function buildPreviewDigest({
   issueDate,

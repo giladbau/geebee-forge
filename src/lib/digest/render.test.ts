@@ -132,7 +132,8 @@ describe('digest render', () => {
     });
 
     expect(digest.hero_topics[0].sources[0].url).toBe('https://example.com/real');
-    expect(digest.hero_topics[0].summary).not.toContain('https://');
+    expect(digest.hero_topics[0].summary).not.toContain('example.com/foo');
+    expect(digest.hero_topics[0].summary).not.toContain('example.com/gossip');
     expect(digest.hero_topics[0].summary).not.toContain('sexual abuse');
   });
 
@@ -172,9 +173,10 @@ describe('digest render', () => {
       notableTargetMax: 1
     });
 
-    expect(digest.hero_topics[0].summary).toContain('This Image/Video GenAI theme centers on');
     expect(digest.hero_topics[0].summary).toContain('A broad roundup of visual-ai tooling and releases.');
     expect(digest.hero_topics[0].summary).toContain('A paper on process-driven image generation.');
+    expect(digest.hero_topics[0].summary).not.toMatch(/This Image\/Video GenAI theme centers on/);
+    expect(digest.hero_topics[0].summary).toMatch(/\[[^\]]+\]\(https?:\/\/[^)]+\)/);
   });
 
   it('keeps cross-subject diversity first, then can use AI subthemes for extra hero slots', () => {
@@ -877,5 +879,108 @@ describe('digest render', () => {
     expect(digest.hero_topics[0].title).toBe('Generative 3D Worlds: Explorable World Models');
     expect(digest.hero_topics[0].summary).not.toMatch(/\bSource\b|##|\\"/);
     expect(digest.hero_topics[0].sources.map((source) => source.url)).toContain('https://3d-models.hunyuan.tencent.com/world');
+  });
+
+  it('labels GitHub source citations as owner/repo instead of the bare domain', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-19',
+      publishedAt: '2026-04-19T06:01:09.037Z',
+      items: [
+        {
+          id: 'reddit:gh',
+          source: 'reddit',
+          title: 'New open-source Numina tool for image editing',
+          summary: 'A new open-source tool for precise image editing based on learned trajectories.',
+          url: 'https://github.com/h-embodvis/numina',
+          sources: [
+            { title: 'Reddit thread', url: 'https://reddit.com/r/StableDiffusion/comments/1numina/new_numina/', type: 'reddit' },
+            { title: 'github.com: GitHub', url: 'https://github.com/h-embodvis/numina', type: 'github' }
+          ],
+          tags: ['stablediffusion'],
+          subject_primary: 'image-video-genai',
+          subject_matches: ['image-video-genai'],
+          subject_match_score: 2,
+          engagement: { score: 240 }
+        }
+      ],
+      heroTopicTargetMax: 1,
+      notableTargetMax: 0
+    });
+
+    const titles = digest.hero_topics[0].sources.map((source) => source.title);
+    expect(titles).toContain('h-embodvis/numina');
+    expect(titles.every((title) => title !== 'github.com: GitHub')).toBe(true);
+  });
+
+  it('labels Hugging Face paper and X citations with meaningful names', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-19',
+      publishedAt: '2026-04-19T06:01:09.037Z',
+      items: [
+        {
+          id: 'paper:hf',
+          source: 'huggingface_daily_papers',
+          title: 'LoGeR: long-context reconstruction',
+          summary: 'A paper on long-context reconstruction.',
+          url: 'https://huggingface.co/papers/2603.03269',
+          sources: [
+            { title: 'huggingface.co', url: 'https://huggingface.co/papers/2603.03269', type: 'paper' },
+            { title: '@DylanTFWang', url: 'https://x.com/DylanTFWang/status/2043952886166761519', type: 'twitter' }
+          ],
+          tags: ['gaussian-splatting'],
+          subject_primary: 'gaussian-splatting',
+          subject_matches: ['gaussian-splatting'],
+          subject_match_score: 3,
+          engagement: { upvotes: 120 }
+        }
+      ],
+      heroTopicTargetMax: 1,
+      notableTargetMax: 0
+    });
+
+    const titles = digest.hero_topics[0].sources.map((source) => source.title);
+    expect(titles).toContain('HF paper: 2603.03269');
+    expect(titles).toContain('@DylanTFWang');
+  });
+
+  it('embeds inline markdown links in hero summaries that point to the underlying sources', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-19',
+      publishedAt: '2026-04-19T06:01:09.037Z',
+      items: [
+        {
+          id: 'paper:nucleus',
+          source: 'huggingface_daily_papers',
+          title: 'Nucleus-Image Released',
+          summary: 'Nucleus-Image is a sparse mixture-of-experts diffusion transformer with 17B total parameters.',
+          url: 'https://huggingface.co/papers/nucleus-image',
+          sources: [{ title: 'Nucleus-Image Released', url: 'https://huggingface.co/papers/nucleus-image', type: 'paper' }],
+          tags: ['vision'],
+          subject_primary: 'image-video-genai',
+          subject_matches: ['image-video-genai'],
+          subject_match_score: 2,
+          engagement: { upvotes: 80 }
+        },
+        {
+          id: 'repo:numina',
+          source: 'reddit',
+          title: 'Numina releases a post-processing LoRA for LTX2.3',
+          summary: 'A new post-processing LoRA for LTX2.3 image rendering with improved detail.',
+          url: 'https://github.com/h-embodvis/numina',
+          sources: [{ title: 'github.com', url: 'https://github.com/h-embodvis/numina', type: 'github' }],
+          tags: ['stablediffusion'],
+          subject_primary: 'image-video-genai',
+          subject_matches: ['image-video-genai'],
+          subject_match_score: 2,
+          engagement: { score: 300 }
+        }
+      ],
+      heroTopicTargetMax: 1,
+      notableTargetMax: 0
+    });
+
+    const summary = digest.hero_topics[0].summary;
+    expect(summary).toMatch(/\[Nucleus-Image Released\]\(https:\/\/huggingface\.co\/papers\/nucleus-image\)/);
+    expect(summary).toMatch(/\[h-embodvis\/numina\]\(https:\/\/github\.com\/h-embodvis\/numina\)/);
   });
 });

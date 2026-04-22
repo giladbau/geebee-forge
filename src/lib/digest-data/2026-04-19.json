@@ -5,7 +5,7 @@
     {
       "title": "Image/Video GenAI: Model Releases",
       "slug": "image-video-genai-model-releases",
-      "summary": "This Image/Video GenAI theme centers on model releases. Last week in Generative Image & Video. IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3). DFlash speculative decoding on Apple Silicon: 4.1x on Qwen3.5-9B, now open source (MLX, M5 Max). The cluster includes 6 more in-scope items across 13 source domains.",
+      "summary": "Last week in Generative Image & Video. ([h-embodvis/numina](https://github.com/h-embodvis/numina)) IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3). ([url](https://www.google.com/url?sa=e&q=https%3a%2f%2fhuggingface.co%2fstkzzzz222%2fdtlzz%2fblob%2fmain%2f2026-04-13-03h34m56s_seed126661456_very%2520close%2520upperbody%2520view%2520of%2520a%2520very%2520old%2520teacher%2520wi.mp4)) DFlash speculative decoding on Apple Silicon: 4.1x on Qwen3.5-9B, now open source (MLX, M5 Max). ([bstnxbt/dflash-mlx](https://github.com/bstnxbt/dflash-mlx)) Nucleus-Image Released. ([nucleusai/nucleus-image](https://huggingface.co/nucleusai/nucleus-image)) Just saw this new technical blog from SenseNova (SenseTime) and it looks like the \"Frankenstein\" era of sticking different models together might be ending. ([vh5se45d8b](https://discord.gg/vh5se45d8b)) Signal spans 13 source domains.",
       "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
       "image_url": null,
       "sources": [
@@ -15,17 +15,17 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: GitHub",
+          "title": "h-embodvis/numina",
           "url": "https://github.com/h-embodvis/numina",
           "type": "github"
         },
         {
-          "title": "h-embodvis.github.io: Project",
+          "title": "h-embodvis/numina",
           "url": "https://h-embodvis.github.io/numina",
           "type": "project"
         },
         {
-          "title": "gordonchen19.github.io: Project",
+          "title": "gordonchen19/prompt-relay",
           "url": "https://gordonchen19.github.io/prompt-relay",
           "type": "project"
         }
@@ -38,7 +38,7 @@
     {
       "title": "AI Agents: Frontier Models",
       "slug": "ai-agents-frontier-models",
-      "summary": "This AI Agents theme centers on frontier models. Mythos is Mostly Hype... (also the bugs it found were mostly unexploitable and exaggerated...). AI Security Institute Findings on Claude Mythos Preview. OpenAI rolls out GPT-5.4-Cyber to limited group for testing, seeks to rival Claude Mythos. The cluster includes 19 more in-scope items across 14 source domains.",
+      "summary": "Mythos is Mostly Hype... (also the bugs it found were mostly unexploitable and exaggerated...). ([verbose 250-page report](https://www-cdn.anthropic.com/8b8380204f74670be75e81c820ca8dda846ab289.pdf)) AI Security Institute Findings on Claude Mythos Preview. ([aisi.gov.uk](https://www.aisi.gov.uk/blog/our-evaluation-of-claude-mythos-previews-cyber-capabilities)) OpenAI rolls out GPT-5.4-Cyber to limited group for testing, seeks to rival Claude Mythos. ([openai.com](https://openai.com/index/scaling-trusted-access-for-cyber-defense)) Gemini Robotics ER-1.6 enhances reasoning to help robots navigate real-world tasks. ([Gemini Robotics ER-1.6 enhances reasoning to help robots navigate real-world tasks](https://blog.google/innovation-and-ai/models-and-research/google-deepmind/gemini-robotics-er-1-6)) Anthropic is set to release Claude Opus 4.7 and a new AI design tool as early as this week. ([Anthropic is set to release Claude Opus 4.7 and a new AI design tool as early as this week](https://www.theinformation.com/briefings/exclusive-anthropic-preps-opus-4-7-model-ai-design-tool)) Additional coverage spans 3 more items across 14 source domains.",
       "insight": "This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
       "image_url": null,
       "sources": [
@@ -53,14 +53,14 @@
           "type": "project"
         },
         {
-          "title": "aisle.com",
-          "url": "https://aisle.com/blog/ai-cybersecurity-after-mythos-the-jagged-frontier",
+          "title": "clearthis.page",
+          "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/anthropics-claude-mythos-isnt-a-sentient-super-hacker-its-a-sales-pitch-claims-of-thousands-of-severe-zero-days-rely-on-just-198-manual-reviews",
           "type": "project"
         },
         {
-          "title": "www-cdn.anthropic.com: verbose 250-page report",
-          "url": "https://www-cdn.anthropic.com/8b8380204f74670be75e81c820ca8dda846ab289.pdf",
-          "type": "official"
+          "title": "aisle.com",
+          "url": "https://aisle.com/blog/ai-cybersecurity-after-mythos-the-jagged-frontier",
+          "type": "project"
         }
       ],
       "tags": [
@@ -72,7 +72,7 @@
     {
       "title": "Generative 3D Worlds: Explorable World Models",
       "slug": "generative-3d-worlds-explorable-world-models",
-      "summary": "This Generative 3D Worlds theme centers on explorable world models. Today, we released Lyra 2.0, a framework for generating persistent, explorable 3D worlds at scale, from NVIDIA Research. Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan. The signal spans 3 source domains.",
+      "summary": "Today, we released Lyra 2.0, a framework for generating persistent, explorable 3D worlds at scale, from NVIDIA Research. ([Today, we released Lyra 2.0, a framework for generating persistent, explorable 3D worlds at scale, from NVIDIA Resear...](https://x.com/nvidiaaidev/status/2044445645109436672)) Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan. ([world](https://3d-models.hunyuan.tencent.com/world))",
       "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The multi-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
       "image_url": "https://pbs.twimg.com/amplify_video_thumb/2044436411076509696/img/Ur9JSiE-nI1M9Sqj.jpg",
       "sources": [
@@ -87,12 +87,12 @@
           "type": "reddit"
         },
         {
-          "title": "x.com",
+          "title": "@dylantfwang",
           "url": "https://x.com/dylantfwang/status/2043952886166761519",
           "type": "twitter"
         },
         {
-          "title": "3d-models.hunyuan.tencent.com",
+          "title": "world",
           "url": "https://3d-models.hunyuan.tencent.com/world",
           "type": "official"
         }
@@ -104,7 +104,7 @@
     {
       "title": "3D Gaussian Splatting: Tools & Reconstruction",
       "slug": "gaussian-splatting-tools-reconstruction",
-      "summary": "This 3D Gaussian Splatting theme centers on tools & reconstruction. RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting.",
+      "summary": "RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting. ([warpgatelabs/rsr](https://github.com/warpgatelabs/rsr/releases))",
       "insight": "This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. The multi-source signal points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.",
       "image_url": null,
       "sources": [
@@ -114,7 +114,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "warpgatelabs/rsr",
           "url": "https://github.com/warpgatelabs/rsr/releases",
           "type": "github"
         }
@@ -128,7 +128,7 @@
   "notable": [
     {
       "title": "Claude vs GPT in a bomberman-style 1v1 game",
-      "summary": "A few weeks ago, ARC-AGI 3 was released. For those unfamiliar, it’s a benchmark designed to study agentic intelligence through interactive environments. I'm a big fan of these kinds of benchmarks as IMO they reveal so much more about the capabilities and limi…",
+      "summary": "A few weeks ago, ARC-AGI 3 was released. For those unfamiliar, it’s a benchmark designed to study agentic intelligence through interactive environments. I'm a big fan of these kinds of benchmarks as IMO they reveal so much more about the capabilities and limits of agentic AI than static Q&A benchmarks. They are also more intuitive to understand when you are able to actually see how the model behaves in these environments. I wanted to b…. ([klemenvod/tokenbrawl](https://github.com/klemenvod/tokenbrawl))",
       "sources": [
         {
           "title": "Claude vs GPT in a bomberman-style 1v1 game",
@@ -136,7 +136,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: github",
+          "title": "klemenvod/tokenbrawl",
           "url": "https://github.com/klemenvod/tokenbrawl",
           "type": "github"
         }
@@ -149,7 +149,7 @@
     },
     {
       "title": "TUI to see where Claude Code tokens actually go",
-      "summary": "been spending $200+/day on claude code and had zero visibility into what was eating the tokens. ccusage shows cost per model per day which is great but i wanted to know - is it the debugging thats expensive? the brainstorming? which project is burning the mos…",
+      "summary": "been spending $200+/day on claude code and had zero visibility into what was eating the tokens. ccusage shows cost per model per day which is great but i wanted to know - is it the debugging thats expensive? the brainstorming? which project is burning the most? it reads the session transcripts claude code already stores on disk (\\~/.claude/projects/) and classifies every turn into 13 categories based on tool usage patterns. no llm call…. ([agentseal/codeburn](https://github.com/agentseal/codeburn))",
       "sources": [
         {
           "title": "TUI to see where Claude Code tokens actually go",
@@ -157,7 +157,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "agentseal/codeburn",
           "url": "https://github.com/agentseal/codeburn",
           "type": "github"
         }
@@ -169,7 +169,7 @@
     },
     {
       "title": "Claude + Playwright to teardown websites and unearth dark pattern trackers & feature flags (oss)",
-      "summary": "i'm building agents for procurement & one thread has been to let claude systematically deconstruct a website so agents can navigate them. but as i've been doing this, like a piñata, interesting things keep falling off -- from trackers, to interesting feature…",
+      "summary": "i'm building agents for procurement & one thread has been to let claude systematically deconstruct a website so agents can navigate them. but as i've been doing this, like a piñata, interesting things keep falling off -- from trackers, to interesting feature flags to even some over-exposed data. so i naturally claude-coded it into an oss repo \\+ website (teardown.fyi) i've run it for about \\~125 websites so far - here are some interest…. ([oss repo](https://github.com/hayabhay/teardown))",
       "sources": [
         {
           "title": "Claude + Playwright to teardown websites and unearth dark pattern trackers & feature flags (oss)",
@@ -177,12 +177,12 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: oss repo",
+          "title": "oss repo",
           "url": "https://github.com/hayabhay/teardown",
           "type": "github"
         },
         {
-          "title": "teardown.fyi: website",
+          "title": "teardown.fyi",
           "url": "https://teardown.fyi",
           "type": "project"
         }
@@ -194,7 +194,7 @@
     },
     {
       "title": "Why Claude Code Max burns limits 40% faster with 20K less usable context. Proxy evidence inside.",
-      "summary": "TL;DR: Claude Code v2.1.100+ silently adds ~20K invisible tokens to every request, server-side. This eats your limits faster AND may degrade output quality. Downgrade to v2.1.98 for immediate relief. Proxy evidence below. --- I run Claude Code Max (5x plan) h…",
+      "summary": "TL;DR: Claude Code v2.1.100+ silently adds ~20K invisible tokens to every request, server-side. This eats your limits faster AND may degrade output quality. Downgrade to v2.1.98 for immediate relief. Proxy evidence below. --- I run Claude Code Max (5x plan) heavily — 3-5 parallel sessions, custom orchestration, the whole deal. Two weeks ago my usage limits started hitting way earlier than expected. What used to last a full workday star…. ([anthropics/claude-code](https://github.com/anthropics/claude-code/issues/46917))",
       "sources": [
         {
           "title": "Why Claude Code Max burns limits 40% faster with 20K less usable context. Proxy evidence inside.",
@@ -202,7 +202,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "anthropics/claude-code",
           "url": "https://github.com/anthropics/claude-code/issues/46917",
           "type": "github"
         }
@@ -214,7 +214,7 @@
     },
     {
       "title": "I built a Claude Code plugin that extracts any website's full design system",
-      "summary": "Just type `/extract-design` ` in Claude Code and it pulls the entire design language — colors, fonts, spacing, shadows, components, everything. The main output is a markdown file specifically structured for Claude to understand. So you can extract a site's de…",
+      "summary": "Just type `/extract-design` ` in Claude Code and it pulls the entire design language — colors, fonts, spacing, shadows, components, everything. The main output is a markdown file specifically structured for Claude to understand. So you can extract a site's design, then tell Claude \"build me a landing page using this design system\" and it actually nails it because it has the exact tokens, scales, and component patterns. It also generate…. ([manavarya09/design-extract](https://github.com/manavarya09/design-extract))",
       "sources": [
         {
           "title": "I built a Claude Code plugin that extracts any website's full design system",
@@ -227,7 +227,7 @@
           "type": "project"
         },
         {
-          "title": "github.com",
+          "title": "manavarya09/design-extract",
           "url": "https://github.com/manavarya09/design-extract",
           "type": "github"
         }
@@ -239,7 +239,7 @@
     },
     {
       "title": "Hot Experts in your VRAM! Dynamic expert cache in llama.cpp for 27% faster CPU +GPU token generation with Qwen3.5-122B-A10B compared to lay…",
-      "summary": "Claude cooked on the code, but I wrote this post myself, caveman style. I wanted to play with Qwen3.5-122B, but I don't have a unified memory system to work with, and 15 tok/s was rough. 23 tok/s is still rough but honestly noticeably faster when streaming re…",
+      "summary": "Claude cooked on the code, but I wrote this post myself, caveman style. I wanted to play with Qwen3.5-122B, but I don't have a unified memory system to work with, and 15 tok/s was rough. 23 tok/s is still rough but honestly noticeably faster when streaming responses. Tl;dr: We keep track of which experts get routed to most frequently for the past N tokens. We make a bet that the processing speed-up from loading these frequently routed-…. ([parmesanparty/llama.cpp](https://github.com/parmesanparty/llama.cpp))",
       "sources": [
         {
           "title": "Hot Experts in your VRAM! Dynamic expert cache in llama.cpp for 27% faster CPU +GPU token generation with Qwen3.5-122B-A10B compared to lay…",
@@ -247,7 +247,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "parmesanparty/llama.cpp",
           "url": "https://github.com/parmesanparty/llama.cpp",
           "type": "github"
         }
