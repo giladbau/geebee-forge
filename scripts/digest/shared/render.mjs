@@ -498,13 +498,21 @@ function normalizeSource(source, fallbackType = 'unknown') {
     if (originalHost && normalizedHost && originalHost !== normalizedHost && normalizedTitle.toLowerCase() === originalHost) {
       return normalizedHost;
     }
-    if (normalizedHost && normalizedTitle.toLowerCase() === normalizedHost) return normalizedHost;
+    if (normalizedHost && normalizedTitle.toLowerCase() === normalizedHost) {
+      const derived = derivedTitleFromUrl();
+      if (derived && derived !== normalizedHost && !/^\d{8,}$/.test(derived)) return derived;
+      return normalizedHost;
+    }
     if (normalizedHost && escapedHost) {
       const hostPrefixedUrl = normalizedTitle.match(new RegExp(`^${escapedHost}:\\s*(https?:\\/\\/.+)$`, 'i'));
       if (hostPrefixedUrl && canonicalUrl(hostPrefixedUrl[1]) === url) return normalizedHost;
     }
     if (canonicalUrl(normalizedTitle) === url) return derivedTitleFromUrl();
-    if (isGenericTitle(normalizedTitle)) return derivedTitleFromUrl();
+    if (isGenericTitle(normalizedTitle)) {
+      const derived = derivedTitleFromUrl();
+      if (derived && !/^\d{8,}$/.test(derived)) return derived;
+      return normalizedHost || 'Source item';
+    }
     if (normalizedHost && escapedHost && new RegExp(`^${escapedHost}:\\s*(source|link|article|read more|view post)$`, 'i').test(normalizedTitle)) {
       return derivedTitleFromUrl();
     }

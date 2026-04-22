@@ -5,7 +5,7 @@
     {
       "title": "Image/Video GenAI: Model Releases",
       "slug": "image-video-genai-model-releases",
-      "summary": "This Image/Video GenAI theme centers on model releases. Last week in Generative Image & Video. IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3). DFlash speculative decoding on Apple Silicon: 4.1x on Qwen3.5-9B, now open source (MLX, M5 Max). The cluster includes 6 more in-scope items across 13 source domains.",
+      "summary": "Image/Video GenAI: Last week in Generative Image & Video {{src:0|Last week in Generative Image & Video}}. IC-LoRA-Detailer: It's for post-processing, not just rendering (LTX2.3).",
       "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
       "image_url": null,
       "sources": [
@@ -15,17 +15,17 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: GitHub",
+          "title": "h-embodvis/numina",
           "url": "https://github.com/h-embodvis/numina",
           "type": "github"
         },
         {
-          "title": "h-embodvis.github.io: Project",
+          "title": "Numina",
           "url": "https://h-embodvis.github.io/numina",
           "type": "project"
         },
         {
-          "title": "gordonchen19.github.io: Project",
+          "title": "Prompt Relay",
           "url": "https://gordonchen19.github.io/prompt-relay",
           "type": "project"
         }
@@ -38,7 +38,7 @@
     {
       "title": "AI Agents: Frontier Models",
       "slug": "ai-agents-frontier-models",
-      "summary": "This AI Agents theme centers on frontier models. Mythos is Mostly Hype... (also the bugs it found were mostly unexploitable and exaggerated...). AI Security Institute Findings on Claude Mythos Preview. OpenAI rolls out GPT-5.4-Cyber to limited group for testing, seeks to rival Claude Mythos. The cluster includes 19 more in-scope items across 14 source domains.",
+      "summary": "AI Agents: Mythos is Mostly Hype... (also the bugs it found were mostly unexploitable and exaggerated...) {{src:0|Mythos is Mostly Hype... (also the bugs it found were mostly unexploitable and…}}. AI Security Institute Findings on Claude Mythos Preview.",
       "insight": "This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
       "image_url": null,
       "sources": [
@@ -48,19 +48,19 @@
           "type": "reddit"
         },
         {
+          "title": "Anthropics Claude Mythos Isnt A Sentient Super Hacker Its A Sales Pitch Claims Of Thousands Of Severe Zero Days Rely On Just 198 Manual Reviews",
+          "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/anthropics-claude-mythos-isnt-a-sentient-super-hacker-its-a-sales-pitch-claims-of-thousands-of-severe-zero-days-rely-on-just-198-manual-reviews",
+          "type": "project"
+        },
+        {
           "title": "tomshardware.com",
           "url": "https://www.tomshardware.com/tech-industry/artificial-intelligence/anthropics-claude-mythos-isnt-a-sentient-super-hacker-its-a-sales-pitch-claims-of-thousands-of-severe-zero-days-rely-on-just-198-manual-reviews",
           "type": "project"
         },
         {
-          "title": "aisle.com",
+          "title": "Ai Cybersecurity After Mythos The Jagged Frontier",
           "url": "https://aisle.com/blog/ai-cybersecurity-after-mythos-the-jagged-frontier",
           "type": "project"
-        },
-        {
-          "title": "www-cdn.anthropic.com: verbose 250-page report",
-          "url": "https://www-cdn.anthropic.com/8b8380204f74670be75e81c820ca8dda846ab289.pdf",
-          "type": "official"
         }
       ],
       "tags": [
@@ -72,7 +72,7 @@
     {
       "title": "Generative 3D Worlds: Explorable World Models",
       "slug": "generative-3d-worlds-explorable-world-models",
-      "summary": "This Generative 3D Worlds theme centers on explorable world models. Today, we released Lyra 2.0, a framework for generating persistent, explorable 3D worlds at scale, from NVIDIA Research. Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan. The signal spans 3 source domains.",
+      "summary": "Generative 3D Worlds: Today, we released Lyra 2.0, a framework for generating persistent, explorable 3D worlds at scale, from NVIDIA Research {{src:0|Today, we released Lyra 2.0, a framework for generating persistent, explorable…}}. Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimodal 3D world generation from Tencent Hunyuan {{src:1|Tencent HY-World 2.0 appears to be dropping on April 15 — open-source multimoda…}}.",
       "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The multi-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
       "image_url": "https://pbs.twimg.com/amplify_video_thumb/2044436411076509696/img/Ur9JSiE-nI1M9Sqj.jpg",
       "sources": [
@@ -87,12 +87,12 @@
           "type": "reddit"
         },
         {
-          "title": "x.com",
+          "title": "2043952886166761519",
           "url": "https://x.com/dylantfwang/status/2043952886166761519",
           "type": "twitter"
         },
         {
-          "title": "3d-models.hunyuan.tencent.com",
+          "title": "World",
           "url": "https://3d-models.hunyuan.tencent.com/world",
           "type": "official"
         }
@@ -104,7 +104,7 @@
     {
       "title": "3D Gaussian Splatting: Tools & Reconstruction",
       "slug": "gaussian-splatting-tools-reconstruction",
-      "summary": "This 3D Gaussian Splatting theme centers on tools & reconstruction. RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting.",
+      "summary": "In 3D Gaussian Splatting, RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer for Gaussian Splatting {{src:0|RSR: Rapid Splat Renderer - Free Native D3D12 Windows Desktop/VR DLSS Viewer fo…}}.",
       "insight": "This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. The multi-source signal points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.",
       "image_url": null,
       "sources": [
@@ -114,7 +114,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "warpgatelabs/rsr",
           "url": "https://github.com/warpgatelabs/rsr/releases",
           "type": "github"
         }
@@ -136,7 +136,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: github",
+          "title": "klemenvod/tokenbrawl",
           "url": "https://github.com/klemenvod/tokenbrawl",
           "type": "github"
         }
@@ -157,7 +157,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "agentseal/codeburn",
           "url": "https://github.com/agentseal/codeburn",
           "type": "github"
         }
@@ -202,7 +202,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "anthropics/claude-code",
           "url": "https://github.com/anthropics/claude-code/issues/46917",
           "type": "github"
         }
@@ -227,7 +227,7 @@
           "type": "project"
         },
         {
-          "title": "github.com",
+          "title": "manavarya09/design-extract",
           "url": "https://github.com/manavarya09/design-extract",
           "type": "github"
         }
@@ -247,7 +247,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "parmesanparty/llama.cpp",
           "url": "https://github.com/parmesanparty/llama.cpp",
           "type": "github"
         }

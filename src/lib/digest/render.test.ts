@@ -454,16 +454,31 @@ describe('digest render', () => {
           subject_matches: ['ai-agents'],
           subject_match_score: 3,
           engagement: { likes: 350 }
+        },
+        {
+          id: 'agent:release-page',
+          source: 'reddit',
+          title: 'Rapid splat renderer release lands on GitHub',
+          summary: 'A Windows desktop and VR viewer for Gaussian splatting shipped a releases page.',
+          url: 'https://github.com/warpgatelabs/rsr/releases',
+          sources: [{ title: 'github.com', url: 'https://github.com/warpgatelabs/rsr/releases', type: 'github' }],
+          tags: ['gaussiansplatting'],
+          subject_primary: 'gaussian-splatting',
+          subject_matches: ['gaussian-splatting'],
+          subject_match_score: 3,
+          engagement: { score: 700 }
         }
       ],
-      heroTopicTargetMax: 1,
+      heroTopicTargetMax: 3,
       notableTargetMax: 0
     });
 
-    expect(digest.hero_topics[0].sources.map((source) => source.title)).toContain('example/claude-token-tui');
-    expect(digest.hero_topics[0].sources.map((source) => source.title)).toContain('Agent Telemetry Dashboard');
-    expect(digest.hero_topics[0].sources.map((source) => source.title)).not.toContain('github.com');
-    expect(digest.hero_topics[0].sources.map((source) => source.title)).not.toContain('Project');
+    const sourceTitles = digest.hero_topics.flatMap((topic) => topic.sources.map((source) => source.title));
+    expect(sourceTitles).toContain('example/claude-token-tui');
+    expect(sourceTitles).toContain('Agent Telemetry Dashboard');
+    expect(sourceTitles).toContain('warpgatelabs/rsr');
+    expect(sourceTitles).not.toContain('github.com');
+    expect(sourceTitles).not.toContain('Project');
   });
 
   it('excludes every source already covered by hero topics from notable items', () => {
