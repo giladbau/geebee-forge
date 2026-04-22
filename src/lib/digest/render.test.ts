@@ -172,9 +172,11 @@ describe('digest render', () => {
       notableTargetMax: 1
     });
 
-    expect(digest.hero_topics[0].summary).toContain('This Image/Video GenAI theme centers on');
-    expect(digest.hero_topics[0].summary).toContain('A broad roundup of visual-ai tooling and releases.');
-    expect(digest.hero_topics[0].summary).toContain('A paper on process-driven image generation.');
+    expect(digest.hero_topics[0].summary).toContain('Image/Video GenAI:');
+    expect(digest.hero_topics[0].summary).toContain('A broad roundup of visual-ai tooling and releases');
+    expect(digest.hero_topics[0].summary).toContain('A paper on process-driven image generation');
+    expect(digest.hero_topics[0].summary).toContain('{{src:');
+    expect(digest.hero_topics[0].summary).not.toContain('theme centers on');
   });
 
   it('keeps cross-subject diversity first, then can use AI subthemes for extra hero slots', () => {
@@ -420,6 +422,48 @@ describe('digest render', () => {
     expect(topic.insight).toMatch(/matters|means|suggests|watch|takeaway/i);
     expect(topic.insight).not.toContain('Key signals this cycle');
     expect(topic.insight).not.toBe(topic.summary);
+  });
+
+  it('normalizes weak source labels into descriptive source names', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-19',
+      publishedAt: '2026-04-19T06:01:09.037Z',
+      items: [
+        {
+          id: 'agent:github',
+          source: 'reddit',
+          title: 'Claude token dashboard',
+          summary: 'A TUI shows where Claude Code token spend goes across projects and tasks.',
+          url: 'https://github.com/example/claude-token-tui',
+          sources: [{ title: 'github.com: GitHub', url: 'https://github.com/example/claude-token-tui', type: 'github' }],
+          tags: ['claudeai'],
+          subject_primary: 'ai-agents',
+          subject_matches: ['ai-agents'],
+          subject_match_score: 3,
+          engagement: { score: 900 }
+        },
+        {
+          id: 'agent:official',
+          source: 'x',
+          title: 'Usage telemetry dashboard for coding-agent spend',
+          summary: 'A second corroborating writeup covers monitoring spend and token burn for coding agents.',
+          url: 'https://example.com/blog/agent-telemetry-dashboard',
+          sources: [{ title: 'Project', url: 'https://example.com/blog/agent-telemetry-dashboard', type: 'blog' }],
+          tags: ['claudeai'],
+          subject_primary: 'ai-agents',
+          subject_matches: ['ai-agents'],
+          subject_match_score: 3,
+          engagement: { likes: 350 }
+        }
+      ],
+      heroTopicTargetMax: 1,
+      notableTargetMax: 0
+    });
+
+    expect(digest.hero_topics[0].sources.map((source) => source.title)).toContain('example/claude-token-tui');
+    expect(digest.hero_topics[0].sources.map((source) => source.title)).toContain('Agent Telemetry Dashboard');
+    expect(digest.hero_topics[0].sources.map((source) => source.title)).not.toContain('github.com');
+    expect(digest.hero_topics[0].sources.map((source) => source.title)).not.toContain('Project');
   });
 
   it('excludes every source already covered by hero topics from notable items', () => {

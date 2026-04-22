@@ -452,9 +452,49 @@ function normalizeSource(source, fallbackType = 'unknown') {
     .trim();
   const normalizedTitle = rawTitle.replace(/[:\-–—]+$/g, '').trim();
 
+  function titleCaseSlug(value) {
+    return String(value || '')
+      .replace(/\.(html|md|pdf)$/i, '')
+      .replace(/[_+]+/g, ' ')
+      .replace(/[-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
+
+  function lastPathSegments() {
+    try {
+      const parsed = new URL(url);
+      return parsed.pathname.split('/').filter(Boolean);
+    } catch {
+      return [];
+    }
+  }
+
+  function derivedTitleFromUrl() {
+    const segments = lastPathSegments();
+    if (normalizedHost === 'github.com' && segments.length >= 2) {
+      return `${segments[0]}/${segments[1]}`;
+    }
+    if (normalizedHost === 'huggingface.co' && segments[0] === 'papers' && segments[1]) {
+      return `${titleCaseSlug(segments[1])} paper`;
+    }
+    if (segments.length > 0) {
+      const candidate = titleCaseSlug(segments[segments.length - 1]);
+      if (candidate && !/^(Index|Home|Readme)$/i.test(candidate)) return candidate;
+    }
+    if (normalizedHost === 'github.com') return 'GitHub repository';
+    if (normalizedHost === 'huggingface.co') return 'Hugging Face source';
+    return normalizedHost || 'Source item';
+  }
+
+  function isGenericTitle(value) {
+    return /^(source|link|article|read more|view post|post|project|github|repository|repo|paper|official|website|site)$/i.test(value);
+  }
+
   const title = (() => {
     const escapedHost = normalizedHost ? normalizedHost.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&') : '';
-    if (!normalizedTitle) return normalizedHost || 'Source item';
+    if (!normalizedTitle) return derivedTitleFromUrl();
     if (originalHost && normalizedHost && originalHost !== normalizedHost && normalizedTitle.toLowerCase() === originalHost) {
       return normalizedHost;
     }
@@ -463,10 +503,13 @@ function normalizeSource(source, fallbackType = 'unknown') {
       const hostPrefixedUrl = normalizedTitle.match(new RegExp(`^${escapedHost}:\\s*(https?:\\/\\/.+)$`, 'i'));
       if (hostPrefixedUrl && canonicalUrl(hostPrefixedUrl[1]) === url) return normalizedHost;
     }
-    if (canonicalUrl(normalizedTitle) === url) return normalizedHost || 'Source item';
-    if (/^(source|link|article|read more|view post)$/i.test(normalizedTitle)) return normalizedHost || normalizedTitle;
+    if (canonicalUrl(normalizedTitle) === url) return derivedTitleFromUrl();
+    if (isGenericTitle(normalizedTitle)) return derivedTitleFromUrl();
     if (normalizedHost && escapedHost && new RegExp(`^${escapedHost}:\\s*(source|link|article|read more|view post)$`, 'i').test(normalizedTitle)) {
-      return normalizedHost;
+      return derivedTitleFromUrl();
+    }
+    if (normalizedHost && escapedHost && new RegExp(`^${escapedHost}:\\s*(github|repository|repo|project|paper)$`, 'i').test(normalizedTitle)) {
+      return derivedTitleFromUrl();
     }
     return cleanText(normalizedTitle, 140) || normalizedHost || 'Source item';
   })();
@@ -546,25 +589,45 @@ function itemDigestLine(item) {
   return cleanedTitle ? `${cleanedTitle}.` : '';
 }
 
-function buildHeroSummary(group) {
-  const extraCount = Math.max(group.items.length - 1, 0);
-  const themeLabel = (inferThemeLabel(group) || group.subjectLabel).toLowerCase();
-  const editorialItems = presentableItems(group);
-  const topLines = uniqueBy(editorialItems.map(itemDigestLine).filter(Boolean), (value) => value).slice(0, 3);
-  const sourceCount = uniqueBy(editorialItems.flatMap(sourceDomains), (value) => value).length;
+function sourceReferenceTag(index, label) {
+  return `{{src:${index}|${cleanText(label, 80)}}}`;
+}
 
-  if (topLines.length >= 2) {
-    const details = topLines.join(' ');
-    const suffix = extraCount > topLines.length - 1
-      ? ` The cluster includes ${extraCount - (topLines.length - 1)} more in-scope item${extraCount - (topLines.length - 1) === 1 ? '' : 's'}${sourceCount > 1 ? ` across ${sourceCount} source domains` : ''}.`
-      : sourceCount > 1
-        ? ` The signal spans ${sourceCount} source domains.`
-        : '';
-    return cleanText(`This ${group.subjectLabel} theme centers on ${themeLabel}. ${details}${suffix}`, 560);
+function sourceIndexForItem(item, supporting) {
+  const normalizedSources = (item.sources || [{ title: item.title ?? 'Source item', url: item.url ?? 'about:blank', type: item.source ?? 'unknown' }])
+    .map((source) => normalizeSource(source, item.source ?? 'unknown'));
+  for (const source of normalizedSources) {
+    const index = supporting.findIndex((entry) => canonicalUrl(entry.url) === canonicalUrl(source.url));
+    if (index >= 0) return index;
+  }
+  return -1;
+}
+
+function trimSentencePunctuation(value) {
+  return String(value || '').trim().replace(/[.!?]+$/g, '').trim();
+}
+
+function buildHeroSummary(group, supporting) {
+  const editorialItems = presentableItems(group);
+  const summaryLines = uniqueBy(
+    editorialItems
+      .map((item) => {
+        const line = itemDigestLine(item);
+        if (!line) return '';
+        const sourceIndex = sourceIndexForItem(item, supporting);
+        if (sourceIndex < 0 || !supporting[sourceIndex]) return trimSentencePunctuation(line);
+        return `${trimSentencePunctuation(line)} ${sourceReferenceTag(sourceIndex, supporting[sourceIndex].title)}`;
+      })
+      .filter(Boolean),
+    (value) => value
+  ).slice(0, 2);
+
+  if (summaryLines.length >= 2) {
+    return cleanText(`${group.subjectLabel}: ${summaryLines[0]}. ${summaryLines[1]}.`, 560);
   }
 
-  if (topLines.length === 1) {
-    return cleanText(`This ${group.subjectLabel} theme centers on ${themeLabel}. ${topLines[0]}`, 420);
+  if (summaryLines.length === 1) {
+    return cleanText(`In ${group.subjectLabel}, ${summaryLines[0]}.`, 420);
   }
 
   return 'Pending summary.';
@@ -624,7 +687,7 @@ function buildHeroTopic(group, index) {
   return {
     title,
     slug: slugify(`${group.subjectId}-${group.subthemeId || inferThemeLabel(group) || index + 1}`),
-    summary: buildHeroSummary(group),
+    summary: buildHeroSummary(group, supporting),
     insight: buildHeroInsight(group, supporting),
     image_url: lead.image_url ?? null,
     sources: supporting,

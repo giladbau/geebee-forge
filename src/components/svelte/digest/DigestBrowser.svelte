@@ -121,6 +121,74 @@
 		return `${text.slice(0, cutAt).trimEnd()}...`;
 	}
 
+	type SummarySegment =
+		| { type: 'text'; text: string }
+		| { type: 'link'; text: string; url: string };
+
+	function parseSummarySegments(summary: string, sources: Source[]): SummarySegment[] {
+		const segments: SummarySegment[] = [];
+		const pattern = /\{\{src:(\d+)\|([^}]+)\}\}/g;
+		let lastIndex = 0;
+
+		for (const match of summary.matchAll(pattern)) {
+			const [token, rawIndex, rawLabel] = match;
+			const index = Number(rawIndex);
+			const start = match.index ?? 0;
+			if (start > lastIndex) {
+				segments.push({ type: 'text', text: summary.slice(lastIndex, start) });
+			}
+			const source = Number.isInteger(index) ? sources[index] : undefined;
+			if (source?.url) {
+				segments.push({ type: 'link', text: rawLabel.trim() || source.title, url: source.url });
+			} else {
+				segments.push({ type: 'text', text: token });
+			}
+			lastIndex = start + token.length;
+		}
+
+		if (lastIndex < summary.length) {
+			segments.push({ type: 'text', text: summary.slice(lastIndex) });
+		}
+
+		return segments;
+	}
+
+	function displaySummarySegments(summary: string, sources: Source[], key: string, limit: number): SummarySegment[] {
+		const segments = parseSummarySegments(summary, sources);
+		if (!needsExpansion(summary, limit) || isExpanded(key)) return segments;
+
+		const clipped: SummarySegment[] = [];
+		let remaining = limit;
+
+		for (const segment of segments) {
+			if (remaining <= 0) break;
+			if (segment.text.length <= remaining) {
+				clipped.push(segment);
+				remaining -= segment.text.length;
+				continue;
+			}
+
+			if (segment.type === 'text') {
+				const partial = segment.text.slice(0, remaining);
+				const lastSpace = partial.lastIndexOf(' ');
+				const cutAt = lastSpace > remaining * 0.7 ? lastSpace : remaining;
+				clipped.push({ type: 'text', text: `${segment.text.slice(0, cutAt).trimEnd()}...` });
+			} else if (clipped.length > 0) {
+				const previous = clipped[clipped.length - 1];
+				if (previous.type === 'text') {
+					previous.text = `${previous.text.trimEnd()}...`;
+				} else {
+					clipped.push({ type: 'text', text: '...' });
+				}
+			} else {
+				clipped.push({ type: 'text', text: '...' });
+			}
+			break;
+		}
+
+		return clipped;
+	}
+
 	const latest = $derived(digests[0]);
 	const archive = $derived(digests);
 
@@ -234,7 +302,15 @@
 								</a>
 							</div>
 						{/if}
-						<p class="hero-summary">{displayText(topic.summary, summaryKey, HERO_SUMMARY_LIMIT)}</p>
+						<p class="hero-summary">
+							{#each displaySummarySegments(topic.summary, topic.sources, summaryKey, HERO_SUMMARY_LIMIT) as segment}
+								{#if segment.type === 'link'}
+									<a href={segment.url} target="_blank" rel="noopener noreferrer" class="summary-link">{segment.text}</a>
+								{:else}
+									{segment.text}
+								{/if}
+							{/each}
+						</p>
 						{#if needsExpansion(topic.summary, HERO_SUMMARY_LIMIT)}
 							<button
 								type="button"
@@ -364,7 +440,15 @@
 									</a>
 								</div>
 							{/if}
-							<p class="hero-summary">{displayText(topic.summary, summaryKey, HERO_SUMMARY_LIMIT)}</p>
+							<p class="hero-summary">
+								{#each displaySummarySegments(topic.summary, topic.sources, summaryKey, HERO_SUMMARY_LIMIT) as segment}
+									{#if segment.type === 'link'}
+										<a href={segment.url} target="_blank" rel="noopener noreferrer" class="summary-link">{segment.text}</a>
+									{:else}
+										{segment.text}
+									{/if}
+								{/each}
+							</p>
 							{#if needsExpansion(topic.summary, HERO_SUMMARY_LIMIT)}
 								<button
 									type="button"
@@ -683,6 +767,18 @@
 		font-size: 0.9rem;
 		line-height: 1.65;
 		margin: 0 0 1.25rem;
+	}
+
+	.summary-link {
+		color: #9bc2ff;
+		text-decoration: underline;
+		text-decoration-color: rgba(107, 163, 255, 0.45);
+		text-underline-offset: 0.12em;
+	}
+
+	.summary-link:hover {
+		color: #d4e5ff;
+		text-decoration-color: rgba(155, 194, 255, 0.8);
 	}
 
 	.expand-toggle {
