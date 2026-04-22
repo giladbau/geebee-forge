@@ -92,7 +92,7 @@ function sourceTitleForUrl(label, url) {
 	if (normalizeCandidateUrl(cleanLabel)) return host;
 	if (/^[\W_]+$/.test(cleanLabel)) return host;
 	if (/^(source|link|article|read more|view post)$/i.test(cleanLabel)) return host;
-	return `${host}: ${cleanLabel}`;
+	return cleanLabel;
 }
 
 function extractExternalSourcesFromText(text) {

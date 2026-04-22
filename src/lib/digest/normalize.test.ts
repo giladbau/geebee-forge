@@ -63,7 +63,7 @@ describe('digest normalization', () => {
 
 		expect(item.sources).toEqual([
 			{ title: 'Wrapper-heavy source post', url: 'https://reddit.com/r/Claude/comments/1wrapper/wrapper_heavy_source_post/', type: 'reddit' },
-			{ title: 'tomshardware.com: Mirror', url: 'https://www.tomshardware.com/story', type: 'project' },
+			{ title: 'Mirror', url: 'https://www.tomshardware.com/story', type: 'project' },
 			{ title: 'stripe.com', url: 'https://stripe.com/', type: 'project' }
 		]);
 		expect(item.dedupe_keys).toContain('url:https://www.tomshardware.com/story');

@@ -40,9 +40,65 @@
 	let showFavorites = $state(false);
 	let expandedText = $state<Set<string>>(new Set());
 
-	const HERO_SUMMARY_LIMIT = 360;
+	const HERO_SUMMARY_LIMIT = 600;
 	const HERO_INSIGHT_LIMIT = 300;
-	const NOTABLE_SUMMARY_LIMIT = 260;
+	const NOTABLE_SUMMARY_LIMIT = 420;
+
+	type TextSegment =
+		| { type: 'text'; value: string }
+		| { type: 'link'; href: string; label: string };
+
+	const LINK_PATTERN = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+
+	function parseSegments(text: string): TextSegment[] {
+		const segments: TextSegment[] = [];
+		const source = String(text ?? '');
+		let cursor = 0;
+		const pattern = new RegExp(LINK_PATTERN);
+		let match: RegExpExecArray | null;
+		while ((match = pattern.exec(source)) !== null) {
+			if (match.index > cursor) {
+				segments.push({ type: 'text', value: source.slice(cursor, match.index) });
+			}
+			segments.push({ type: 'link', label: match[1], href: match[2] });
+			cursor = match.index + match[0].length;
+		}
+		if (cursor < source.length) {
+			segments.push({ type: 'text', value: source.slice(cursor) });
+		}
+		return segments;
+	}
+
+	function plainTextLength(text: string): number {
+		return String(text ?? '').replace(LINK_PATTERN, '$1').length;
+	}
+
+	function truncatePreservingLinks(text: string, limit: number): string {
+		const source = String(text ?? '');
+		if (plainTextLength(source) <= limit) return source;
+		let result = '';
+		let count = 0;
+		let index = 0;
+		const pattern = new RegExp(LINK_PATTERN);
+		while (index < source.length && count < limit) {
+			pattern.lastIndex = index;
+			const match = pattern.exec(source);
+			if (match && match.index === index) {
+				const [full, label] = match;
+				if (count + label.length > limit) break;
+				result += full;
+				count += label.length;
+				index += full.length;
+			} else {
+				result += source[index];
+				count += 1;
+				index += 1;
+			}
+		}
+		const lastSpace = result.lastIndexOf(' ');
+		if (lastSpace > result.length * 0.7) result = result.slice(0, lastSpace);
+		return `${result.replace(/[\s,;:]+$/g, '').trimEnd()}...`;
+	}
 
 	// --- Favorites (localStorage-backed) ---
 	function slugify(text: string): string {
@@ -110,15 +166,16 @@
 	}
 
 	function needsExpansion(text: string, limit: number): boolean {
-		return text.length > limit;
+		return plainTextLength(text) > limit;
 	}
 
 	function displayText(text: string, key: string, limit: number): string {
 		if (!needsExpansion(text, limit) || isExpanded(key)) return text;
-		const clipped = text.slice(0, limit);
-		const lastSpace = clipped.lastIndexOf(' ');
-		const cutAt = lastSpace > limit * 0.7 ? lastSpace : limit;
-		return `${text.slice(0, cutAt).trimEnd()}...`;
+		return truncatePreservingLinks(text, limit);
+	}
+
+	function renderedSegments(text: string, key: string, limit: number): TextSegment[] {
+		return parseSegments(displayText(text, key, limit));
 	}
 
 	const latest = $derived(digests[0]);
@@ -234,7 +291,7 @@
 								</a>
 							</div>
 						{/if}
-						<p class="hero-summary">{displayText(topic.summary, summaryKey, HERO_SUMMARY_LIMIT)}</p>
+						<p class="hero-summary">{#each renderedSegments(topic.summary, summaryKey, HERO_SUMMARY_LIMIT) as seg}{#if seg.type === 'link'}<a href={seg.href} target="_blank" rel="noopener noreferrer" class="inline-source">{seg.label}</a>{:else}{seg.value}{/if}{/each}</p>
 						{#if needsExpansion(topic.summary, HERO_SUMMARY_LIMIT)}
 							<button
 								type="button"
@@ -299,7 +356,7 @@
 											aria-label={isFavorited(notableId(item)) ? `Remove ${item.title} from favorites` : `Add ${item.title} to favorites`}
 										>★</button>
 									</div>
-									<p class="notable-summary">{displayText(item.summary, notableSummaryKey, NOTABLE_SUMMARY_LIMIT)}</p>
+									<p class="notable-summary">{#each renderedSegments(item.summary, notableSummaryKey, NOTABLE_SUMMARY_LIMIT) as seg}{#if seg.type === 'link'}<a href={seg.href} target="_blank" rel="noopener noreferrer" class="inline-source">{seg.label}</a>{:else}{seg.value}{/if}{/each}</p>
 									{#if needsExpansion(item.summary, NOTABLE_SUMMARY_LIMIT)}
 										<button
 											type="button"
@@ -364,7 +421,7 @@
 									</a>
 								</div>
 							{/if}
-							<p class="hero-summary">{displayText(topic.summary, summaryKey, HERO_SUMMARY_LIMIT)}</p>
+							<p class="hero-summary">{#each renderedSegments(topic.summary, summaryKey, HERO_SUMMARY_LIMIT) as seg}{#if seg.type === 'link'}<a href={seg.href} target="_blank" rel="noopener noreferrer" class="inline-source">{seg.label}</a>{:else}{seg.value}{/if}{/each}</p>
 							{#if needsExpansion(topic.summary, HERO_SUMMARY_LIMIT)}
 								<button
 									type="button"
@@ -428,7 +485,7 @@
 												aria-label={isFavorited(notableId(item)) ? `Remove ${item.title} from favorites` : `Add ${item.title} to favorites`}
 											>★</button>
 										</div>
-										<p class="notable-summary">{displayText(item.summary, notableSummaryKey, NOTABLE_SUMMARY_LIMIT)}</p>
+										<p class="notable-summary">{#each renderedSegments(item.summary, notableSummaryKey, NOTABLE_SUMMARY_LIMIT) as seg}{#if seg.type === 'link'}<a href={seg.href} target="_blank" rel="noopener noreferrer" class="inline-source">{seg.label}</a>{:else}{seg.value}{/if}{/each}</p>
 										{#if needsExpansion(item.summary, NOTABLE_SUMMARY_LIMIT)}
 											<button
 												type="button"
@@ -683,6 +740,19 @@
 		font-size: 0.9rem;
 		line-height: 1.65;
 		margin: 0 0 1.25rem;
+	}
+
+	.inline-source {
+		color: #6ba3ff;
+		text-decoration: underline;
+		text-decoration-color: rgba(107, 163, 255, 0.4);
+		text-underline-offset: 2px;
+		transition: color 0.15s, text-decoration-color 0.15s;
+	}
+
+	.inline-source:hover {
+		color: #c8dcff;
+		text-decoration-color: #c8dcff;
 	}
 
 	.expand-toggle {
