@@ -15,17 +15,17 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: GitHub",
+          "title": "h-embodvis/numina",
           "url": "https://github.com/h-embodvis/numina",
           "type": "github"
         },
         {
-          "title": "h-embodvis.github.io: Project",
+          "title": "h-embodvis/numina",
           "url": "https://h-embodvis.github.io/numina",
           "type": "project"
         },
         {
-          "title": "gordonchen19.github.io: Project",
+          "title": "gordonchen19/prompt-relay",
           "url": "https://gordonchen19.github.io/prompt-relay",
           "type": "project"
         }
@@ -58,7 +58,7 @@
           "type": "project"
         },
         {
-          "title": "www-cdn.anthropic.com: verbose 250-page report",
+          "title": "verbose 250-page report",
           "url": "https://www-cdn.anthropic.com/8b8380204f74670be75e81c820ca8dda846ab289.pdf",
           "type": "official"
         }
@@ -87,12 +87,12 @@
           "type": "reddit"
         },
         {
-          "title": "x.com",
+          "title": "@dylantfwang",
           "url": "https://x.com/dylantfwang/status/2043952886166761519",
           "type": "twitter"
         },
         {
-          "title": "3d-models.hunyuan.tencent.com",
+          "title": "world",
           "url": "https://3d-models.hunyuan.tencent.com/world",
           "type": "official"
         }
@@ -114,7 +114,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "warpgatelabs/rsr",
           "url": "https://github.com/warpgatelabs/rsr/releases",
           "type": "github"
         }
@@ -136,7 +136,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: github",
+          "title": "klemenvod/tokenbrawl",
           "url": "https://github.com/klemenvod/tokenbrawl",
           "type": "github"
         }
@@ -157,7 +157,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "agentseal/codeburn",
           "url": "https://github.com/agentseal/codeburn",
           "type": "github"
         }
@@ -177,12 +177,12 @@
           "type": "reddit"
         },
         {
-          "title": "github.com: oss repo",
+          "title": "oss repo",
           "url": "https://github.com/hayabhay/teardown",
           "type": "github"
         },
         {
-          "title": "teardown.fyi: website",
+          "title": "teardown.fyi",
           "url": "https://teardown.fyi",
           "type": "project"
         }
@@ -202,7 +202,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "anthropics/claude-code",
           "url": "https://github.com/anthropics/claude-code/issues/46917",
           "type": "github"
         }
@@ -227,7 +227,7 @@
           "type": "project"
         },
         {
-          "title": "github.com",
+          "title": "manavarya09/design-extract",
           "url": "https://github.com/manavarya09/design-extract",
           "type": "github"
         }
@@ -247,7 +247,7 @@
           "type": "reddit"
         },
         {
-          "title": "github.com",
+          "title": "parmesanparty/llama.cpp",
           "url": "https://github.com/parmesanparty/llama.cpp",
           "type": "github"
         }

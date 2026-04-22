@@ -482,11 +482,15 @@ function deriveHostLabel(host, pathname) {
     return `${host.replace(/\.github\.io$/, '')}/${segments[0]}`;
   }
 
-  // Generic: if the path has a meaningful slug, use the final segment
+  // Generic: only surface the last path segment when it looks like a short project
+  // slug (few words, ≤ ~30 chars) — URL slugs with many dashes are noisier than the host.
   if (segments.length > 0) {
-    const last = segments[segments.length - 1];
+    const last = segments[segments.length - 1].replace(/\.(html?|pdf|md|txt)$/i, '');
     const pretty = titleCaseSlug(last);
-    if (pretty && !/^(index|home|main|blog|news|research|papers?|post)$/i.test(pretty)) {
+    const dashCount = (last.match(/-/g) || []).length;
+    const isShortSlug = pretty && pretty.length <= 30 && dashCount <= 2;
+    const isGenericWord = /^(index|home|main|blog|news|research|papers?|post|about|docs?|documentation|release|releases|tag|tags)$/i.test(pretty);
+    if (isShortSlug && !isGenericWord) {
       return pretty;
     }
   }
@@ -882,6 +886,8 @@ function buildWeekLabel({ issueDate, publishedAt, compileWindowStartAt, items })
   const start = toDateLabel(compileWindowStartAt) || toDateLabel(inferredStart) || issueDate;
   return `${start} to ${end}`;
 }
+
+export { normalizeSource };
 
 export function buildPreviewDigest({
   issueDate,
