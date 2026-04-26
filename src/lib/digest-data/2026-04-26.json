@@ -1,0 +1,94 @@
+{
+  "week": "2026-04-19 to 2026-04-26",
+  "published_at": "2026-04-26T06:00:52.461Z",
+  "hero_topics": [
+    {
+      "title": "AI Agents: Frontier Models",
+      "slug": "ai-agents-frontier-models",
+      "summary": "Introducing GPT-5.5 A new class of intelligence for real work and powering agents, built to understand complex goals, use tools, check its work, and carry more tasks through to completion. ([Introducing GPT-5.5 A new class of intelligence for real work and powering agents, built to understand complex goals,...](https://x.com/openai/status/2047376561205325845)) Access GPT Image 2.0 natively in Hermes Agent Update now to get access - just run `hermes update` and select your image generation tool model with `hermes tools`. ([Access GPT Image 2.0 natively in Hermes Agent Update now to get access - just run hermes update and select your ima...](https://x.com/nousresearch/status/2046693872773062834)) GPT-5.5 is now accessible in Hermes Agent through the ChatGPT/Codex OAuth provider. Run `hermes update` to access now or learn how to get started with Hermes Agent here. ([GPT-5.5 is now accessible in Hermes Agent through the ChatGPT/Codex OAuth provider. Run hermes update to access now...](https://x.com/teknium/status/2047419336537846193)) Additional coverage spans 5 more items.",
+      "insight": "This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Introducing GPT-5.5 A new class of intelligence for real work and powering agents, built to understand complex goals,...",
+          "url": "https://x.com/openai/status/2047376561205325845",
+          "type": "twitter"
+        },
+        {
+          "title": "Access GPT Image 2.0 natively in Hermes Agent Update now to get access - just run hermes update and select your ima...",
+          "url": "https://x.com/nousresearch/status/2046693872773062834",
+          "type": "twitter"
+        },
+        {
+          "title": "GPT-5.5 is now accessible in Hermes Agent through the ChatGPT/Codex OAuth provider. Run hermes update to access now...",
+          "url": "https://x.com/teknium/status/2047419336537846193",
+          "type": "twitter"
+        },
+        {
+          "title": "Anthropic is in trouble unless they ship image gen on par with GPT-image-2. It changes the entire workflow of buildin...",
+          "url": "https://x.com/cocktailpeanut/status/2046694003572134014",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents",
+        "frontier-models"
+      ]
+    },
+    {
+      "title": "Image/Video GenAI: Model Releases",
+      "slug": "image-video-genai-model-releases",
+      "summary": "What makes ChatGPT Images 2.0 a state-of-the-art image generation model? Researchers behind the model explain. ([What makes ChatGPT Images 2.0 a state-of-the-art image generation model? Researchers behind the model explain. A thre...](https://x.com/openai/status/2046691647036227700)) Built a time machine powered by OpenAI’s new image generation model. Describe where and when you want to go, and it creates an immersive panoramic world you can explore. ([Built a time machine powered by OpenAI’s new image generation model. Describe where and when you want to go, and it c...](https://x.com/skirano/status/2046694981818019969))",
+      "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
+      "image_url": "https://pbs.twimg.com/media/HGdP_cnbUAEwzw3.jpg",
+      "sources": [
+        {
+          "title": "What makes ChatGPT Images 2.0 a state-of-the-art image generation model? Researchers behind the model explain. A thre...",
+          "url": "https://x.com/openai/status/2046691647036227700",
+          "type": "twitter"
+        },
+        {
+          "title": "Built a time machine powered by OpenAI’s new image generation model. Describe where and when you want to go, and it c...",
+          "url": "https://x.com/skirano/status/2046694981818019969",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "Generative 3D Worlds: Interactive 3D Worlds",
+      "slug": "generative-3d-worlds-interactive-3d-worlds",
+      "summary": "Rapid 3D scene generation from text or images. ([Rapid 3D scene generation from text or images](https://x.com/tom_doerr/status/2046695380625023176))",
+      "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The single-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
+      "image_url": "https://pbs.twimg.com/media/HGdSmiUWsAAD0kt.jpg",
+      "sources": [
+        {
+          "title": "Rapid 3D scene generation from text or images",
+          "url": "https://x.com/tom_doerr/status/2046695380625023176",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "generative-3d-worlds"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "GIANT e-ink display LIVE in my house and actively removing the “mental load” of motherhood 😅 Turns out my household ...",
+      "summary": "GIANT e-ink display LIVE in my house and actively removing the “mental load” of motherhood 😅 Turns out my household chaos just needed to be tamed by a display my team of @openclaw and @NousResearch Hermes agents manage for me 💅. ([GIANT e-ink display LIVE in my house and actively removing the “mental load” of motherhood 😅 Turns out my household ...](https://x.com/jessegenet/status/2046258049632067942))",
+      "sources": [
+        {
+          "title": "GIANT e-ink display LIVE in my house and actively removing the “mental load” of motherhood 😅 Turns out my household ...",
+          "url": "https://x.com/jessegenet/status/2046258049632067942",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents"
+      ]
+    }
+  ]
+}
