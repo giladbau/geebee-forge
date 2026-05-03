@@ -88,6 +88,52 @@ describe('digest source collectors', () => {
 		}
 	});
 
+	it('falls back to reddit RSS when JSON API listing is blocked', async () => {
+		const originalFetch = globalThis.fetch;
+		const seenUrls: string[] = [];
+		globalThis.fetch = async (url) => {
+			seenUrls.push(String(url));
+			if (String(url).endsWith('.json?limit=25')) {
+				return { ok: false, status: 403 } as Response;
+			}
+			return {
+				ok: true,
+				text: async () => `<?xml version="1.0" encoding="UTF-8"?>
+					<feed xmlns="http://www.w3.org/2005/Atom">
+						<entry>
+							<id>t3_rss123</id>
+							<title>Open model serving benchmark</title>
+							<author><name>bob</name></author>
+							<updated>2026-04-08T12:00:00+00:00</updated>
+							<link href="https://www.reddit.com/r/LocalLLaMA/comments/rss123/open_model_serving_benchmark/" />
+							<content type="html">Benchmark notes with https://github.com/example/server</content>
+						</entry>
+					</feed>`
+			} as Response;
+		};
+
+		try {
+			const result = await collectRedditSource({ subreddits: ['LocalLLaMA'], min_score: 50, window_days: 30 }, {
+				fetchedAt: '2026-04-08T13:00:00Z',
+				rawRefBase: 'raw/run'
+			});
+
+			expect(seenUrls.some((url) => url.includes('/hot.json'))).toBe(true);
+			expect(seenUrls.some((url) => url.includes('/hot/.rss'))).toBe(true);
+			expect(result.status).toBe('ok:rss-fallback');
+			expect(result.items).toHaveLength(1);
+			expect(result.items[0]).toMatchObject({
+				source: 'reddit',
+				source_item_id: 'rss123',
+				title: 'Open model serving benchmark',
+				author: 'bob'
+			});
+			expect(result.items[0].sources.some((source) => source.url === 'https://github.com/example/server')).toBe(true);
+		} finally {
+			globalThis.fetch = originalFetch;
+		}
+	});
+
 	it('parses bookmark search timeline tweets into canonical X items', () => {
 		const items = parseBookmarkSearchTimelineToItems({
 			data: {
