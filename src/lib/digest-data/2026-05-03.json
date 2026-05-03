@@ -1,0 +1,40 @@
+{
+  "week": "2026-04-26 to 2026-05-03",
+  "published_at": "2026-05-03T06:01:27.989Z",
+  "hero_topics": [
+    {
+      "title": "AI Agents: Frontier Models",
+      "slug": "ai-agents-frontier-models",
+      "summary": "OpenAI’s GPT-5.5 is the second model to complete one of our multi-step cyber-attack simulations end-to-end 🧵. ([OpenAI’s GPT-5.5 is the second model to complete one of our multi-step cyber-attack simulations end-to-end 🧵 https:/...](https://x.com/aisecurityinst/status/2049868227740565890)) Someone made a Geoguessr clone where you can travel through time 🤯 Cool use case of GPT-Image-2, which can make panoramas. ([Someone made a Geoguessr clone where you can travel through time 🤯 Cool use case of GPT-Image-2, which can make pano...](https://x.com/venturetwins/status/2048453326694646124)) GPT-5.5 is going to have a party for itself. it chose 5/5 at 5:55 pm for the date and time. if you'd like to come, le.... ([GPT-5.5 is going to have a party for itself. it chose 5/5 at 5:55 pm for the date and time. if you'd like to come, le...](https://x.com/sama/status/2049653810558353746)) DeepSeek just permanently cut cached input prices by 10x across the entire API 139× cheaper than GPT-5.5 and 83× cheaper than Claude Sonnet 4.6 btw. ([DeepSeek just permanently cut cached input prices by 10x across the entire API 139× cheaper than GPT-5.5 and 83× chea...](https://x.com/ns123abc/status/2048449231539593473)) Additional coverage spans 6 more items.",
+      "insight": "This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": "https://pbs.twimg.com/media/HG2NtxvaQAAfL0U.jpg",
+      "sources": [
+        {
+          "title": "OpenAI’s GPT-5.5 is the second model to complete one of our multi-step cyber-attack simulations end-to-end 🧵 https:/...",
+          "url": "https://x.com/aisecurityinst/status/2049868227740565890",
+          "type": "twitter"
+        },
+        {
+          "title": "Someone made a Geoguessr clone where you can travel through time 🤯 Cool use case of GPT-Image-2, which can make pano...",
+          "url": "https://x.com/venturetwins/status/2048453326694646124",
+          "type": "twitter"
+        },
+        {
+          "title": "GPT-5.5 is going to have a party for itself. it chose 5/5 at 5:55 pm for the date and time. if you'd like to come, le...",
+          "url": "https://x.com/sama/status/2049653810558353746",
+          "type": "twitter"
+        },
+        {
+          "title": "DeepSeek just permanently cut cached input prices by 10x across the entire API 139× cheaper than GPT-5.5 and 83× chea...",
+          "url": "https://x.com/ns123abc/status/2048449231539593473",
+          "type": "twitter"
+        }
+      ],
+      "tags": [
+        "ai-agents",
+        "frontier-models"
+      ]
+    }
+  ],
+  "notable": []
+}
