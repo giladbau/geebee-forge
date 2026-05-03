@@ -3,38 +3,241 @@
   "published_at": "2026-05-03T06:01:27.989Z",
   "hero_topics": [
     {
-      "title": "AI Agents: Frontier Models",
-      "slug": "ai-agents-frontier-models",
-      "summary": "OpenAI’s GPT-5.5 is the second model to complete one of our multi-step cyber-attack simulations end-to-end 🧵. ([OpenAI’s GPT-5.5 is the second model to complete one of our multi-step cyber-attack simulations end-to-end 🧵 https:/...](https://x.com/aisecurityinst/status/2049868227740565890)) Someone made a Geoguessr clone where you can travel through time 🤯 Cool use case of GPT-Image-2, which can make panoramas. ([Someone made a Geoguessr clone where you can travel through time 🤯 Cool use case of GPT-Image-2, which can make pano...](https://x.com/venturetwins/status/2048453326694646124)) GPT-5.5 is going to have a party for itself. it chose 5/5 at 5:55 pm for the date and time. if you'd like to come, le.... ([GPT-5.5 is going to have a party for itself. it chose 5/5 at 5:55 pm for the date and time. if you'd like to come, le...](https://x.com/sama/status/2049653810558353746)) DeepSeek just permanently cut cached input prices by 10x across the entire API 139× cheaper than GPT-5.5 and 83× cheaper than Claude Sonnet 4.6 btw. ([DeepSeek just permanently cut cached input prices by 10x across the entire API 139× cheaper than GPT-5.5 and 83× chea...](https://x.com/ns123abc/status/2048449231539593473)) Additional coverage spans 6 more items.",
-      "insight": "This matters because model updates and official evaluations reset expectations for what agent stacks can attempt, while also creating new operating and safety assumptions. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
-      "image_url": "https://pbs.twimg.com/media/HG2NtxvaQAAfL0U.jpg",
+      "title": "Image/Video GenAI: Tools & Workflows",
+      "slug": "image-video-genai-tools-workflows",
+      "summary": "Modern video diffusion models excel at appearance synthesis but still struggle with physical consistency: objects drift, collisions lack realistic rebound, and material responses seldom match their underlying properties. ([PhyCo: Learning Controllable Physical Priors for Generative Motion](https://huggingface.co/papers/2604.28169)) Diffusion large language models (dLLMs) offer parallel decoding and bidirectional context, but state-of-the-art dLLMs require billions of parameters for competitive performance. ([Turning the TIDE: Cross-Architecture Distillation for Diffusion Large Language Models](https://huggingface.co/papers/2604.26951)) Humanoid control systems have made significant progress in recent years, yet modeling fluent interaction-rich behavior between a robot, its surrounding environment, and task-relevant objects remains a fundamental challe…. ([ExoActor: Exocentric Video Generation as Generalizable Interactive Humanoid Control](https://huggingface.co/papers/2604.27711)) Additional coverage spans 3 more items.",
+      "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.28169.png",
       "sources": [
         {
-          "title": "OpenAI’s GPT-5.5 is the second model to complete one of our multi-step cyber-attack simulations end-to-end 🧵 https:/...",
-          "url": "https://x.com/aisecurityinst/status/2049868227740565890",
-          "type": "twitter"
+          "title": "PhyCo: Learning Controllable Physical Priors for Generative Motion",
+          "url": "https://huggingface.co/papers/2604.28169",
+          "type": "paper"
         },
         {
-          "title": "Someone made a Geoguessr clone where you can travel through time 🤯 Cool use case of GPT-Image-2, which can make pano...",
-          "url": "https://x.com/venturetwins/status/2048453326694646124",
-          "type": "twitter"
+          "title": "Turning the TIDE: Cross-Architecture Distillation for Diffusion Large Language Models",
+          "url": "https://huggingface.co/papers/2604.26951",
+          "type": "paper"
         },
         {
-          "title": "GPT-5.5 is going to have a party for itself. it chose 5/5 at 5:55 pm for the date and time. if you'd like to come, le...",
-          "url": "https://x.com/sama/status/2049653810558353746",
-          "type": "twitter"
+          "title": "ExoActor: Exocentric Video Generation as Generalizable Interactive Humanoid Control",
+          "url": "https://huggingface.co/papers/2604.27711",
+          "type": "paper"
         },
         {
-          "title": "DeepSeek just permanently cut cached input prices by 10x across the entire API 139× cheaper than GPT-5.5 and 83× chea...",
-          "url": "https://x.com/ns123abc/status/2048449231539593473",
-          "type": "twitter"
+          "title": "Leveraging Verifier-Based Reinforcement Learning in Image Editing",
+          "url": "https://huggingface.co/papers/2604.27505",
+          "type": "paper"
         }
       ],
       "tags": [
+        "video diffusion models",
+        "physics-supervised fine-tuning",
+        "ControlNet",
+        "pixel-aligned physical property maps",
+        "vision-language model",
+        "reward optimization",
+        "physics-IQ benchmark",
+        "generative video models"
+      ]
+    },
+    {
+      "title": "AI Agents: Applications & Builds",
+      "slug": "ai-agents-applications-and-builds",
+      "summary": "We present GLM-5V-Turbo, a step toward native foundation models for multimodal agents. ([GLM-5V-Turbo: Toward a Native Foundation Model for Multimodal Agents](https://huggingface.co/papers/2604.26752)) We introduce Nemotron 3 Nano Omni, the latest model in the Nemotron multimodal series and the first to natively support audio inputs alongside text, images, and video. ([Nemotron 3 Nano Omni: Efficient and Open Multimodal Intelligence](https://huggingface.co/papers/2604.24954)) Recent visual generation models have made major progress in photorealism, typography, instruction following, and interactive editing, yet they still struggle with spatial reasoning, persistent state, long-horizon consis…. ([Visual Generation in the New Era: An Evolution from Atomic Mapping to Agentic World Modeling](https://huggingface.co/papers/2604.28185)) Realistic long-horizon productivity work is strongly conditioned on user-specific computer environments, where much of the work context is stored and organized through directory structures and content-rich artifacts. ([Synthetic Computers at Scale for Long-Horizon Productivity Simulation](https://huggingface.co/papers/2604.28181))",
+      "insight": "This matters because practical agent use cases are widening, but the durable signal is whether they solve repeated workflows instead of one-off demos. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.26752.png",
+      "sources": [
+        {
+          "title": "GLM-5V-Turbo: Toward a Native Foundation Model for Multimodal Agents",
+          "url": "https://huggingface.co/papers/2604.26752",
+          "type": "paper"
+        },
+        {
+          "title": "Nemotron 3 Nano Omni: Efficient and Open Multimodal Intelligence",
+          "url": "https://huggingface.co/papers/2604.24954",
+          "type": "paper"
+        },
+        {
+          "title": "Visual Generation in the New Era: An Evolution from Atomic Mapping to Agentic World Modeling",
+          "url": "https://huggingface.co/papers/2604.28185",
+          "type": "paper"
+        },
+        {
+          "title": "Synthetic Computers at Scale for Long-Horizon Productivity Simulation",
+          "url": "https://huggingface.co/papers/2604.28181",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "multimodal agents",
+        "multimodal perception",
+        "foundation models",
+        "visual tool use",
+        "hierarchical optimization",
+        "end-to-end verification",
         "ai-agents",
-        "frontier-models"
+        "applications-and-builds"
+      ]
+    },
+    {
+      "title": "Generative 3D Worlds: Explorable World Models",
+      "slug": "generative-3d-worlds-explorable-world-models",
+      "summary": "We propose X-WAM, a Unified 4D World Model that unifies real-time robotic action execution and high-fidelity 4D world synthesis (video + 3D reconstruction) in a single framework, addressing the critical limitations of p…. ([Unified 4D World Action Modeling from Video Priors with Asynchronous Denoising](https://huggingface.co/papers/2604.26694))",
+      "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The single-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.26694.png",
+      "sources": [
+        {
+          "title": "Unified 4D World Action Modeling from Video Priors with Asynchronous Denoising",
+          "url": "https://huggingface.co/papers/2604.26694",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "video diffusion models",
+        "Diffusion Transformer",
+        "RGB-D videos",
+        "depth prediction branch",
+        "asynchronous denoising schedule",
+        "joint distribution",
+        "robotic action execution",
+        "4D world synthesis"
+      ]
+    },
+    {
+      "title": "AI Agents: Research & Evals",
+      "slug": "ai-agents-research-and-evals",
+      "summary": "Autonomous scientific research is significantly advanced thanks to the development of AI agents. ([AutoResearchBench: Benchmarking AI Agents on Complex Scientific Literature Discovery](https://huggingface.co/papers/2604.25256)) Scientific publication compresses a branching, iterative research process into a linear narrative, discarding the majority of what was discovered along the way. ([The Last Human-Written Paper: Agent-Native Research Artifacts](https://huggingface.co/papers/2604.24658)) Long-context large language models (LLMs)-for example, Gemini-3.1-Pro and Qwen-3.5-are widely used to empower many real-world applications, such as retrieval-augmented generation, autonomous agents, and AI assistants. ([FlashRT: Towards Computationally and Memory Efficient Red-Teaming for Prompt Injection and Knowledge Corruption](https://huggingface.co/papers/2604.28157))",
+      "insight": "This matters because evaluation work is becoming the control surface for agent progress: better tests shape what builders trust, deploy, and regulate. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2604.25256.png",
+      "sources": [
+        {
+          "title": "AutoResearchBench: Benchmarking AI Agents on Complex Scientific Literature Discovery",
+          "url": "https://huggingface.co/papers/2604.25256",
+          "type": "paper"
+        },
+        {
+          "title": "The Last Human-Written Paper: Agent-Native Research Artifacts",
+          "url": "https://huggingface.co/papers/2604.24658",
+          "type": "paper"
+        },
+        {
+          "title": "FlashRT: Towards Computationally and Memory Efficient Red-Teaming for Prompt Injection and Knowledge Corruption",
+          "url": "https://huggingface.co/papers/2604.28157",
+          "type": "paper"
+        },
+        {
+          "title": "Compliance versus Sensibility: On the Reasoning Controllability in Large Language Models",
+          "url": "https://huggingface.co/papers/2604.27251",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "autonomous scientific research",
+        "AI agents",
+        "scientific literature discovery",
+        "AutoResearchBench",
+        "Deep Research",
+        "Wide Research",
+        "agentic web browsing",
+        "LLMs"
       ]
     }
   ],
-  "notable": []
+  "notable": [
+    {
+      "title": "Heterogeneous Scientific Foundation Model Collaboration",
+      "summary": "Agentic large language model systems have demonstrated strong capabilities. However, their reliance on language as the universal interface fundamentally limits their applicability to many real-world problems, especially in scientific domains where domain-specific foundation models have been developed to address specialized tasks beyond natural language. In this work, we introduce Eywa, a heterogeneous agentic framework designed to exte…. ([Heterogeneous Scientific Foundation Model Collaboration](https://huggingface.co/papers/2604.27351))",
+      "sources": [
+        {
+          "title": "Heterogeneous Scientific Foundation Model Collaboration",
+          "url": "https://huggingface.co/papers/2604.27351",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "agentic framework",
+        "domain-specific foundation models",
+        "language-model-based reasoning",
+        "non-linguistic data modalities",
+        "predictive foundation models",
+        "multi-agent systems",
+        "planning-based orchestration",
+        "heterogeneous data modalities",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "FAMA: Failure-Aware Meta-Agentic Framework for Open-Source LLMs in Interactive Tool Use Environments",
+      "summary": "Large Language Models are being increasingly deployed as the decision-making core of autonomous agents capable of effecting change in external environments. Yet, in conversational benchmarks, which simulate real-world customer-centric issue resolution scenarios, these agents frequently fail due to the cascading effects of incorrect decision-making. These challenges are particularly pronounced for open-source LLMs with smaller parameter….…",
+      "sources": [
+        {
+          "title": "FAMA: Failure-Aware Meta-Agentic Framework for Open-Source LLMs in Interactive Tool Use Environments",
+          "url": "https://huggingface.co/papers/2604.25135",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "large language models",
+        "autonomous agents",
+        "decision-making",
+        "failure trajectories",
+        "orchestration mechanism",
+        "specialized agents",
+        "tool-use agents",
+        "context injection",
+        "error accumulation",
+        "multi-turn conversations",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Agentic Fusion of Large Atomic and Language Models to Accelerate Superconductors Discovery",
+      "summary": "The discovery of novel materials is critical for global energy and quantum technology transitions. While deep learning has fundamentally reshaped this landscape, existing predictive or generative models typically operate in isolation, lacking the autonomous orchestration required to execute the full discovery process. Here we present ElementsClaw, an agentic framework for materials discovery that synergizes Large Atomic Models (LAMs) w….…",
+      "sources": [
+        {
+          "title": "Agentic Fusion of Large Atomic and Language Models to Accelerate Superconductors Discovery",
+          "url": "https://huggingface.co/papers/2604.23758",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "Large Atomic Models",
+        "Large Language Models",
+        "agentic framework",
+        "materials discovery",
+        "superconductors",
+        "atomic-scale numerical computation",
+        "semantic reasoning",
+        "high-confidence candidates",
+        "experimental verification",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Efficient Training on Multiple Consumer GPUs with RoundPipe",
+      "summary": "Fine-tuning Large Language Models (LLMs) on consumer-grade GPUs is highly cost-effective, yet constrained by limited GPU memory and slow PCIe interconnects. Pipeline parallelism combined with CPU offloading mitigates these hardware bottlenecks by reducing communication overhead. However, existing PP schedules suffer from an inherent limitation termed the weight binding issue. Binding uneven model stages (e.g., the LM head is large) to….…",
+      "sources": [
+        {
+          "title": "Efficient Training on Multiple Consumer GPUs with RoundPipe",
+          "url": "https://huggingface.co/papers/2604.27085",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "pipeline parallelism",
+        "CPU offloading",
+        "weight binding issue",
+        "pipeline bubbles",
+        "RoundPipe",
+        "stateless execution workers",
+        "round-robin dispatching",
+        "distributed event-based synchronization",
+        "layer partitioning",
+        "LoRA fine-tuning",
+        "Qwen3-235B",
+        "ai-agents"
+      ]
+    }
+  ]
 }

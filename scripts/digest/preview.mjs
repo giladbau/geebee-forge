@@ -6,6 +6,8 @@ import { buildPreviewDigest } from './shared/render.mjs';
 import { createIssueId } from './shared/ids.mjs';
 import { filterDigestItems } from './shared/subjects.mjs';
 import { nowIso } from './shared/time.mjs';
+import { collectHuggingFaceDailyPapers } from './sources/huggingface-papers.mjs';
+import { filterItemsNewerThan } from './shared/pool.mjs';
 
 const paths = getStatePaths();
 const config = await loadConfig();
@@ -18,7 +20,23 @@ const issueId = createIssueId(publishedAt);
 const issueDir = path.join(paths.issues, issueId);
 await ensureDir(issueDir);
 
-const filteredPool = filterDigestItems(pool.items, config.subjects);
+const compileItems = [...pool.items];
+const sourceHealth = {};
+if (config.sources.huggingface_daily_papers?.enabled && config.sources.huggingface_daily_papers?.mode === 'compile') {
+	try {
+		const result = await collectHuggingFaceDailyPapers(config.sources.huggingface_daily_papers, {
+			fetchedAt: publishedAt,
+			rawRefBase: issueDir
+		});
+		await writeJson(path.join(issueDir, 'huggingface-daily-papers.json'), result.raw);
+		compileItems.push(...filterItemsNewerThan(result.items, state.last_compile_at));
+		sourceHealth.huggingface_daily_papers = `ok:${result.items.length}`;
+	} catch (error) {
+		sourceHealth.huggingface_daily_papers = `error: ${error.message}`;
+	}
+}
+
+const filteredPool = filterDigestItems(compileItems, config.subjects);
 
 const digest = buildPreviewDigest({
 	issueDate: issueId,
@@ -39,6 +57,7 @@ console.log(JSON.stringify({
 	issue_id: issueId,
 	preview_path: previewPath,
 	pool_items: filteredPool.accepted.length,
+	source_health: sourceHealth,
 	hero_topics: digest.hero_topics.length,
 	notable: digest.notable.length
 }, null, 2));
