@@ -27,8 +27,14 @@ function cleanText(value, maxLength = 320) {
     .trim();
 
   if (!cleaned) return '';
-  if (cleaned.length <= maxLength) return cleaned;
+  if (!Number.isFinite(maxLength) || cleaned.length <= maxLength) return cleaned;
   return `${cleaned.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
+function cleanFullText(value) {
+  return cleanText(value, Number.POSITIVE_INFINITY)
+    .replace(/(?:\.{3}|…)+$/g, '')
+    .trim();
 }
 
 function itemText(item) {
@@ -850,10 +856,10 @@ function buildNotableItems(items, notableTargetMax, heroCoveredUrls = new Set())
     const subject = item.subject_primary || 'unknown';
     const count = perSubjectCounts.get(subject) || 0;
     if (count >= 6) continue;
-    const rawSummary = cleanText(item.summary ?? item.snippet ?? '', 440) || '';
+    const rawSummary = cleanFullText(item.summary ?? item.snippet ?? '') || '';
     const summaryBase = rawSummary || `${cleanText(item.title ?? '', 160)}.`;
     const inlineSource = pickInlineSource(item);
-    const summary = truncatePreservingLinks(formatDescriptor(summaryBase, inlineSource) || 'Pending summary', 500);
+    const summary = formatDescriptor(summaryBase, inlineSource) || 'Pending summary';
     output.push({
       title: cleanText(item.title ?? `Untitled notable ${output.length + 1}`, 140),
       summary,

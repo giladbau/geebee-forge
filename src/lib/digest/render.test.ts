@@ -272,6 +272,41 @@ describe('digest render', () => {
     expect(digest.notable).toHaveLength(1);
   });
 
+  it('keeps expanded notable summaries complete instead of baking in ellipses', () => {
+    const longSummary = [
+      'Large Language Models are being increasingly deployed as the decision-making core of autonomous agents capable of effecting change in external environments.',
+      'Yet, in conversational benchmarks, these agents frequently fail due to cascading effects of incorrect decision-making.',
+      'These challenges are particularly pronounced for open-source LLMs with smaller parameter sizes, limited context windows, and constrained inference budgets.',
+      'The important final sentence should remain visible in the expanded digest text.'
+    ].join(' ');
+
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-08',
+      publishedAt: '2026-04-08T13:00:00Z',
+      items: [
+        ...items,
+        {
+          id: 'paper:fama-like',
+          source: 'huggingface_daily_papers',
+          title: 'FAMA-like Failure-Aware Meta-Agentic Framework for Open-Source LLMs',
+          summary: longSummary,
+          url: 'https://huggingface.co/papers/example',
+          sources: [{ title: 'FAMA-like Failure-Aware Meta-Agentic Framework for Open-Source LLMs', url: 'https://huggingface.co/papers/example', type: 'paper' }],
+          tags: ['large language models', 'autonomous agents', 'tool-use agents'],
+          subject_primary: 'ai-agents',
+          subject_matches: ['ai-agents'],
+          subject_match_score: 4,
+          engagement: { upvotes: 500 }
+        }
+      ],
+      heroTopicTargetMax: 0,
+      notableTargetMax: 1
+    });
+
+    expect(digest.notable[0].summary).toContain('The important final sentence should remain visible');
+    expect(digest.notable[0].summary).not.toMatch(/(?:…|\.\.\.)\.?\s*(?:\[[^\]]+\]\(https?:\/\/[^)]+\))?$/);
+  });
+
   it('uses the compile window for the week label', () => {
     const digest = buildPreviewDigest({
       issueDate: '2026-04-19',
