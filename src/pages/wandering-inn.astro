@@ -1,0 +1,315 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const pieces = [
+  {
+    title: 'Gazi Pathseeker',
+    subtitle: 'Before the injury',
+    src: '/images/wandering-inn/gazi-pathseeker-before-injury.jpg',
+    alt: 'AI-generated portrait of Gazi Pathseeker before the injury',
+  },
+  {
+    title: 'Flos Reimarch',
+    subtitle: 'The King of Destruction',
+    src: '/images/wandering-inn/flos-reimarch-king-of-destruction.jpg',
+    alt: 'AI-generated portrait of Flos Reimarch, the King of Destruction',
+  },
+];
+---
+
+<BaseLayout title="The Wandering Inn Gallery">
+  <main class="wandering-page">
+    <section class="hero" aria-labelledby="page-title">
+      <p class="eyebrow">Image forge</p>
+      <h1 id="page-title">The Wandering Inn</h1>
+      <p class="intro">
+        A small gallery of generated character portraits. Click any piece to inspect it full-size without leaving the page.
+      </p>
+    </section>
+
+    <section class="gallery" aria-label="Wandering Inn image gallery">
+      {pieces.map((piece) => (
+        <button
+          class="gallery-card"
+          type="button"
+          data-lightbox-src={piece.src}
+          data-lightbox-title={piece.title}
+          data-lightbox-subtitle={piece.subtitle}
+          data-lightbox-alt={piece.alt}
+          aria-label={`Open ${piece.title}: ${piece.subtitle}`}
+        >
+          <span class="image-frame">
+            <img src={piece.src} alt={piece.alt} loading="lazy" />
+          </span>
+          <span class="meta">
+            <span class="title">{piece.title}</span>
+            <span class="subtitle">{piece.subtitle}</span>
+          </span>
+        </button>
+      ))}
+    </section>
+  </main>
+
+  <div class="lightbox" hidden aria-hidden="true">
+    <div class="lightbox-backdrop" data-lightbox-close></div>
+    <figure class="lightbox-panel" role="dialog" aria-modal="true" aria-labelledby="lightbox-title">
+      <button class="close-button" type="button" data-lightbox-close aria-label="Close image preview">×</button>
+      <img class="lightbox-image" src="" alt="" />
+      <figcaption>
+        <strong id="lightbox-title"></strong>
+        <span id="lightbox-subtitle"></span>
+      </figcaption>
+    </figure>
+  </div>
+
+  <script is:inline>
+    const lightbox = document.querySelector('.lightbox');
+    const lightboxImage = document.querySelector('.lightbox-image');
+    const lightboxTitle = document.querySelector('#lightbox-title');
+    const lightboxSubtitle = document.querySelector('#lightbox-subtitle');
+    const cards = document.querySelectorAll('[data-lightbox-src]');
+    let lastFocused = null;
+
+    const closeLightbox = () => {
+      if (!lightbox) return;
+      lightbox.hidden = true;
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('lightbox-open');
+      lightboxImage?.removeAttribute('src');
+      if (lastFocused instanceof HTMLElement) lastFocused.focus();
+    };
+
+    const openLightbox = (card) => {
+      if (!lightbox || !lightboxImage || !lightboxTitle || !lightboxSubtitle) return;
+      lastFocused = document.activeElement;
+      lightboxImage.src = card.dataset.lightboxSrc || '';
+      lightboxImage.alt = card.dataset.lightboxAlt || '';
+      lightboxTitle.textContent = card.dataset.lightboxTitle || '';
+      lightboxSubtitle.textContent = card.dataset.lightboxSubtitle || '';
+      lightbox.hidden = false;
+      lightbox.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('lightbox-open');
+      lightbox.querySelector('[data-lightbox-close]')?.focus();
+    };
+
+    cards.forEach((card) => {
+      card.addEventListener('click', () => openLightbox(card));
+    });
+
+    document.querySelectorAll('[data-lightbox-close]').forEach((element) => {
+      element.addEventListener('click', closeLightbox);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !lightbox?.hidden) closeLightbox();
+    });
+  </script>
+</BaseLayout>
+
+<style>
+  :global(body.lightbox-open) {
+    overflow: hidden;
+  }
+
+  .wandering-page {
+    min-height: 100vh;
+    padding: 6rem 1.5rem 4rem;
+    color: #e8e8e8;
+    background:
+      radial-gradient(circle at 18% 8%, rgba(198, 92, 43, 0.2), transparent 30rem),
+      radial-gradient(circle at 84% 14%, rgba(107, 163, 255, 0.13), transparent 24rem),
+      linear-gradient(180deg, #090909 0%, #12100f 48%, #090909 100%);
+  }
+
+  .hero {
+    max-width: 860px;
+    margin: 0 auto 2.5rem;
+    text-align: center;
+  }
+
+  .eyebrow {
+    margin: 0 0 0.75rem;
+    color: #d9925b;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(2.4rem, 7vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.06em;
+    background: linear-gradient(135deg, #fff1dc, #d9925b 45%, #6ba3ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .intro {
+    max-width: 650px;
+    margin: 1rem auto 0;
+    color: #a8a8a8;
+    line-height: 1.7;
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    width: min(900px, 100%);
+    margin: 0 auto;
+  }
+
+  .gallery-card {
+    padding: 0;
+    overflow: hidden;
+    text-align: left;
+    color: inherit;
+    background: rgba(20, 18, 17, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+    cursor: zoom-in;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .gallery-card:hover,
+  .gallery-card:focus-visible {
+    transform: translateY(-4px);
+    border-color: rgba(217, 146, 91, 0.62);
+    box-shadow: 0 30px 90px rgba(198, 92, 43, 0.18);
+    outline: none;
+  }
+
+  .image-frame {
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: #050505;
+  }
+
+  .image-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.25s ease;
+  }
+
+  .gallery-card:hover img,
+  .gallery-card:focus-visible img {
+    transform: scale(1.035);
+  }
+
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1.1rem 1.2rem 1.2rem;
+  }
+
+  .title {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    color: #9a9a9a;
+    font-size: 0.88rem;
+  }
+
+  .lightbox[hidden] {
+    display: none;
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+  }
+
+  .lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .lightbox-panel {
+    position: relative;
+    z-index: 1;
+    width: min(92vw, 760px);
+    max-height: 92vh;
+    margin: 0;
+    overflow: hidden;
+    background: #0b0b0b;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 24px;
+    box-shadow: 0 35px 120px rgba(0, 0, 0, 0.72);
+  }
+
+  .lightbox-image {
+    display: block;
+    width: 100%;
+    max-height: calc(92vh - 86px);
+    object-fit: contain;
+    background: #050505;
+  }
+
+  figcaption {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.15rem;
+    color: #f0f0f0;
+    background: rgba(12, 12, 12, 0.96);
+  }
+
+  figcaption span {
+    color: #a6a6a6;
+    font-size: 0.9rem;
+  }
+
+  .close-button {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.85rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    color: #f5f5f5;
+    font-size: 1.8rem;
+    line-height: 1;
+    background: rgba(0, 0, 0, 0.52);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    cursor: pointer;
+  }
+
+  .close-button:hover,
+  .close-button:focus-visible {
+    background: rgba(217, 146, 91, 0.9);
+    outline: none;
+  }
+
+  @media (max-width: 620px) {
+    .wandering-page {
+      padding-inline: 1rem;
+    }
+
+    figcaption {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+</style>

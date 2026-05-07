@@ -5,6 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "astro dev",
+		"prebuild": "git lfs install --local && git lfs pull",
 		"build": "astro build",
 		"preview": "astro preview",
 		"check": "astro check",
