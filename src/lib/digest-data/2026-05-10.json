@@ -1,0 +1,362 @@
+{
+  "week": "2026-05-03 to 2026-05-10",
+  "published_at": "2026-05-10T06:00:29.223Z",
+  "hero_topics": [
+    {
+      "title": "AI Agents: Applications & Builds",
+      "slug": "ai-agents-applications-and-builds",
+      "summary": "SenseNova dropped SenseNova-U1 on the last day of April and I’ve only found like one other mostly ignored post on this sub talking about it. ([sensenova/sensenova-u1-8b-mot](https://huggingface.co/sensenova/sensenova-u1-8b-mot)) In my initial post, I mentioned using turboquants. However, I forgot to include instructions for building llama.cpp with the corresponding PR. ([froggeric/qwen3.6-27b-mtp-gguf](https://huggingface.co/froggeric/qwen3.6-27b-mtp-gguf)) Despite the success of large language models (LLMs) on general-purpose tasks, their performance in highly specialized domains such as biomedicine remains unsatisfactory. ([BioTool: A Comprehensive Tool-Calling Dataset for Enhancing Biomedical Capabilities of Large Language Models](https://huggingface.co/papers/2605.05758)) A growing body of work in cognitive science suggests that reportable conscious access is associated with global ignition over distributed memory systems, while such activation is only partially accessible as individuals…. ([MiA-Signature: Approximating Global Activation for Long-Context Understanding](https://huggingface.co/papers/2605.06416)) Additional coverage spans 208 more items across 28 source domains.",
+      "insight": "This matters because practical agent use cases are widening, but the durable signal is whether they solve repeated workflows instead of one-off demos. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "SenseNova-U1-8B-MoT (novel open source multimodal understanding + image generation model) seems like a bigger deal architecturally then it’…",
+          "url": "https://www.reddit.com/r/localllama/comments/1t4i1yx/sensenovau18bmot_novel_open_source_multimodal",
+          "type": "reddit"
+        },
+        {
+          "title": "sensenova/sensenova-u1-8b-mot",
+          "url": "https://huggingface.co/sensenova/sensenova-u1-8b-mot",
+          "type": "huggingface"
+        },
+        {
+          "title": "opensensenova/sensenova-skills",
+          "url": "https://github.com/opensensenova/sensenova-skills",
+          "type": "github"
+        },
+        {
+          "title": "2.5x faster inference with Qwen 3.6 27B using MTP - Finally a viable option for local agentic coding - 262k context on 48GB - Fixed chat te…",
+          "url": "https://www.reddit.com/r/localllama/comments/1t57xuu/25x_faster_inference_with_qwen_36_27b_using_mtp",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "ai-agents",
+        "applications-and-builds"
+      ]
+    },
+    {
+      "title": "Image/Video GenAI: Tools & Workflows",
+      "slug": "image-video-genai-tools-workflows",
+      "summary": "A C++ port of Echo-TTS - a multi-speaker TTS model with speaker reference conditioning. Runs on GPU via CUDA, using GGML for the diffusion transformer + ONNX Runtime for the DAC autoencoder. ([jordandare/echo-tts](https://github.com/jordandare/echo-tts)) A few weeks ago I shipped vibevoice.cpp , a pure-C++ ggml port of Microsoft VibeVoice (the speech-to-speech model with voice cloning, ). ([microsoft/vibevoice](https://github.com/microsoft/vibevoice)) Built a spatial style mixing tool — drop in two paintings, paint a region on your content image, hit Generate. Style A applies inside the painted region, Style B applies outside, clean boundary, no muddy averaging. ([oswinbiju/mixstylegan (space)](https://huggingface.co/spaces/oswinbiju/mixstylegan)) Reinforcement learning fine-tuning has become the dominant approach for aligning diffusion models with human preferences. ([MARBLE: Multi-Aspect Reward Balance for Diffusion RL](https://huggingface.co/papers/2605.06507)) Additional coverage spans 65 more items across 11 source domains.",
+      "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.06376.png",
+      "sources": [
+        {
+          "title": "A C++ port of Echo-TTS",
+          "url": "https://www.reddit.com/r/localllama/comments/1t5lw8b/a_c_port_of_echotts",
+          "type": "reddit"
+        },
+        {
+          "title": "jordandare/echo-tts",
+          "url": "https://github.com/jordandare/echo-tts",
+          "type": "github"
+        },
+        {
+          "title": "cirius0310/echo-tts-cpp",
+          "url": "https://github.com/cirius0310/echo-tts-cpp",
+          "type": "github"
+        },
+        {
+          "title": "tmdarkbr/echo-tts-gguf",
+          "url": "https://huggingface.co/tmdarkbr/echo-tts-gguf",
+          "type": "huggingface"
+        }
+      ],
+      "tags": [
+        "diffusion models",
+        "distribution matching",
+        "consistency distillation",
+        "reverse KL divergence",
+        "continuous-time",
+        "velocity field",
+        "latent space",
+        "image generation"
+      ]
+    },
+    {
+      "title": "3D Gaussian Splatting: Tools & Reconstruction",
+      "slug": "gaussian-splatting-tools-reconstruction",
+      "summary": "PlayCanvas just released SplatTransform 2.0! For anyone working with 3D Gaussian Splats, SplatTransform is an open source CLI tool and library for processing splats. ([playcanvas/splat-transform](https://github.com/playcanvas/splat-transform/releases/tag/v2.0.0)) 3DGS PLY to 3D Tiles Converter This is a Node.js CLI / library for converting 3D Gaussian Splatting PLY models into explicit 3D Tiles tilesets. ([williamliu-1997/3dgs-ply-3dtiles-converter](https://github.com/williamliu-1997/3dgs-ply-3dtiles-converter)) Some tests with effects and color corrections done to the images before they are fed into the training. Some view dependent. ([db0c6c31](https://superspl.at/scene/db0c6c31)) I wanted to share a project that turned out to be a deeply moving experience (more than I initially expected). Using the recent archives from the NASA Artemis II mission I have reconstructed our celestial neighbor using 3D Gaussian Splatting. ([2ac8f423](https://superspl.at/scene/2ac8f423)) I’ve been experimenting with reconstructing places from video instead of a traditional photo set. ([1278e99d](https://superspl.at/scene/1278e99d)) Additional coverage spans 18 more items across 6 source domains.",
+      "insight": "This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. The multi-source signal points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "SplatTransform 2.0: Automated collision generation for 3D Gaussian Splats",
+          "url": "https://www.reddit.com/r/gaussiansplatting/comments/1t4f4xr/splattransform_20_automated_collision_generation",
+          "type": "reddit"
+        },
+        {
+          "title": "playcanvas/splat-transform",
+          "url": "https://github.com/playcanvas/splat-transform/releases/tag/v2.0.0",
+          "type": "github"
+        },
+        {
+          "title": "b0703bc1",
+          "url": "https://superspl.at/scene/b0703bc1",
+          "type": "project"
+        },
+        {
+          "title": "Open-source 3D Gaussian Splatting 3D Tiles Toolchain",
+          "url": "https://www.reddit.com/r/gaussiansplatting/comments/1t74jhc/opensource_3d_gaussian_splatting_3d_tiles",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "gaussiansplatting",
+        "gaussian-splatting"
+      ]
+    },
+    {
+      "title": "Generative 3D Worlds: Explorable World Models",
+      "slug": "generative-3d-worlds-explorable-world-models",
+      "summary": "So I recently stumbled upon Reactor's new demo of an open source world model. ([I just tried Reactor's open source world model demo, here are my thoughts](https://www.reddit.com/r/stablediffusion/comments/1t6qfff/i_just_tried_reactors_open_source_world_model))",
+      "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The single-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "I just tried Reactor's open source world model demo, here are my thoughts",
+          "url": "https://www.reddit.com/r/stablediffusion/comments/1t6qfff/i_just_tried_reactors_open_source_world_model",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "stablediffusion",
+        "generative-3d-worlds"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "Current state of local research tools as of May 2026",
+      "summary": "I was thinking, that some folks in this community will be interested to see what current options are on local deep research field. So I spent some time to collect everything I could find together. Enjoy. TLDR: the most healthiest and local-friendly projects are \"GPT Researcher\" by assafelovic and \"Local Deep Research\" by LearningCircuit. \"Local Deep Research\" by LearningCircuit Observations: python alive - last commit made yesterday medium number of contributors - 46 75 opened issues (half from the contributor, half from users but no comments for long months) / 254 closed (many self-reported) 161 opened PR (many from contributor hanging for long weeks - what's the point??) / 3309 closed PRs (visually 95% from contributor or dependobot) uses SearXNG Reddit - Subreddit - Github - Benchmark - \"STORM\" by Stanford Observations: python abandoned - last commit 8 months ago small number of contributors - 23 58 opened issues (many bug reports with no replies) / 164 closed (mostly without resolution as not planned) 60 PRs (mostly with no replies) / 111 closed (for last 2 years just cancelled) uses various retrival services - YouRM, BingSearch, VectorRM, SerperRM, BraveRM, SearXNG, DuckDuckGoSearchRM, TavilySearchRM, GoogleSearch, and AzureAISearch Github - Website - \"GPT Researcher\" by assafelovic Observations: python + typescript semi-alive - last commit 3 weeks ago poorly maintained - lots of stale branches large number of contributors - 211 173 opened issues (almost no reaction to 2026 issues) / 511 closed (mostly with fixes) 44 opened PRs (some are 6 months old without review and comments) / 785 closed (60-70% merged) obsessed with MCP - internet search & web scraping is done via separate MCP which uses 3rd party API Github - Documentation - Website - \"Local Deep Research\" by LangChain Observations: python semi-alive - last commit 2 weeks ago small number of contributors - 14 36 opened issues (many with no reply) / 39 closed (with solutions) 6 opened PR (some are hanging more than a year) / 48 closed (mostly from dependabot, no recent contributions from users) DuckDuckGo, SearXNG + commercial providers Github - \"Open Deep Research\" by LangChain What are these LangChain guys smoking? Two similarly named projects, one is most probably a successor of the other, but not a word being said on readme about it. Observations: python + Jupyter notebook (???) abandoned - last dev work by human ended in Aug 2025 small number of contributors - 26 34 opened issues (no replies since Nov 2025) / 95 closed ones 24 opened PRs (no comments/ no reviews) / 114 closed ones (community contribution is mostly discarded) no info on what it uses as internet search engine GitHub - \"Open Deep Research\" by Together Observations: python abandoned - last commit year ago, 3 commits in total one contributor no opened and closed issues no PRs relies on TAVILY for web search Github - Blogpost - \"Deer flow\" (Deep Exploration and Efficient Research Flow) by ByteDance Supports any OpenAI compatible providers Observations: python alive - last commit 19 minutes ago large number of contributors - 253 444 opened issues (mostly from Chinese folks, many have replies) / 735 closed (half with code changes) 257 opened pull requests, lots are pending for review and merge / 1230 closed (visually 70% merged) uses \"Info Quest\" for internet search (proprietary, paid) Github - Website - \"Deep Research\" by Alibaba Observations: python abandoned - last commits months ago small number of contributors - 27 focused on using a single model - their own \"Tongyi-DeepResearch-30B-A3B\" vendor locked-in - glued its ass to Serper.dev for search and Jina.ai for scraping Github - \"MiroThinker\" by MiroMindAI Observations: semi-alive - last commit 3 weeks ago small number of contributors - 19 focused on using their own models - \"MiroThinker-1.7-mini\" (30B) or \"MiroThinker-1.7\" (235B) vendor locked-in - bring your own SERPER_API_KEY, JINA_API_KEY tried to run a test research from their demo page - fall on it's face Github - Website - \"Deep-searcher\" by Zilliztech Observations: abandoned - last commit 6 months ago small number of contributors - 31 40 issues, 50 closed 6 pending PRs, 167 closed (mostly merged) Github - PS No LLM assisted research tools were used to gather the above table. Just me and my own hands. Only few out of the above projects had a demo website - Mirothinker, Storm and DeerFlow - but: Mirothinker produced a quite comprehensive report after an hour, but it hallucinated one half of github metrics and didn't give a fuck to collect the other half. Untrusted and unusable. Storm is basically unusable for deep research tasks as you cannot provide an extended instruction on what to research and what kind of results you need, just a shitty short string of how your research paper should be titled DeerFlow site is just broken, cannot get past the authentication + various 404. Shame on you, ByteDance web developers! If you have time and your local deep research agent is sitting nearby, try to give it below prompt. I'm sincerely curious what your results will be. Especially how many hallucinations in github figures. Find and compare the best local deep research projects. Compose a table with results. The table must contain: - vendor / company name - project name - github URL - product website or blog URL where it was announced - when the last commit to github was made - number of github issues and PRs - number of contributors to github project - if project docs are suggesting to use a bespoke LLM model - if project is coming with its own web search and web page scraping tool &#32; submitted by &#32; /u/Shoddy-Tutor9563 [link] &#32; [comments]. ([learningcircuit/local-deep-research](https://github.com/learningcircuit/local-deep-research))",
+      "sources": [
+        {
+          "title": "Current state of local research tools as of May 2026",
+          "url": "https://www.reddit.com/r/localllama/comments/1t4e83m/current_state_of_local_research_tools_as_of_may",
+          "type": "reddit"
+        },
+        {
+          "title": "learningcircuit/local-deep-research",
+          "url": "https://github.com/learningcircuit/local-deep-research",
+          "type": "github"
+        },
+        {
+          "title": "local-deep-research/ldr-benchmarks (dataset)",
+          "url": "https://huggingface.co/datasets/local-deep-research/ldr-benchmarks",
+          "type": "huggingface"
+        },
+        {
+          "title": "stanford-oval/storm",
+          "url": "https://github.com/stanford-oval/storm",
+          "type": "github"
+        },
+        {
+          "title": "storm-project.stanford.edu",
+          "url": "https://storm-project.stanford.edu",
+          "type": "project"
+        },
+        {
+          "title": "assafelovic/gptr-mcp",
+          "url": "https://github.com/assafelovic/gptr-mcp",
+          "type": "github"
+        },
+        {
+          "title": "assafelovic/gpt-researcher",
+          "url": "https://github.com/assafelovic/gpt-researcher",
+          "type": "github"
+        },
+        {
+          "title": "docs.gptr.dev",
+          "url": "https://docs.gptr.dev",
+          "type": "project"
+        },
+        {
+          "title": "gptr.dev",
+          "url": "https://gptr.dev",
+          "type": "project"
+        },
+        {
+          "title": "langchain-ai/local-deep-researcher",
+          "url": "https://github.com/langchain-ai/local-deep-researcher",
+          "type": "github"
+        },
+        {
+          "title": "langchain-ai/open_deep_research",
+          "url": "https://github.com/langchain-ai/open_deep_research",
+          "type": "github"
+        },
+        {
+          "title": "togethercomputer/open_deep_research",
+          "url": "https://github.com/togethercomputer/open_deep_research",
+          "type": "github"
+        },
+        {
+          "title": "open-deep-research",
+          "url": "https://www.together.ai/blog/open-deep-research",
+          "type": "project"
+        },
+        {
+          "title": "bytedance/deer-flow",
+          "url": "https://github.com/bytedance/deer-flow",
+          "type": "github"
+        },
+        {
+          "title": "deerflow.tech",
+          "url": "https://deerflow.tech",
+          "type": "project"
+        },
+        {
+          "title": "alibaba-nlp/deepresearch",
+          "url": "https://github.com/alibaba-nlp/deepresearch",
+          "type": "github"
+        },
+        {
+          "title": "miromindai/mirothinker",
+          "url": "https://github.com/miromindai/mirothinker",
+          "type": "github"
+        },
+        {
+          "title": "miromind.ai",
+          "url": "https://www.miromind.ai",
+          "type": "project"
+        },
+        {
+          "title": "zilliztech/deep-searcher",
+          "url": "https://github.com/zilliztech/deep-searcher",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "SWE-WebDevBench: Evaluating Coding Agent Application Platforms as Virtual Software Agencies",
+      "summary": "The emergence of \"vibe coding\" platforms, where users describe applications in natural language and AI agents autonomously generate full-stack software, has created a need for rigorous evaluation beyond code-level benchmarks. In order to assess them as virtual software development agencies on understanding business requirements, making architectural decisions, writing production code, handling iterative modifications, and maintaining business readiness, we introduce SWE-WebDev Bench, a 68-metric evaluation framework spanning 25 primary and 43 diagnostic metrics across seven groups, organized along three dimensions: Interaction Mode (App Creation Request (ACR) vs. App Modification Request (AMR)), Agency Angle (Product Manager (PM), Engineering, Ops), and Complexity Tier (T4 multi-role SaaS, T5 AI-native). Our evaluation (six platforms, three domains, 18 evaluation cells) reveals four recurring shortcomings in the current generation of AI app builders: (1) A specification bottleneck, where platforms compress rich business requirements into oversimplified technical plans, (2) A pervasive frontend-backend decoupling, where visually polished UIs mask absent or broken backend infrastructure, (3) A steep production-readiness cliff, where no platform scores above 60% on engineering quality and post-generation human effort varies substantially across platforms and (4) Widespread security and infrastructure failures, with no platform exceeding 65% Security Score against a 90% target and concurrency handling as low as 6%. These observations are descriptive of our sample and require larger-scale replication to establish generality. We release SWE-WebDev Bench as a community benchmark to enable such replication and help platform builders identify and address these gaps. Code and benchmark resources are available at: and. ([SWE-WebDevBench: Evaluating Coding Agent Application Platforms as Virtual Software Agencies](https://huggingface.co/papers/2605.04637))",
+      "sources": [
+        {
+          "title": "SWE-WebDevBench: Evaluating Coding Agent Application Platforms as Virtual Software Agencies",
+          "url": "https://huggingface.co/papers/2605.04637",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "vibe coding",
+        "AI agents",
+        "software development agencies",
+        "business requirements",
+        "architectural decisions",
+        "production code",
+        "iterative modifications",
+        "business readiness",
+        "SWE-WebDev Bench",
+        "evaluation framework",
+        "interaction mode",
+        "agency angle",
+        "complexity tier",
+        "specification bottleneck",
+        "frontend-backend decoupling",
+        "production-readiness cliff",
+        "security score",
+        "concurrency handling",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "RaguTeam at SemEval-2026 Task 8: Meno and Friends in a Judge-Orchestrated LLM Ensemble for Faithful Multi-Turn Response Generation",
+      "summary": "We present our winning system for Task~B (generation with reference passages) in SemEval-2026 Task~8: MTRAGEval. Our method is a heterogeneous ensemble of seven LLMs with two prompting variants, where a GPT-4o-mini judge selects the best candidate per instance. We ranked 1st out of 26 teams, achieving a conditioned harmonic mean of 0.7827 and outperforming the strongest baseline (gpt-oss-120b, 0.6390). Ablations show that diversity in model families, scales, and prompting strategies is essential, with the ensemble consistently beating any single model. We also introduce Meno-Lite-0.1, a 7B domain-adapted model with a strong cost--performance trade-off, and analyse MTRAGEval, highlighting annotation limitations and directions for improvement. Our code is publicly available. ([RaguTeam at SemEval-2026 Task 8: Meno and Friends in a Judge-Orchestrated LLM Ensemble for Faithful Multi-Turn Response Generation](https://huggingface.co/papers/2605.04523))",
+      "sources": [
+        {
+          "title": "RaguTeam at SemEval-2026 Task 8: Meno and Friends in a Judge-Orchestrated LLM Ensemble for Faithful Multi-Turn Response Generation",
+          "url": "https://huggingface.co/papers/2605.04523",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "heterogeneous ensemble",
+        "large language models",
+        "prompting variants",
+        "GPT-4o-mini",
+        "conditioned harmonic mean",
+        "domain-adapted model",
+        "cost--performance trade-off",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning",
+      "summary": "Robotic systems that interact with the physical world must reason about kinematic and dynamic constraints imposed by their own embodiment, their environment, and the task at hand. We introduce KinDER, a benchmark for Kinematic and Dynamic Embodied Reasoning that targets physical reasoning challenges arising in robot learning and planning. KinDER comprises 25 procedurally generated environments, a Gymnasium-compatible Python library with parameterized skills and demonstrations, and a standardized evaluation suite with 13 implemented baselines spanning task and motion planning, imitation learning, reinforcement learning, and foundation-model-based approaches. The environments are designed to isolate five core physical reasoning challenges: basic spatial relations, nonprehensile multi-object manipulation, tool use, combinatorial geometric constraints, and dynamic constraints, disentangled from perception, language understanding, and application-specific complexity. Empirical evaluation shows that existing methods struggle to solve many of the environments, indicating substantial gaps in current approaches to physical reasoning. We additionally include real-to-sim-to-real experiments on a mobile manipulator to assess the correspondence between simulation and real-world physical interaction. KinDER is fully open-sourced and intended to enable systematic comparison across diverse paradigms for advancing physical reasoning in robotics. Website and code. ([KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning](https://huggingface.co/papers/2604.25788))",
+      "sources": [
+        {
+          "title": "KinDER: A Physical Reasoning Benchmark for Robot Learning and Planning",
+          "url": "https://huggingface.co/papers/2604.25788",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "kinematic constraints",
+        "dynamic constraints",
+        "embodied reasoning",
+        "robotic systems",
+        "physical reasoning",
+        "task planning",
+        "motion planning",
+        "imitation learning",
+        "reinforcement learning",
+        "foundation models",
+        "real-to-sim-to-real experiments",
+        "procedural generation",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "CreativityBench: Evaluating Agent Creative Reasoning via Affordance-Based Tool Repurposing",
+      "summary": "Recent advances in large language models have led to strong performance on reasoning and environment-interaction tasks, yet their ability for creative problem-solving remains underexplored. We study this capability through the lens of creative tool use, where a model repurposes available objects by reasoning about their affordances and attributes rather than relying on canonical usage. As a first step, we introduce CreativityBench, a benchmark for evaluating affordance-based creativity in LLMs. To this end, we build a large-scale affordance knowledge base (KB) with 4K entities and 150K+ affordance annotations, explicitly linking objects, parts, attributes, and actionable uses. Building on this KB, we generate 14K grounded tasks that require identifying non-obvious yet physically plausible solutions under constraints. Evaluations across 10 state-of-the-art LLMs, including closed and open-source models, show that models can often select a plausible object, but fail to identify the correct parts, their affordances, and the underlying physical mechanism needed to solve the task, leading to a significant drop in performance. Furthermore, improvements from model scaling quickly saturate, strong general reasoning does not reliably translate to creative affordance discovery, and common inference-time strategies such as Chain-of-Thought yield limited gains. These results suggest that creative tool use remains a major challenge for current models, and that CreativityBench provides a useful testbed for studying this missing dimension of intelligence, with potential implications for planning and reasoning modules in future agents. ([CreativityBench: Evaluating Agent Creative Reasoning via Affordance-Based Tool Repurposing](https://huggingface.co/papers/2605.02910))",
+      "sources": [
+        {
+          "title": "CreativityBench: Evaluating Agent Creative Reasoning via Affordance-Based Tool Repurposing",
+          "url": "https://huggingface.co/papers/2605.02910",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "large language models",
+        "creative tool use",
+        "affordance-based creativity",
+        "CreativityBench",
+        "affordance knowledge base",
+        "grounded tasks",
+        "physical mechanism",
+        "creative problem-solving",
+        "tool repurposing",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "StraTA: Incentivizing Agentic Reinforcement Learning with Strategic Trajectory Abstraction",
+      "summary": "Large language models (LLMs) are increasingly used as interactive agents, but optimizing them for long-horizon decision making remains difficult because current methods are largely purely reactive, which weakens both exploration and credit assignment over extended trajectories. In this work, we present Strategic Trajectory Abstraction (StraTA), a simple framework that introduces an explicit trajectory-level strategy into agentic reinforcement learning (RL). StraTA samples a compact strategy from the initial task state, conditions subsequent actions on that strategy, and trains strategy generation and action execution jointly with a hierarchical GRPO-style rollout design, further enhanced by diverse strategy rollout and critical self-judgment. Experiments on ALFWorld, WebShop, and SciWorld show that StraTA consistently improves both sample efficiency and final performance over strong baselines. StraTA reaches success rates of 93.1% on ALFWorld and 84.2% on WebShop. On SciWorld, StraTA attains a 63.5% overall score, outperforming frontier closed-source models. ([StraTA: Incentivizing Agentic Reinforcement Learning with Strategic Trajectory Abstraction](https://huggingface.co/papers/2605.06642))",
+      "sources": [
+        {
+          "title": "StraTA: Incentivizing Agentic Reinforcement Learning with Strategic Trajectory Abstraction",
+          "url": "https://huggingface.co/papers/2605.06642",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "strategic trajectory abstraction",
+        "agentic reinforcement learning",
+        "hierarchical GRPO-style rollout",
+        "trajectory-level strategy",
+        "joint training",
+        "diverse strategy rollout",
+        "critical self-judgment",
+        "sample efficiency",
+        "final performance",
+        "ai-agents"
+      ]
+    }
+  ]
+}
