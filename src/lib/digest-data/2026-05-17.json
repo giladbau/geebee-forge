@@ -1,0 +1,339 @@
+{
+  "week": "2026-05-10 to 2026-05-17",
+  "published_at": "2026-05-17T06:01:08.474Z",
+  "hero_topics": [
+    {
+      "title": "AI Agents: Applications & Builds",
+      "slug": "ai-agents-applications-and-builds",
+      "summary": "I rewrite to skill, and now it's uses your subscription instead of paid tokens! Also I used it to implement from scratch deepseek v4 with gpt2 tokenizer and train it on tiny stories &#32; submitted by &#32; /u/Mysterious_Hearing14 [link] &#32; [comments]. ([huggingface/ml-intern](https://github.com/huggingface/ml-intern)) TL;DR : DeepSeek-V4-Flash running at 85.52 tok/s @ 524k ctx and ~111 tok/s @ 128k single-stream on 2× RTX PRO 6000 Max-Q pasta-paul's DeepSeek-V4-Flash-W4A16-FP8 quant is great, but its MTP head silently gets stripped a…. ([lordneel/deepseek-v4-flash-acti-mtp-w4a16-fp8](https://huggingface.co/lordneel/deepseek-v4-flash-acti-mtp-w4a16-fp8)) LLM-based autonomous agents have demonstrated strong capabilities in reasoning, planning, and tool use, yet remain limited when tasks require sustained coordination across roles, tools, and environments. ([Beyond Individual Intelligence: Surveying Collaboration, Failure Attribution, and Self-Evolution in LLM-based Multi-Agent Systems](https://huggingface.co/papers/2605.14892)) Additional coverage spans 147 more items across 18 source domains.",
+      "insight": "This matters because practical agent use cases are widening, but the durable signal is whether they solve repeated workflows instead of one-off demos. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.14892.png",
+      "sources": [
+        {
+          "title": "Intern ml skill",
+          "url": "https://www.reddit.com/r/localllama/comments/1tc0krf/intern_ml_skill",
+          "type": "reddit"
+        },
+        {
+          "title": "huggingface/ml-intern",
+          "url": "https://github.com/huggingface/ml-intern",
+          "type": "github"
+        },
+        {
+          "title": "alexwortega/claude-ml-intern-skill",
+          "url": "https://github.com/alexwortega/claude-ml-intern-skill",
+          "type": "github"
+        },
+        {
+          "title": "alexwortega/ml-intern-v4-100m-tinystories-20260512-1721",
+          "url": "https://huggingface.co/alexwortega/ml-intern-v4-100m-tinystories-20260512-1721",
+          "type": "huggingface"
+        }
+      ],
+      "tags": [
+        "multi-agent systems",
+        "autonomous agents",
+        "coordination",
+        "error propagation",
+        "self-improvement",
+        "agent collaboration",
+        "fault attribution",
+        "closed-loop systems"
+      ]
+    },
+    {
+      "title": "Image/Video GenAI: Tools & Workflows",
+      "slug": "image-video-genai-tools-workflows",
+      "summary": "Cola DLM ( Co ntinuous La tent D iffusion L anguage M odel) is a hierarchical continuous latent-space diffusion language model. ([arXiv:2605.06548](https://arxiv.org/abs/2605.06548)) 3,000 tok/s ? bring your pitchforks (open-dllm)\" title=\"Can a 5090 with qwen3.6 achieve > 3,000 tok/s ? ([2605.07933v1](https://arxiv.org/pdf/2605.07933v1)) Today we're releasing a beta of LipDub, a new open-source lipsync capability built on LTX. LipDub is an IC-LoRA adapter that takes an existing video and replaces the dialogue by regenerating speech and lip motion together in a single pass. ([lightricks/ltx-2.3-22b-ic-lora-lipdub](https://huggingface.co/lightricks/ltx-2.3-22b-ic-lora-lipdub)) It was a f cking chore that took almost 9 hours but i was able to FINALLLLLY MAKE IT !!!! I´ve reached it ! ([view](https://drive.google.com/file/d/14s8rphvn4zfi77frtrfdx5drzxm6-51c/view?usp=drive_link)) Shipped this for the AMD x lablab hackathon. Attached video is one of the actual reels the pipeline produced - one English sentence in, finished mp4 with characters, story, music, and voice-over out. ([bladedevoff/studiomi300](https://github.com/bladedevoff/studiomi300)) Additional coverage spans 72 more items across 16 source domains.",
+      "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "ByteDance-Seed/Cola-DLM · Hugging Face",
+          "url": "https://www.reddit.com/r/localllama/comments/1tdtaqt/bytedanceseedcoladlm_hugging_face",
+          "type": "reddit"
+        },
+        {
+          "title": "bytedance-seed/cola-dlm",
+          "url": "https://huggingface.co/bytedance-seed/cola-dlm",
+          "type": "huggingface"
+        },
+        {
+          "title": "bytedance-seed/cola-dlm",
+          "url": "https://github.com/bytedance-seed/cola-dlm",
+          "type": "github"
+        },
+        {
+          "title": "arXiv:2605.06548",
+          "url": "https://arxiv.org/abs/2605.06548",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "3D Gaussian Splatting: Tools & Reconstruction",
+      "slug": "gaussian-splatting-tools-reconstruction",
+      "summary": "High-quality 3D scene reconstruction has recently advanced toward generalizable feed-forward architectures, enabling the generation of complex environments in a single forward pass. ([VGGT-Edit: Feed-forward Native 3D Scene Editing with Residual Field Prediction](https://huggingface.co/papers/2605.15186)) I just landed two new examples in the PlayCanvas engine that let you walk around inside a real Gaussian Splat scan — both first-person and third-person, with proper collision against the scene. ([playcanvas/engine](https://github.com/playcanvas/engine/pull/8736)) RSR: Rapid Splat Renderer is a native Windows VR viewer for 3D Gaussian Splatting scenes, built with raw C++, Direct3D 12, and OpenXR, and featuring advanced features like NVIDIA DLSS for maximum rendering speed. ([warpgatelabs/rsr](https://github.com/warpgatelabs/rsr/releases)) This is my first post here. A little over a month ago I discovered Gaussian Splats through an ml-sharp demo video. ([hkirsman/sharp-local](https://github.com/hkirsman/sharp-local)) Should I add more splats, run more iterations, or stop because the scene has already reached a practical plateau? ([dok11/lichtfeld-tensorboard-export](https://github.com/dok11/lichtfeld-tensorboard-export/blob/main/docs/articles/using-loss-curves.en.md)) Additional coverage spans 34 more items across 12 source domains.",
+      "insight": "This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. The multi-source signal points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.15186.png",
+      "sources": [
+        {
+          "title": "VGGT-Edit: Feed-forward Native 3D Scene Editing with Residual Field Prediction",
+          "url": "https://huggingface.co/papers/2605.15186",
+          "type": "paper"
+        },
+        {
+          "title": "First-person + third-person walking demos inside a Gaussian Splat scene (PlayCanvas, runs in the browser)",
+          "url": "https://www.reddit.com/r/gaussiansplatting/comments/1tf1x5y/firstperson_thirdperson_walking_demos_inside_a",
+          "type": "reddit"
+        },
+        {
+          "title": "engine-cmbu8r47z-playcanvas.vercel.app",
+          "url": "https://engine-cmbu8r47z-playcanvas.vercel.app",
+          "type": "project"
+        },
+        {
+          "title": "optimize",
+          "url": "https://polyforge.xyz/optimize",
+          "type": "project"
+        }
+      ],
+      "tags": [
+        "feed-forward architectures",
+        "3D scene reconstruction",
+        "text-conditioned editing",
+        "depth-synchronized text injection",
+        "residual transformation head",
+        "geometric displacements",
+        "multi-term objective function",
+        "cross-view consistency"
+      ]
+    },
+    {
+      "title": "Generative 3D Worlds: Explorable World Models",
+      "slug": "generative-3d-worlds-explorable-world-models",
+      "summary": "Generative video models are increasingly studied as implicit world models, yet evaluating whether they produce physically plausible 3D structure and motion remains challenging. ([Quantitative Video World Model Evaluation for Geometric-Consistency](https://huggingface.co/papers/2605.15185)) We introduce SANA-WM, an efficient 2.6B-parameter open-source world model natively trained for one-minute generation, synthesizing high-fidelity, 720p, minute-scale videos with precise camera control. ([SANA-WM: Efficient Minute-Scale World Modeling with Hybrid Linear Diffusion Transformer](https://huggingface.co/papers/2605.15178)) Generating a street-level 3D scene from a single satellite image is a crucial yet challenging task. Current methods present a stark trade-off: geometry-colorization models achieve high geometric fidelity but are typically building-focused and lack semantic diversity. ([Sat3DGen: Comprehensive Street-Level 3D Scene Generation from Single Satellite Image](https://huggingface.co/papers/2605.14984))",
+      "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The multi-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.15185.png",
+      "sources": [
+        {
+          "title": "Quantitative Video World Model Evaluation for Geometric-Consistency",
+          "url": "https://huggingface.co/papers/2605.15185",
+          "type": "paper"
+        },
+        {
+          "title": "SANA-WM: Efficient Minute-Scale World Modeling with Hybrid Linear Diffusion Transformer",
+          "url": "https://huggingface.co/papers/2605.15178",
+          "type": "paper"
+        },
+        {
+          "title": "Sat3DGen: Comprehensive Street-Level 3D Scene Generation from Single Satellite Image",
+          "url": "https://huggingface.co/papers/2605.14984",
+          "type": "paper"
+        },
+        {
+          "title": "Is RL post-training in 'imagined environments' a path to continual learning? Trying to understand this deeper [D]",
+          "url": "https://www.reddit.com/r/machinelearning/comments/1tda24m/is_rl_posttraining_in_imagined_environments_a",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "Perspective Distortion Index",
+        "monocular reconstruction",
+        "projective-geometry residuals",
+        "3D motion consistency",
+        "3D structural rigidity",
+        "object-centric observations",
+        "segmentation",
+        "point tracking"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "MOOSE-Star (ICML 2026): 7B model + 108K-paper dataset for scientific hypothesis discovery",
+      "summary": "Disclosure first: I work on community at MiroMind. One of our researchers just dropped the full MOOSE-Star collection on Hugging Face — a 7B model post-trained for scientific hypothesis discovery, plus the dataset behind it. Paper accepted at ICML 2026. 🤗 Collection: Inside: MS-IR-7B / MS-HC-7B / MS-7B : 7B models for inspiration retrieval, hypothesis composition, and joint use. Base: DeepSeek-R1-Distill-Qwen-7B. TOMATO-Star : 108,717 NCBI papers decomposed into (background, hypothesis, inspirations), every inspiration anchored to a real citation. Covers biology, chemistry, medicine, medical imaging, psychology, cognitive science. ~38,400 A800 GPU-hours of preprocessing went into building it. Strict temporal split for evaluation : train ≤ Sep 2025, test = Oct 2025 (after the base model's knowledge cutoff). Inspiration retrieval accuracy Model IR accuracy Random Selection 6.70% R1-Distilled-Qwen-7B (base) 28.42% Claude Sonnet 4.6 45.02% DeepSeek-R1 45.11% Gemini-3 Flash 51.44% GPT-5.4 51.50% MS-7B (7B, joint IR + HC) 54.34% MS-IR-7B (7B, IR-only) 54.37% Gemini-3 Pro 54.89% Locally: it's a standard DeepSeek-R1-Distill-Qwen-7B fine-tune, so anything that runs that runs this — llama.cpp / vLLM / SGLang all fine. ~14GB at fp16, single 24GB card territory. Apache-2.0 code, CC-BY-4.0 data. Stress-test it, anything! Qestions or any views welcomed below! 📄 💻 &#32; submitted by &#32; /u/MiroMindAI [link] &#32; [comments]. ([arXiv:2603.03756](https://arxiv.org/abs/2603.03756))",
+      "sources": [
+        {
+          "title": "MOOSE-Star (ICML 2026): 7B model + 108K-paper dataset for scientific hypothesis discovery",
+          "url": "https://www.reddit.com/r/localllama/comments/1td58q7/moosestar_icml_2026_7b_model_108kpaper_dataset",
+          "type": "reddit"
+        },
+        {
+          "title": "collections/zongliny",
+          "url": "https://huggingface.co/collections/zongliny/moose-star-models-and-data",
+          "type": "huggingface"
+        },
+        {
+          "title": "arXiv:2603.03756",
+          "url": "https://arxiv.org/abs/2603.03756",
+          "type": "paper"
+        },
+        {
+          "title": "zongliny/moose-star",
+          "url": "https://github.com/zongliny/moose-star",
+          "type": "github"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "WildClawBench: A Benchmark for Real-World, Long-Horizon Agent Evaluation",
+      "summary": "Large language and vision-language models increasingly power agents that act on a user's behalf through command-line interface (CLI) harnesses. However, most agent benchmarks still rely on synthetic sandboxes, short-horizon tasks, mock-service APIs, and final-answer checks, leaving open whether agents can complete realistic long-horizon work in the runtimes where they are deployed. This work presents WildClawBench, a native-runtime benchmark of 60 human-authored, bilingual, multimodal tasks spanning six thematic categories. Each task averages roughly 8 minutes of wall-clock time and over 20 tool calls, and runs inside a reproducible Docker container hosting an actual CLI agent harness (OpenClaw, Claude Code, Codex, or Hermes Agent) with access to real tools rather than mock services. Grading is hybrid, combining deterministic rule-based checks, environment-state auditing of side effects, and an LLM/VLM judge for semantic verification. Across 19 frontier models, the best, Claude Opus 4.7, reaches only 62.2% overall under OpenClaw, while every other model stays below 60%, and switching harness alone shifts a single model by up to 18 points. These results show that long-horizon, native-runtime agent evaluation remains a far-from-resolved task for current frontier models. We release the tasks, code, and containerized tooling to support reproducible evaluation. ([WildClawBench: A Benchmark for Real-World, Long-Horizon Agent Evaluation](https://huggingface.co/papers/2605.10912))",
+      "sources": [
+        {
+          "title": "WildClawBench: A Benchmark for Real-World, Long-Horizon Agent Evaluation",
+          "url": "https://huggingface.co/papers/2605.10912",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "command-line interface",
+        "multimodal tasks",
+        "Docker container",
+        "LLM/VLM judge",
+        "semantic verification",
+        "tool calls",
+        "agent benchmarks",
+        "native-runtime evaluation",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Orthrus-Qwen3-8B : up to 7.8×tokens/forward on Qwen3-8B, frozen backbone, provably identical output distribution",
+      "summary": "Code: Paper: HF: ; ; Disclosure: co-author. Idea: Inject a trainable diffusion attention module into each layer of a frozen AR Transformer. Both heads share one KV cache. Diffusion head projects K=32 tokens in parallel; AR head verifies in a second pass and accepts the longest matching prefix. Output distribution is provably identical to the base model. Results: Up to 7.8× TPF, ~6× wall-clock on MATH-500. 16% of params trained, vs. diffusion LMs (Dream, Fast-dLLM-v2, SDAR, Mercury, Gemini Diffusion): they modify base weights and lose accuracy (Fast-dLLM-v2: -11 pts on MATH-500). Orthrus freezes the backbone; accuracy matches Qwen3-8B exactly. vs. Speculative Decoding (EAGLE-3, DFlash): No external drafter, no separate cache, and zero Time-To-First-Token (TTFT) penalty because we don't have to initialize and sync a separate drafter model. KV overhead is O(1) (~4.5 MiB flat). Acceptance length on MATH-500: 11.7 vs. 7.9 (DFlash) vs. 3.5 (EAGLE-3). Single-step denoising beats multi-step (6.35 vs. 3.53 TPF). KL distillation beats CE on acceptance rate. Limitations: strictly bounded by the frozen base model (inherits its biases, hallucinations, knowledge gaps); Qwen3-only evaluation; greedy + rejection sampling only. &#32; submitted by &#32; /u/Franck_Dernoncourt [link] &#32; [comments]. ([arXiv:2605.12825](https://arxiv.org/abs/2605.12825))",
+      "sources": [
+        {
+          "title": "Orthrus-Qwen3-8B : up to 7.8×tokens/forward on Qwen3-8B, frozen backbone, provably identical output distribution",
+          "url": "https://www.reddit.com/r/localllama/comments/1te5xpu/orthrusqwen38b_up_to_78tokensforward_on_qwen38b",
+          "type": "reddit"
+        },
+        {
+          "title": "chiennv2000/orthrus",
+          "url": "https://github.com/chiennv2000/orthrus",
+          "type": "github"
+        },
+        {
+          "title": "arXiv:2605.12825",
+          "url": "https://arxiv.org/abs/2605.12825",
+          "type": "paper"
+        },
+        {
+          "title": "chiennv/orthrus-qwen3-1.7b",
+          "url": "https://huggingface.co/chiennv/orthrus-qwen3-1.7b",
+          "type": "huggingface"
+        },
+        {
+          "title": "chiennv/orthrus-qwen3-4b",
+          "url": "https://huggingface.co/chiennv/orthrus-qwen3-4b",
+          "type": "huggingface"
+        },
+        {
+          "title": "chiennv/orthrus-qwen3-8b",
+          "url": "https://huggingface.co/chiennv/orthrus-qwen3-8b",
+          "type": "huggingface"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "ai-agents",
+        "image-video-genai"
+      ]
+    },
+    {
+      "title": "Orchard: An Open-Source Agentic Modeling Framework",
+      "summary": "Agentic modeling aims to transform LLMs into autonomous agents capable of solving complex tasks through planning, reasoning, tool use, and multi-turn interaction with environments. Despite major investment, open research remains constrained by infrastructure and training gaps. Many high-performing systems rely on proprietary codebases, models, or services, while most open-source frameworks focus on orchestration and evaluation rather than scalable agent training. We present Orchard, an open-source framework for scalable agentic modeling. At its core is Orchard Env, a lightweight environment service providing reusable primitives for sandbox lifecycle management across task domains, agent harnesses, and pipeline stages. On top of Orchard Env, we build three agentic modeling recipes. Orchard-SWE targets coding agents. We distill 107K trajectories from MiniMax-M2.5 and Qwen3.5-397B, introduce credit-assignment SFT to learn from productive segments of unresolved trajectories, and apply Balanced Adaptive Rollout for RL. Starting from Qwen3-30B-A3B-Thinking, Orchard-SWE achieves 64.3% on SWE-bench Verified after SFT and 67.5% after SFT+RL, setting a new state of the art among open-source models of comparable size. Orchard-GUI trains a 4B vision-language computer-use agent using only 0.4K distilled trajectories and 2.2K open-ended tasks. It achieves 74.1%, 67.0%, and 64.0% success rates on WebVoyager, Online-Mind2Web, and DeepShop, respectively, making it the strongest open-source model while remaining competitive with proprietary systems. Orchard-Claw targets personal assistant agents. Trained with only 0.2K synthetic tasks, it achieves 59.6% pass@3 on Claw-Eval and 73.9% when paired with a stronger ZeroClaw harness. Collectively, these results show that a lightweight, open, harness-agnostic environment layer enables reusable agentic data, training recipes, and evaluations across domains. ([Orchard: An Open-Source Agentic Modeling Framework](https://huggingface.co/papers/2605.15040))",
+      "sources": [
+        {
+          "title": "Orchard: An Open-Source Agentic Modeling Framework",
+          "url": "https://huggingface.co/papers/2605.15040",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "agentic modeling",
+        "large language models",
+        "planning",
+        "reasoning",
+        "tool use",
+        "multi-turn interaction",
+        "environment service",
+        "sandbox lifecycle management",
+        "agentic modeling recipes",
+        "SWE-bench",
+        "credit-assignment SFT",
+        "Balanced Adaptive Rollout",
+        "vision-language models",
+        "WebVoyager",
+        "Online-Mind2Web",
+        "DeepShop",
+        "Claw-Eval",
+        "ZeroClaw harness",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "CurveBench: A Benchmark for Exact Topological Reasoning over Nested Jordan Curves",
+      "summary": "We introduce CurveBench, a benchmark for hierarchical topological reasoning from visual input. CurveBench consists of 756 images of pairwise non-intersecting Jordan curves across easy, polygonal, topographic-inspired, maze-like, and dense counting configurations. Each image is annotated with a rooted tree encoding the containment relations between planar regions. We formulate the task as structured prediction: given an image, a model must recover the full rooted containment tree induced by the curves. Despite the visual simplicity of the task, the strongest evaluated model, Gemini 3.1 Pro, achieves only 71.1\\% tree-generation accuracy on CurveBench-Easy and 19.1\\% on CurveBench-Hard. We further demonstrate benchmark utility through RLVR-style fine-tuning of open-weight vision-language models. Our trained Qwen3-VL-8B model improves over Qwen-3-VL-8B-Thinking from 2.8\\% to 33.3\\% tree-generation accuracy on CurveBench-Easy, exceeding GPT-5.4 and Claude Opus 4.5 under our evaluation protocol. The remaining gap, especially on CurveBench-Hard, shows that exact topology-aware visual reasoning remains far from solved. ([CurveBench: A Benchmark for Exact Topological Reasoning over Nested Jordan Curves](https://huggingface.co/papers/2605.14068))",
+      "sources": [
+        {
+          "title": "CurveBench: A Benchmark for Exact Topological Reasoning over Nested Jordan Curves",
+          "url": "https://huggingface.co/papers/2605.14068",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "hierarchical topological reasoning",
+        "structured prediction",
+        "rooted tree",
+        "containment relations",
+        "vision-language models",
+        "fine-tuning",
+        "visual reasoning",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Needle: We Distilled Gemini Tool Calling Into a 26M Model",
+      "summary": "We open-sourced Needle, a 26M parameter function-calling (tool use) model. It runs at 6000 tok/s prefill and 1200 tok/s decode on consumer devices. We were always frustrated by the little effort made towards building agentic models that run on budget phones, so we conducted investigations that led to an observation: agentic experiences are built upon tool calling, and massive models are overkill for it. Tool calling is fundamentally retrieval-and-assembly (match query to tool name, extract argument values, emit JSON), not reasoning. Cross-attention is the right primitive for this, and FFN parameters are wasted at this scale. Simple Attention Networks: the entire model is just attention and gating, no MLPs anywhere. Needle is an experimental run for single-shot function calling for consumer devices (phones, watches, glasses...). Training: - Pretrained on 200B tokens across 16 TPU v6e (27 hours) - Post-trained on 2B tokens of synthesized function-calling data (45 minutes) - Dataset synthesized via Gemini with 15 tool categories (timers, messaging, navigation, smart home, etc.) You can test it right now and finetune on your Mac/PC: The full writeup on the architecture is here: We found that the \"no FFN\" finding generalizes beyond function calling to any task where the model has access to external structured knowledge (RAG, tool use, retrieval-augmented generation). The model doesn't need to memorize facts in FFN weights if the facts are provided in the input. Experimental results to be published. While it beats FunctionGemma-270M, Qwen-0.6B, Granite-350M, LFM2.5-350M on single-shot function calling, those models have more scope/capacity and excel in conversational settings. We encourage you to test on your own tools via the playground and finetune accordingly. Needle is part of a broader effort to make on-device AI practical. We also build Cactus ( ), an open-source inference engine for mobile and wearables. Everything is MIT licensed. Weights: GitHub: &#32; submitted by &#32; /u/Henrie_the_dreamer [link] &#32; [comments]. ([cactus-compute/needle](https://github.com/cactus-compute/needle))",
+      "sources": [
+        {
+          "title": "Needle: We Distilled Gemini Tool Calling Into a 26M Model",
+          "url": "https://www.reddit.com/r/localllama/comments/1tb9b0r/needle_we_distilled_gemini_tool_calling_into_a",
+          "type": "reddit"
+        },
+        {
+          "title": "cactus-compute/needle",
+          "url": "https://github.com/cactus-compute/needle",
+          "type": "github"
+        },
+        {
+          "title": "cactus-compute/needle",
+          "url": "https://github.com/cactus-compute/needle/blob/main/docs/simple_attention_networks.md",
+          "type": "github"
+        },
+        {
+          "title": "cactus-compute/cactus",
+          "url": "https://github.com/cactus-compute/cactus",
+          "type": "github"
+        },
+        {
+          "title": "cactus-compute/needle",
+          "url": "https://huggingface.co/cactus-compute/needle",
+          "type": "huggingface"
+        }
+      ],
+      "tags": [
+        "localllama",
+        "ai-agents"
+      ]
+    }
+  ]
+}
