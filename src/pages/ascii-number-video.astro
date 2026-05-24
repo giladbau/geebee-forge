@@ -1,7 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const scriptPath = 'scripts/generate_ascii_number_video.py';
+const generatorScriptPath = 'scripts/generate_ascii_number_video.py';
+const serverScriptPath = 'scripts/ascii_number_video_server.py';
+const defaultServerUrl = 'http://127.0.0.1:8765';
 ---
 
 <BaseLayout title="ASCII Number Video | GeeBee Forge">
@@ -11,8 +13,8 @@ const scriptPath = 'scripts/generate_ascii_number_video.py';
         <span class="eyebrow">Local Forge Tool</span>
         <h1 id="page-title">ASCII Number Video</h1>
         <p>
-          Generate a one-minute MP4 where neon ASCII-styled numbers count from 1 to 60,
-          one number per second, with every number spoken by edge-tts.
+          Trigger a local render from this page, then preview and download the MP4.
+          The static site talks to a companion server running on your machine.
         </p>
       </div>
 
@@ -21,65 +23,134 @@ const scriptPath = 'scripts/generate_ascii_number_video.py';
       </div>
     </section>
 
-    <section class="forge-bench" aria-label="Generator command builder">
-      <form class="control-panel" aria-label="Video dimensions">
+    <section class="forge-bench" aria-label="ASCII number video local renderer">
+      <form id="render-form" class="render-panel" aria-label="Generate ASCII number video">
         <div>
-          <span class="panel-kicker">Dimensions</span>
-          <h2>Build Command</h2>
+          <span class="panel-kicker">Local Renderer</span>
+          <h2>Generate MP4</h2>
+        </div>
+
+        <div class="field-grid">
+          <label>
+            <span>Width</span>
+            <input id="width-input" type="number" min="320" max="7680" step="2" value="1080" inputmode="numeric" />
+          </label>
+
+          <label>
+            <span>Height</span>
+            <input id="height-input" type="number" min="180" max="4320" step="2" value="1920" inputmode="numeric" />
+          </label>
         </div>
 
         <label>
-          <span>Width</span>
-          <input id="width-input" type="number" min="320" max="7680" step="2" value="1080" inputmode="numeric" />
+          <span>Companion server</span>
+          <input id="server-url-input" type="url" value={defaultServerUrl} inputmode="url" spellcheck="false" />
         </label>
 
-        <label>
-          <span>Height</span>
-          <input id="height-input" type="number" min="180" max="4320" step="2" value="1920" inputmode="numeric" />
-        </label>
+        <div class="action-row">
+          <button id="generate-button" class="primary-button" type="submit">Generate</button>
+          <button id="refresh-button" class="copy-button" type="button">Refresh Status</button>
+        </div>
 
-        <p>
-          This static page only prepares the command and preview. Run the script locally so
-          Python, edge-tts, and ffmpeg can create the video on your machine.
+        <p class="helper-text">
+          Start the local server first. The site remains static; Python, edge-tts,
+          ffmpeg, and ffprobe run only on your machine.
         </p>
       </form>
 
-      <div class="command-panel">
+      <section class="status-panel" aria-label="Render status">
         <div class="panel-heading">
           <div>
-            <span class="panel-kicker">Exact Local Command</span>
-            <h2>Render MP4</h2>
+            <span class="panel-kicker">Render Status</span>
+            <h2 id="status-heading">Not Connected</h2>
           </div>
-          <button class="copy-button" type="button" data-copy-target="command-text" aria-label="Copy render command" title="Copy render command">
-            <span aria-hidden="true">⧉</span>
-            <span>Copy</span>
-          </button>
+          <span id="status-pill" class="status-pill">Idle</span>
         </div>
 
-        <pre><code id="command-text"></code></pre>
+        <div class="progress-track" aria-label="Render progress">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+
+        <p id="status-text" class="status-text">
+          Start <code>{serverScriptPath}</code>, then generate a video from this page.
+        </p>
+
+        <pre class="log-box" aria-label="Render log"><code id="log-text">No render log yet.</code></pre>
+      </section>
+
+      <section id="result-panel" class="result-panel" aria-label="Generated video preview" hidden>
+        <div class="panel-heading">
+          <div>
+            <span class="panel-kicker">Preview</span>
+            <h2>Generated Video</h2>
+          </div>
+          <a id="download-link" class="download-button" href={defaultServerUrl} download>Download MP4</a>
+        </div>
+
+        <video id="result-video" controls playsinline preload="metadata"></video>
+      </section>
+
+      <section class="command-panel" aria-label="Local commands">
+        <div class="panel-heading">
+          <div>
+            <span class="panel-kicker">Exact Local Commands</span>
+            <h2>Start Server or Render Directly</h2>
+          </div>
+        </div>
+
+        <div class="command-block">
+          <div class="command-heading">
+            <span>Companion server</span>
+            <button class="copy-button compact" type="button" data-copy-target="server-command-text">Copy</button>
+          </div>
+          <pre><code id="server-command-text">python3 {serverScriptPath}</code></pre>
+        </div>
+
+        <div class="command-block">
+          <div class="command-heading">
+            <span>Direct render fallback</span>
+            <button class="copy-button compact" type="button" data-copy-target="command-text">Copy</button>
+          </div>
+          <pre><code id="command-text"></code></pre>
+        </div>
 
         <div class="script-row">
-          <span>Script</span>
-          <code id="script-path">{scriptPath}</code>
-          <button class="copy-button compact" type="button" data-copy-target="script-path" aria-label="Copy script path" title="Copy script path">
-            <span aria-hidden="true">⧉</span>
-            <span>Copy</span>
-          </button>
+          <span>Generator</span>
+          <code id="script-path">{generatorScriptPath}</code>
+          <button class="copy-button compact" type="button" data-copy-target="script-path">Copy</button>
         </div>
-      </div>
 
-      <div class="prereq-panel">
-        <span class="panel-kicker">Prerequisites</span>
-        <h2>Local Tools</h2>
-        <ul>
-          <li><code>python3</code> for the reusable generator script.</li>
-          <li><code>edge-tts</code> for spoken numbers.</li>
-          <li><code>ffmpeg</code> and <code>ffprobe</code> for rendering, timing, and muxing.</li>
-        </ul>
-        <pre><code>python3 -m pip install edge-tts
+        <div class="script-row">
+          <span>Server</span>
+          <code id="server-script-path">{serverScriptPath}</code>
+          <button class="copy-button compact" type="button" data-copy-target="server-script-path">Copy</button>
+        </div>
+      </section>
+
+      <section class="prereq-panel" aria-label="Prerequisites and browser access">
+        <div>
+          <span class="panel-kicker">Prerequisites</span>
+          <h2>Local Tools</h2>
+          <ul>
+            <li><code>python3</code> for the companion server and generator script.</li>
+            <li><code>edge-tts</code> for spoken numbers.</li>
+            <li><code>ffmpeg</code> and <code>ffprobe</code> for rendering, timing, and muxing.</li>
+          </ul>
+          <pre><code>python3 -m pip install edge-tts
 ffmpeg -version
 ffprobe -version</code></pre>
-      </div>
+        </div>
+
+        <div>
+          <span class="panel-kicker">Browser Access</span>
+          <h2>Localhost API</h2>
+          <p>
+            The companion server binds to <code>{defaultServerUrl}</code> by default and returns
+            CORS plus private-network headers for browser requests from the static page.
+            If you run it on another port, update the server field above.
+          </p>
+        </div>
+      </section>
     </section>
   </main>
 </BaseLayout>
@@ -186,46 +257,78 @@ ffprobe -version</code></pre>
 
   .forge-bench {
     display: grid;
-    grid-template-columns: 0.8fr 1.2fr;
+    grid-template-columns: 0.95fr 1.05fr;
     gap: 1rem;
     margin-top: 1.5rem;
   }
 
-  .control-panel,
+  .render-panel,
+  .status-panel,
+  .result-panel,
   .command-panel,
   .prereq-panel {
     border: 1px solid rgba(255, 255, 255, 0.11);
     border-radius: 8px;
-    background: rgba(9, 12, 18, 0.88);
+    background: rgba(9, 12, 18, 0.9);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
-  .control-panel {
-    display: grid;
-    gap: 1rem;
-    padding: 1.2rem;
-  }
-
+  .render-panel,
+  .status-panel,
+  .result-panel,
   .command-panel,
   .prereq-panel {
     padding: 1.2rem;
   }
 
+  .render-panel,
+  .status-panel,
   .command-panel {
     display: flex;
     flex-direction: column;
     gap: 1rem;
   }
 
+  .result-panel,
+  .command-panel,
   .prereq-panel {
     grid-column: 1 / -1;
   }
 
-  .panel-heading {
+  .result-panel[hidden] {
+    display: none;
+  }
+
+  .prereq-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.2rem;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+
+  .panel-heading,
+  .command-heading,
+  .action-row {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 1rem;
+  }
+
+  .command-heading,
+  .action-row {
+    align-items: center;
+  }
+
+  .command-heading {
+    color: #c7d2e2;
+    font-size: 0.86rem;
+    font-weight: 700;
   }
 
   h2 {
@@ -245,6 +348,7 @@ ffprobe -version</code></pre>
 
   input {
     width: 100%;
+    min-width: 0;
     border: 1px solid rgba(126, 232, 255, 0.22);
     border-radius: 6px;
     background: #050811;
@@ -260,11 +364,118 @@ ffprobe -version</code></pre>
     box-shadow: 0 0 0 3px rgba(126, 232, 255, 0.12);
   }
 
-  .control-panel p,
-  .prereq-panel li {
+  .helper-text,
+  .status-text,
+  .prereq-panel li,
+  .prereq-panel p {
     color: #93a1b7;
     font-size: 0.9rem;
     line-height: 1.55;
+  }
+
+  .primary-button,
+  .download-button,
+  .copy-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.38rem;
+    min-height: 2.4rem;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.18s, border-color 0.18s, color 0.18s, opacity 0.18s;
+  }
+
+  .primary-button,
+  .download-button {
+    border: 1px solid rgba(255, 223, 126, 0.42);
+    background: #ffdf7e;
+    color: #12151a;
+    padding: 0.66rem 0.9rem;
+  }
+
+  .primary-button:hover,
+  .download-button:hover {
+    border-color: #fff1a8;
+    background: #fff1a8;
+  }
+
+  .primary-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .copy-button {
+    border: 1px solid rgba(126, 232, 255, 0.28);
+    background: rgba(126, 232, 255, 0.08);
+    color: #dff9ff;
+    padding: 0.52rem 0.72rem;
+  }
+
+  .copy-button:hover,
+  .copy-button.copied {
+    border-color: #7ee8ff;
+    background: rgba(126, 232, 255, 0.16);
+    color: #ffffff;
+  }
+
+  .copy-button.compact {
+    min-height: 2rem;
+    padding: 0.34rem 0.55rem;
+    font-size: 0.78rem;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.85rem;
+    border: 1px solid rgba(147, 161, 183, 0.28);
+    border-radius: 999px;
+    color: #c7d2e2;
+    background: rgba(147, 161, 183, 0.08);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.22rem 0.62rem;
+    text-transform: uppercase;
+  }
+
+  .status-pill.running {
+    border-color: rgba(126, 232, 255, 0.4);
+    background: rgba(126, 232, 255, 0.12);
+    color: #dff9ff;
+  }
+
+  .status-pill.complete {
+    border-color: rgba(126, 255, 171, 0.42);
+    background: rgba(126, 255, 171, 0.1);
+    color: #d9ffe8;
+  }
+
+  .status-pill.failed,
+  .status-pill.offline {
+    border-color: rgba(255, 101, 126, 0.45);
+    background: rgba(255, 101, 126, 0.1);
+    color: #ffd9df;
+  }
+
+  .progress-track {
+    height: 0.62rem;
+    overflow: hidden;
+    border: 1px solid rgba(126, 232, 255, 0.16);
+    border-radius: 999px;
+    background: #03050a;
+  }
+
+  .progress-bar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #7ee8ff, #ff46bc, #ffdf7e);
+    transition: width 0.24s ease;
   }
 
   pre {
@@ -278,6 +489,11 @@ ffprobe -version</code></pre>
     box-shadow: inset 0 0 30px rgba(126, 232, 255, 0.05);
   }
 
+  .log-box {
+    min-height: 9rem;
+    max-height: 15rem;
+  }
+
   code {
     font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   }
@@ -287,35 +503,6 @@ ffprobe -version</code></pre>
     line-height: 1.6;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
-  }
-
-  .copy-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.38rem;
-    border: 1px solid rgba(126, 232, 255, 0.28);
-    border-radius: 6px;
-    background: rgba(126, 232, 255, 0.08);
-    color: #dff9ff;
-    font: inherit;
-    font-size: 0.86rem;
-    font-weight: 700;
-    padding: 0.52rem 0.72rem;
-    cursor: pointer;
-    transition: background 0.18s, border-color 0.18s, color 0.18s;
-  }
-
-  .copy-button:hover,
-  .copy-button.copied {
-    border-color: #7ee8ff;
-    background: rgba(126, 232, 255, 0.16);
-    color: #ffffff;
-  }
-
-  .copy-button.compact {
-    padding: 0.38rem 0.55rem;
-    font-size: 0.78rem;
   }
 
   .script-row {
@@ -329,6 +516,16 @@ ffprobe -version</code></pre>
 
   .script-row code {
     color: #ffdf7e;
+  }
+
+  video {
+    display: block;
+    width: 100%;
+    max-height: 78vh;
+    margin-top: 1rem;
+    border: 1px solid rgba(126, 232, 255, 0.2);
+    border-radius: 8px;
+    background: #03050a;
   }
 
   ul {
@@ -346,7 +543,8 @@ ffprobe -version</code></pre>
     }
 
     .hero,
-    .forge-bench {
+    .forge-bench,
+    .prereq-panel {
       grid-template-columns: 1fr;
     }
 
@@ -370,23 +568,42 @@ ffprobe -version</code></pre>
       min-height: 280px;
     }
 
-    h1 {
-      font-size: 2.1rem;
-    }
-
-    .panel-heading {
+    .field-grid,
+    .panel-heading,
+    .command-heading,
+    .action-row {
+      grid-template-columns: 1fr;
       align-items: stretch;
       flex-direction: column;
+    }
+
+    h1 {
+      font-size: 2.1rem;
     }
   }
 </style>
 
 <script is:inline>
   // @ts-nocheck
-  const scriptPath = 'scripts/generate_ascii_number_video.py';
+  const generatorScriptPath = 'scripts/generate_ascii_number_video.py';
+  const serverScriptPath = 'scripts/ascii_number_video_server.py';
+  const defaultServerUrl = 'http://127.0.0.1:8765';
+
   const widthInput = document.getElementById('width-input');
   const heightInput = document.getElementById('height-input');
+  const serverUrlInput = document.getElementById('server-url-input');
+  const renderForm = document.getElementById('render-form');
+  const generateButton = document.getElementById('generate-button');
+  const refreshButton = document.getElementById('refresh-button');
   const commandText = document.getElementById('command-text');
+  const statusHeading = document.getElementById('status-heading');
+  const statusPill = document.getElementById('status-pill');
+  const statusText = document.getElementById('status-text');
+  const progressBar = document.getElementById('progress-bar');
+  const logText = document.getElementById('log-text');
+  const resultPanel = document.getElementById('result-panel');
+  const resultVideo = document.getElementById('result-video');
+  const downloadLink = document.getElementById('download-link');
   const preview = document.getElementById('ascii-preview');
   const ctx = preview.getContext('2d');
 
@@ -406,11 +623,23 @@ ffprobe -version</code></pre>
   const digitWidth = 13;
   const digitHeight = 21;
   const digitGap = 3;
+  const pollIntervalMs = 1800;
+
+  let currentJobId = null;
+  let pollTimer = null;
 
   function clamp(value, min, max, fallback) {
     const parsed = Number.parseInt(value, 10);
     if (Number.isNaN(parsed)) return fallback;
     return Math.min(max, Math.max(min, parsed));
+  }
+
+  function evenClamp(value, min, max, fallback) {
+    let parsed = clamp(value, min, max, fallback);
+    if (parsed % 2 !== 0) {
+      parsed = parsed < max ? parsed + 1 : parsed - 1;
+    }
+    return parsed;
   }
 
   function shellToken(value) {
@@ -419,15 +648,243 @@ ffprobe -version</code></pre>
 
   function currentDimensions() {
     return {
-      width: clamp(widthInput.value, 320, 7680, 1080),
-      height: clamp(heightInput.value, 180, 4320, 1920),
+      width: evenClamp(widthInput.value, 320, 7680, 1080),
+      height: evenClamp(heightInput.value, 180, 4320, 1920),
     };
   }
 
   function updateCommand() {
     const { width, height } = currentDimensions();
     const output = `ascii-numbers-${width}x${height}.mp4`;
-    commandText.textContent = `python3 ${scriptPath} --width ${width} --height ${height} --output ${shellToken(output)}`;
+    commandText.textContent = `python3 ${generatorScriptPath} --width ${width} --height ${height} --output ${shellToken(output)}`;
+  }
+
+  function syncDimensionInputs() {
+    const { width, height } = currentDimensions();
+    widthInput.value = String(width);
+    heightInput.value = String(height);
+    updateCommand();
+    return { width, height };
+  }
+
+  function companionBaseUrl() {
+    const raw = serverUrlInput.value.trim() || defaultServerUrl;
+    const url = new URL(raw);
+    if (!['http:', 'https:'].includes(url.protocol)) {
+      throw new Error('Server URL must start with http:// or https://.');
+    }
+    url.pathname = url.pathname.replace(/\/+$/, '');
+    url.search = '';
+    url.hash = '';
+    return url.toString().replace(/\/$/, '');
+  }
+
+  function companionUrl(path) {
+    return `${companionBaseUrl()}${path}`;
+  }
+
+  async function requestJson(path, options = {}) {
+    const headers = {
+      ...(options.headers || {}),
+    };
+    if (options.body) {
+      headers['Content-Type'] = 'application/json';
+    }
+    const response = await fetch(companionUrl(path), {
+      ...options,
+      headers,
+    });
+    const text = await response.text();
+    let payload = {};
+    if (text) {
+      try {
+        payload = JSON.parse(text);
+      } catch {
+        payload = { error: text };
+      }
+    }
+    if (!response.ok) {
+      const message = payload.error || `Request failed with HTTP ${response.status}`;
+      const error = new Error(message);
+      error.status = response.status;
+      error.payload = payload;
+      throw error;
+    }
+    return payload;
+  }
+
+  function setStatus({ heading, pill, text, progress = 0, tone = '' }) {
+    statusHeading.textContent = heading;
+    statusPill.textContent = pill;
+    statusPill.className = `status-pill ${tone}`.trim();
+    statusText.textContent = text;
+    progressBar.style.width = `${Math.max(0, Math.min(100, progress))}%`;
+  }
+
+  function setLogs(lines) {
+    if (!Array.isArray(lines) || lines.length === 0) {
+      logText.textContent = 'No render log yet.';
+      return;
+    }
+    logText.textContent = lines.slice(-80).join('\n');
+  }
+
+  function showResult(job) {
+    if (job.status !== 'complete' || !job.video_url || !job.download_url) {
+      resultPanel.hidden = true;
+      return;
+    }
+    const videoUrl = companionUrl(job.video_url);
+    const downloadUrl = companionUrl(job.download_url);
+    if (resultVideo.dataset.jobId !== job.job_id) {
+      resultVideo.src = `${videoUrl}?t=${Date.now()}`;
+      resultVideo.dataset.jobId = job.job_id;
+    }
+    downloadLink.href = downloadUrl;
+    downloadLink.download = job.output_name || 'ascii-number-video.mp4';
+    resultPanel.hidden = false;
+  }
+
+  function renderJob(job) {
+    if (!job || job.status === 'idle') {
+      currentJobId = null;
+      generateButton.disabled = false;
+      setStatus({
+        heading: 'Ready',
+        pill: 'Idle',
+        text: 'The companion server is reachable and ready for a render.',
+        progress: 0,
+      });
+      setLogs([]);
+      resultPanel.hidden = true;
+      return;
+    }
+
+    currentJobId = job.job_id || currentJobId;
+    setLogs(job.logs);
+    showResult(job);
+
+    if (job.status === 'queued' || job.status === 'running') {
+      generateButton.disabled = true;
+      setStatus({
+        heading: job.phase || 'Rendering',
+        pill: 'Running',
+        text: `Rendering ${job.width}x${job.height}. Keep the companion server running until this completes.`,
+        progress: job.progress || 5,
+        tone: 'running',
+      });
+      schedulePoll();
+      return;
+    }
+
+    generateButton.disabled = false;
+    if (job.status === 'complete') {
+      setStatus({
+        heading: 'Complete',
+        pill: 'Ready',
+        text: `Generated ${job.output_name}. Preview it below or download the MP4.`,
+        progress: 100,
+        tone: 'complete',
+      });
+      stopPolling();
+      return;
+    }
+
+    setStatus({
+      heading: 'Render Failed',
+      pill: 'Failed',
+      text: job.error || 'The generator failed. Check the render log and local prerequisites.',
+      progress: job.progress || 0,
+      tone: 'failed',
+    });
+    stopPolling();
+  }
+
+  function renderOffline(error) {
+    generateButton.disabled = false;
+    stopPolling();
+    setStatus({
+      heading: 'Server Offline',
+      pill: 'Offline',
+      text: `${error.message} Start ${serverScriptPath} locally, then refresh status.`,
+      progress: 0,
+      tone: 'offline',
+    });
+    setLogs([]);
+    resultPanel.hidden = true;
+  }
+
+  function renderRequestError(error) {
+    generateButton.disabled = false;
+    stopPolling();
+    setStatus({
+      heading: 'Request Rejected',
+      pill: 'Failed',
+      text: error.message || 'The companion server rejected the request.',
+      progress: 0,
+      tone: 'failed',
+    });
+    setLogs([error.message || 'Request failed.']);
+    resultPanel.hidden = true;
+  }
+
+  function stopPolling() {
+    if (pollTimer) {
+      window.clearTimeout(pollTimer);
+      pollTimer = null;
+    }
+  }
+
+  function schedulePoll() {
+    stopPolling();
+    pollTimer = window.setTimeout(pollStatus, pollIntervalMs);
+  }
+
+  async function pollStatus() {
+    try {
+      const path = currentJobId ? `/jobs/${currentJobId}` : '/status';
+      const job = await requestJson(path, { method: 'GET', headers: {} });
+      renderJob(job);
+    } catch (error) {
+      renderOffline(error);
+    }
+  }
+
+  async function startGenerate(event) {
+    event.preventDefault();
+    const { width, height } = syncDimensionInputs();
+    stopPolling();
+    resultPanel.hidden = true;
+    setStatus({
+      heading: 'Starting Render',
+      pill: 'Starting',
+      text: 'Sending the render request to the local companion server.',
+      progress: 2,
+      tone: 'running',
+    });
+    setLogs(['Submitting render request...']);
+
+    try {
+      const job = await requestJson('/generate', {
+        method: 'POST',
+        body: JSON.stringify({ width, height }),
+      });
+      currentJobId = job.job_id;
+      renderJob(job);
+      schedulePoll();
+    } catch (error) {
+      if (error.status === 409 && error.payload?.active_job) {
+        currentJobId = error.payload.active_job.job_id;
+        renderJob(error.payload.active_job);
+        schedulePoll();
+        return;
+      }
+      if (error.status) {
+        renderRequestError(error);
+        return;
+      }
+      renderOffline(error);
+    }
   }
 
   function cellsForSegment(segment) {
@@ -534,21 +991,29 @@ ffprobe -version</code></pre>
     if (!text) return;
     await navigator.clipboard.writeText(text);
     button.classList.add('copied');
-    const label = button.querySelector('span:last-child');
-    const previous = label.textContent;
-    label.textContent = 'Copied';
+    const previous = button.textContent;
+    button.textContent = 'Copied';
     window.setTimeout(() => {
       button.classList.remove('copied');
-      label.textContent = previous;
+      button.textContent = previous;
     }, 1200);
   }
 
   widthInput.addEventListener('input', updateCommand);
   heightInput.addEventListener('input', updateCommand);
+  widthInput.addEventListener('blur', syncDimensionInputs);
+  heightInput.addEventListener('blur', syncDimensionInputs);
+  renderForm.addEventListener('submit', startGenerate);
+  refreshButton.addEventListener('click', pollStatus);
+  serverUrlInput.addEventListener('change', () => {
+    currentJobId = null;
+    pollStatus();
+  });
   document.querySelectorAll('[data-copy-target]').forEach((button) => {
     button.addEventListener('click', () => copyTarget(button.dataset.copyTarget, button));
   });
 
   updateCommand();
   drawPreview();
+  pollStatus();
 </script>

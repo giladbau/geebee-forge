@@ -9,6 +9,7 @@ node_modules
 /.astro
 /dist
 /build
+.ascii-number-video-renders
 
 # OS
 .DS_Store

@@ -495,9 +495,11 @@ def render_frames(width: int, height: int, frame_dir: Path) -> None:
     background = make_background(width, height)
     for number in NUMBERS:
         render_number_frame(number, width, height, background, frame_dir / f"frame_{number:03d}.ppm")
+        print(f"Rendered frame {number}/{len(NUMBERS)}")
 
 
 def render_video(ffmpeg: str, frame_dir: Path, video_path: Path, fps: int, crf: int, preset: str) -> None:
+    print("Encoding silent video with ffmpeg...")
     filter_chain = (
         f"fps={fps},"
         "noise=alls=3:allf=t+u,"
@@ -606,12 +608,14 @@ def synthesize_audio(
             label=f"audio slot number {number}",
         )
         segment_paths.append(segment)
+        print(f"Synthesized audio {number}/{len(NUMBERS)}")
 
     concat_file = audio_dir / "concat.txt"
     concat_file.write_text(
         "".join(ffconcat_line(path) for path in segment_paths),
         encoding="utf-8",
     )
+    print("Assembling spoken audio...")
     run_command(
         [
             ffmpeg,
@@ -636,6 +640,7 @@ def synthesize_audio(
 
 
 def mux_video(ffmpeg: str, video_path: Path, audio_path: Path, output_path: Path) -> None:
+    print("Muxing final MP4...")
     run_command(
         [
             ffmpeg,
