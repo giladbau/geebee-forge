@@ -16,15 +16,22 @@ function decodeBasicEntities(value) {
   return decoded;
 }
 
+function stripTruncationArtifacts(value) {
+  return String(value || '')
+    .replace(/(?:\s*(?:\.{3}|…)+)?\s*\[truncated\]\s*$/i, '')
+    .replace(/(?:\.{3}|…)+$/g, '')
+    .trim();
+}
+
 function cleanText(value, maxLength = 320) {
-  const cleaned = decodeBasicEntities(value)
+  const cleaned = stripTruncationArtifacts(decodeBasicEntities(value)
     .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
     .replace(/https?:\/\/\S+/g, ' ')
     .replace(/\*\*/g, '')
     .replace(/\\-/g, '-')
     .replace(/[•*]+/g, ' ')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim());
 
   if (!cleaned) return '';
   if (!Number.isFinite(maxLength) || cleaned.length <= maxLength) return cleaned;
@@ -32,9 +39,16 @@ function cleanText(value, maxLength = 320) {
 }
 
 function cleanFullText(value) {
-  return cleanText(value, Number.POSITIVE_INFINITY)
-    .replace(/(?:\.{3}|…)+$/g, '')
-    .trim();
+  return stripTruncationArtifacts(cleanText(value, Number.POSITIVE_INFINITY));
+}
+
+function clipAtWord(value, maxLength = 280) {
+  const cleaned = cleanFullText(value);
+  if (!cleaned || cleaned.length <= maxLength) return cleaned;
+  const sentenceEnd = Math.max(cleaned.lastIndexOf('. ', maxLength), cleaned.lastIndexOf('! ', maxLength), cleaned.lastIndexOf('? ', maxLength));
+  if (sentenceEnd >= 80) return cleaned.slice(0, sentenceEnd + 1).trim();
+  const clipped = cleaned.slice(0, maxLength).replace(/\s+\S*$/g, '').replace(/[\s,;:]+$/g, '').trim();
+  return clipped ? `${clipped}.` : '';
 }
 
 function itemText(item) {
@@ -613,17 +627,17 @@ function leadingSentence(value) {
 }
 
 function splitSentences(value, sentenceLimit = 220) {
-  return cleanText(value || '', 520)
+  return cleanFullText(value || '')
     .replace(/^(full link:\s*)+/i, '')
     .replace(/^(?:🔥\s*)?breaking:\s*/i, '')
     .split(/(?<=[.!?])\s+/)
-    .map((sentence) => cleanText(sentence, sentenceLimit))
+    .map((sentence) => clipAtWord(sentence, sentenceLimit))
     .filter(Boolean);
 }
 
 function itemDigestLine(item) {
   const rawSummary = String(item.summary || item.snippet || '');
-  const cleanedTitle = cleanText(item.title, 140)
+  const cleanedTitle = clipAtWord(item.title, 140)
     .replace(/^(full link:\s*)+/i, '')
     .replace(/^(?:🔥\s*)?breaking:\s*/i, '')
     .trim();
@@ -639,7 +653,7 @@ function itemDigestLine(item) {
     if (first.length < 120 && usable[1] && first.length + usable[1].length + 1 <= 280) {
       return `${first} ${usable[1]}`;
     }
-    return first;
+    return clipAtWord(first, 280);
   }
   return cleanedTitle ? `${cleanedTitle}.` : '';
 }

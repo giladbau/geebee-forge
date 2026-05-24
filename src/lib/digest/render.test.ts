@@ -307,6 +307,34 @@ describe('digest render', () => {
     expect(digest.notable[0].summary).not.toMatch(/(?:…|\.\.\.)\.?\s*(?:\[[^\]]+\]\(https?:\/\/[^)]+\))?$/);
   });
 
+  it('strips upstream truncation markers from expanded notable summaries', () => {
+    const digest = buildPreviewDigest({
+      issueDate: '2026-04-08',
+      publishedAt: '2026-04-08T13:00:00Z',
+      items: [
+        ...items,
+        {
+          id: 'reddit:truncated-summary',
+          source: 'reddit',
+          title: 'Agent benchmark with source-side truncated selftext',
+          summary: 'A substantive agent benchmark includes paper links, code links, dataset links, and a long explanation of what was evaluated before the upstream RSS reader cut the post off ... [truncated]',
+          url: 'https://www.reddit.com/r/computervision/comments/example/truncated',
+          sources: [{ title: 'Agent benchmark with source-side truncated selftext', url: 'https://www.reddit.com/r/computervision/comments/example/truncated', type: 'reddit' }],
+          tags: ['computervision'],
+          subject_primary: 'ai-agents',
+          subject_matches: ['ai-agents'],
+          subject_match_score: 4,
+          engagement: { score: 500 }
+        }
+      ],
+      heroTopicTargetMax: 0,
+      notableTargetMax: 1
+    });
+
+    expect(digest.notable[0].summary).not.toContain('[truncated]');
+    expect(digest.notable[0].summary).not.toMatch(/(?:…|\.\.\.)\.?\s*(?:\[[^\]]+\]\(https?:\/\/[^)]+\))?$/);
+  });
+
   it('uses the compile window for the week label', () => {
     const digest = buildPreviewDigest({
       issueDate: '2026-04-19',
