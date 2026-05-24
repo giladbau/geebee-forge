@@ -1,0 +1,313 @@
+{
+  "week": "2026-05-17 to 2026-05-24",
+  "published_at": "2026-05-24T06:01:01.676Z",
+  "hero_topics": [
+    {
+      "title": "AI Agents: Applications & Builds",
+      "slug": "ai-agents-applications-and-builds",
+      "summary": "Goal To save humans wasting time sitting in Call Centre queues waiting to be answered To have tool listen in on the audio stream of a live call, post IVR Navigation - to determine whether the call has transitioned out o…. ([2410.08235](https://arxiv.org/pdf/2410.08235)) LLM-based multi-agent systems have demonstrated strong performance across complex real-world tasks, such as software engineering, predictive modeling, and retrieval-augmented generation. ([arXiv:2605.13295](https://arxiv.org/abs/2605.13295)) Recent development of agents has renewed demand for long-context reasoning capacity of LLMs. However, training LLMs for this capacity requires costly long-document curation or heuristic context synthesis. ([ACC: Compiling Agent Trajectories for Long-Context Training](https://huggingface.co/papers/2605.21850)) Linear attention replaces the unbounded cache of softmax attention with a fixed-size recurrent state, reducing sequence mixing to linear time and decoding to constant memory. ([Gated DeltaNet-2: Decoupling Erase and Write in Linear Attention](https://huggingface.co/papers/2605.22791)) Additional coverage spans 197 more items across 29 source domains.",
+      "insight": "This matters because practical agent use cases are widening, but the durable signal is whether they solve repeated workflows instead of one-off demos. The multi-source signal is worth tracking for changes in capability, deployment friction, or operating risk.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Live Human Detector on Outbound Phone Calls [R]",
+          "url": "https://www.reddit.com/r/machinelearning/comments/1tk8ht5/live_human_detector_on_outbound_phone_calls_r",
+          "type": "reddit"
+        },
+        {
+          "title": "3293",
+          "url": "https://www.mdpi.com/2076-3417/12/7/3293",
+          "type": "project"
+        },
+        {
+          "title": "viewtopic.php",
+          "url": "https://www.vicidial.org/vicidialforum/viewtopic.php?t=42330",
+          "type": "project"
+        },
+        {
+          "title": "learn/audio-course",
+          "url": "https://huggingface.co/learn/audio-course/chapter2/audio_classification_pipeline",
+          "type": "huggingface"
+        }
+      ],
+      "tags": [
+        "machinelearning",
+        "ai-agents",
+        "applications-and-builds"
+      ]
+    },
+    {
+      "title": "Image/Video GenAI: Tools & Workflows",
+      "slug": "image-video-genai-tools-workflows",
+      "summary": "Was working on a personal project where I needed masks for a large custom image dataset. Tried the official SAM notebooks, but they felt more like demos than something practical for segmentation mask generation workflows, so I built a small tool around it over the weekend. ([sam interactive.ipynb](https://colab.research.google.com/github/rohitchoudharymanth/sam-mask-generator/blob/main/sam_interactive.ipynb)) Aligning Text-to-Image (T2I) generation models with human preferences increasingly relies on image reward models that score or rank generated images according to prompt alignment and perceptual quality. ([AutoRubric-T2I: Robust Rule-Based Reward Model for Text-to-Image Alignment](https://huggingface.co/papers/2605.17602)) I'm not the author of the paper. &#32; submitted by &#32; /u/AIDivision [link] &#32; [comments]. ([arXiv:2605.22668](https://arxiv.org/abs/2605.22668)) Diffusion transformers (DiTs) have emerged as a dominant architecture for text-to-image generation, yet their performance drops when generating at resolutions beyond their training range. ([SEGA: Spectral-Energy Guided Attention for Resolution Extrapolation in Diffusion Transformers](https://huggingface.co/papers/2605.22668)) Additional coverage spans 74 more items across 23 source domains.",
+      "insight": "This matters because visual generation is shifting from novelty outputs toward controllable production workflows. The multi-source signal suggests builders should watch tools that improve editing precision, repeatability, and model integration.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.17602.png",
+      "sources": [
+        {
+          "title": "Built an interactive SAM mask generator on Google Colab. Click any object and get clean segmentation masks instantly.",
+          "url": "https://www.reddit.com/r/computervision/comments/1thujl0/built_an_interactive_sam_mask_generator_on_google",
+          "type": "reddit"
+        },
+        {
+          "title": "rohitchoudharymanth/sam-mask-generator",
+          "url": "https://github.com/rohitchoudharymanth/sam-mask-generator",
+          "type": "github"
+        },
+        {
+          "title": "sam interactive.ipynb",
+          "url": "https://colab.research.google.com/github/rohitchoudharymanth/sam-mask-generator/blob/main/sam_interactive.ipynb",
+          "type": "official"
+        },
+        {
+          "title": "AutoRubric-T2I: Robust Rule-Based Reward Model for Text-to-Image Alignment",
+          "url": "https://huggingface.co/papers/2605.17602",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "text-to-image generation",
+        "Vision-Language Model judges",
+        "Bradley-Terry preference models",
+        "rubric learning",
+        "$\\ell_1$-Regularized Logistic Regression Refiner",
+        "reward models",
+        "Flow-GRPO",
+        "diffusion models"
+      ]
+    },
+    {
+      "title": "3D Gaussian Splatting: Tools & Reconstruction",
+      "slug": "gaussian-splatting-tools-reconstruction",
+      "summary": "Robust training and validation of Autonomous Driving Systems (ADS) require massive, diverse datasets. ([Sensor2Sensor: Cross-Embodiment Sensor Conversion for Autonomous Driving](https://huggingface.co/papers/2605.22809)) Multimodal Large Language Models (MLLMs) have made rapid progress in spatial intelligence, yet existing spatial reasoning benchmarks largely assume pristine visual inputs and overlook the degradations that commonly occu…. ([SpaceDG: Benchmarking Spatial Intelligence under Visual Degradation](https://huggingface.co/papers/2605.22536)) Many public buildings provide floorplans with a \"you are here\" indicator to help visitors orient themselves. Floorplan localization seeks to computationally replicate this capability by determining where visual observations were captured within a floorplan. ([SceneAligner: 3D-Grounded Floorplan Localization in the Wild](https://huggingface.co/papers/2605.22581)) Additional coverage spans 30 more items across 15 source domains.",
+      "insight": "This matters because Gaussian splatting progress is increasingly judged by usable pipelines, not just reconstruction quality. The multi-source signal points to continued movement from research artifacts toward viewers, mesh conversion, and production workflows.",
+      "image_url": "https://cdn-thumbnails.huggingface.co/social-thumbnails/papers/2605.22536.png",
+      "sources": [
+        {
+          "title": "Sensor2Sensor: Cross-Embodiment Sensor Conversion for Autonomous Driving",
+          "url": "https://huggingface.co/papers/2605.22809",
+          "type": "paper"
+        },
+        {
+          "title": "SpaceDG: Benchmarking Spatial Intelligence under Visual Degradation",
+          "url": "https://huggingface.co/papers/2605.22536",
+          "type": "paper"
+        },
+        {
+          "title": "SceneAligner: 3D-Grounded Floorplan Localization in the Wild",
+          "url": "https://huggingface.co/papers/2605.22581",
+          "type": "paper"
+        },
+        {
+          "title": "Linked two Gaussian Splat scenes with a walk-through portal — no teleport, you just walk between worlds",
+          "url": "https://www.reddit.com/r/gaussiansplatting/comments/1tggn69/linked_two_gaussian_splat_scenes_with_a",
+          "type": "reddit"
+        }
+      ],
+      "tags": [
+        "Multimodal Large Language Models",
+        "spatial intelligence",
+        "degradation-aware spatial understanding",
+        "3D Gaussian Splatting",
+        "visual degradation",
+        "VQA instances",
+        "human-verified benchmark",
+        "finetuning"
+      ]
+    },
+    {
+      "title": "Generative 3D Worlds: Explorable World Models",
+      "slug": "generative-3d-worlds-explorable-world-models",
+      "summary": "World models learn compact latent representations for planning without pixel reconstruction. LeWorldModel (LeWM), from LeCun's group at NYU, achieves stable end-to-end JEPA training by enforcing an isotropic Gaussian prior over the full latent space. ([2605.09241](https://arxiv.org/pdf/2605.09241)) Simulation-ready physical 3D assets have emerged as a promising direction owing to their broad applicability in downstream tasks. ([PhysX-Omni: Unified Simulation-Ready Physical 3D Generation for Rigid, Deformable, and Articulated Objects](https://huggingface.co/papers/2605.21572)) Autoregressive video diffusion models have enabled real-time, action-conditioned world generation. However, sustaining a persistent world, where revisiting a previously seen viewpoint yields consistent content, remains an open problem. ([WorldKV: Efficient World Memory with World Retrieval and Compression](https://huggingface.co/papers/2605.22718)) Additional coverage spans 2 more items across 6 source domains.",
+      "insight": "This matters because world-generation systems are moving from rendered clips toward persistent spaces that can be explored, edited, and exported into production tools. The multi-source signal is worth tracking for signs that 3D asset creation and simulation workflows are becoming model-driven.",
+      "image_url": null,
+      "sources": [
+        {
+          "title": "Sub-JEPA: a simple fix to LeCun group's LeWorldModel that consistently improves performance [P]",
+          "url": "https://www.reddit.com/r/machinelearning/comments/1tgn3bz/subjepa_a_simple_fix_to_lecun_groups_leworldmodel",
+          "type": "reddit"
+        },
+        {
+          "title": "overview.png",
+          "url": "https://kaizhao.net/images/projects/sub-jepa/overview.png",
+          "type": "project"
+        },
+        {
+          "title": "cube.gif",
+          "url": "https://kaizhao.net/images/projects/sub-jepa/cube.gif",
+          "type": "project"
+        },
+        {
+          "title": "sub-jepa",
+          "url": "https://kaizhao.net/sub-jepa",
+          "type": "project"
+        }
+      ],
+      "tags": [
+        "machinelearning",
+        "generative-3d-worlds"
+      ]
+    }
+  ],
+  "notable": [
+    {
+      "title": "[R] FIKA-Bench: From Fine-grained Recognition to Fine-Grained Knowledge Acquisition",
+      "summary": "We are releasing FIKA-Bench: From Fine-grained Recognition to Fine-Grained Knowledge Acquisition , a benchmark for evaluating whether multimodal agents like OpenClaw can actively acquire fine-grained knowledge from external evidence. The motivation is that many fine-grained visual recognition benchmarks are still close to a closed-set classification setting: given an image, the model is expected to output a label that is often covered by training data, benchmark priors, or memorized visual patterns. FIKA-Bench focuses on a different ability: Can an agent look at an unfamiliar fine-grained visual target, search for relevant external evidence, verify that evidence, and use it to produce the exact fine-grained answer? This is especially important for cases where visual appearance alone is insufficient. Identifying the exact product brand, vehicle model, landmark, artifact, or biological species may require combining visual cues with web evidence rather than relying only on the image. The benchmark contains 311 samples across 4 broad domains : Product Nature Transport Culture It includes 17 subcategories and 228 fine-grained answers . Each retained sample has manually verified evidence supporting the gold answer. Public-source samples are additionally screened for leakage through model checks, reverse-image-search inspection, and human verification, so that success is less likely to come from directly memorized benchmark images. We evaluate both standard multimodal models and agent-based systems. The agent setting is the main focus: the agent is expected to search, inspect retrieved evidence, and answer with the required fine-grained specificity. Under strict LLM-as-judge evaluation, the task remains challenging: the best evaluated system reaches 25.1% overall strict accuracy , and no system exceeds 30%. Resources: Paper: Code: Dataset: Project page: The code supports API evaluation, local model evaluation, and agent evaluation with OpenClaw/OpenCode. We provide an Apptainer-based reproduction path for running Qwen3-VL and agent experiments on shared servers. &#32; submitted by &#32; /u/oking9 [link] &#32; [comments]. ([arXiv:2605.13193](https://arxiv.org/abs/2605.13193))",
+      "sources": [
+        {
+          "title": "[R] FIKA-Bench: From Fine-grained Recognition to Fine-Grained Knowledge Acquisition",
+          "url": "https://www.reddit.com/r/computervision/comments/1tjihnk/r_fikabench_from_finegrained_recognition_to",
+          "type": "reddit"
+        },
+        {
+          "title": "arXiv:2605.13193",
+          "url": "https://arxiv.org/abs/2605.13193",
+          "type": "paper"
+        },
+        {
+          "title": "ligeng0197/fika-bench",
+          "url": "https://github.com/ligeng0197/fika-bench",
+          "type": "github"
+        },
+        {
+          "title": "oking0197/fika-bench (dataset)",
+          "url": "https://huggingface.co/datasets/oking0197/fika-bench/tree/main",
+          "type": "huggingface"
+        },
+        {
+          "title": "ligeng0197/fika-bench.github.io",
+          "url": "https://ligeng0197.github.io/fika-bench.github.io",
+          "type": "project"
+        }
+      ],
+      "tags": [
+        "computervision",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Maestro: Reinforcement Learning to Orchestrate Hierarchical Model-Skill Ensembles",
+      "summary": "The proliferation of large language models (LLMs) and modular skills has endowed autonomous agents with increasingly powerful capabilities. Existing frameworks typically rely on monolithic LLMs and fixed logic to interface with these skills. This gives rise to a critical bottleneck: different LLMs offer distinct advantages across diverse domains, yet current frameworks fail to exploit the complementary strengths of models and skills, thereby limiting their performance on downstream tasks. In this paper, we present Maestro (Multimodal Agent for Expert-Skill Targeted Reinforced Orchestration), a Reinforcement Learning (RL)-driven orchestration framework that reframes heterogeneous multimodal tasks as a sequential decision-making process over a hierarchical model-skill registry. Rather than consolidating all knowledge into a single model, Maestro trains a lightweight policy to dynamically compose ensembles of frozen expert models and a two-tier skill library, deciding at each step whether to invoke an external expert, which model-skill pair to select, and when to terminate. The policy is optimized via outcome-based RL, requiring no step-level supervision. We evaluate Maestro across ten representative multimodal benchmarks spanning mathematical reasoning, chart understanding, high-resolution perception, and domain-specific analysis. With only a 4B orchestrator, Maestro achieves an average accuracy of 70.1%, surpassing both GPT-5 (69.3%) and Gemini-2.5-Pro (68.7%). Crucially, the learned coordination policy generalizes to unseen models and skills without retraining: augmenting the registry with out-of-domain experts yields a 59.5% average on four challenging benchmarks, outperforming all closed-source baselines. Maestro further maintains high computational efficiency with low latency. The source code is available at. ([Maestro: Reinforcement Learning to Orchestrate Hierarchical Model-Skill Ensembles](https://huggingface.co/papers/2605.22177))",
+      "sources": [
+        {
+          "title": "Maestro: Reinforcement Learning to Orchestrate Hierarchical Model-Skill Ensembles",
+          "url": "https://huggingface.co/papers/2605.22177",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "large language models",
+        "autonomous agents",
+        "Reinforcement Learning",
+        "multimodal tasks",
+        "hierarchical model-skill registry",
+        "policy optimization",
+        "ensemble learning",
+        "sequential decision-making",
+        "external expert invocation",
+        "outcome-based RL",
+        "computational efficiency",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "TransitLM: A Large-Scale Dataset and Benchmark for Map-Free Transit Route Generation",
+      "summary": "Public transit route planning traditionally depends on structured map infrastructure and complex routing engines, and no existing dataset supports training models to bypass this dependency. We present TransitLM, a large-scale dataset of over 13 million transit route planning records from four Chinese cities covering 120,845 stations and 13,666 lines, released as a continual pre-training corpus and benchmark data for three evaluation tasks with complementary metrics. Experiments show that an LLM trained on TransitLM produces structurally valid routes at high accuracy and implicitly grounds arbitrary GPS coordinates to appropriate stations without any explicit mapping. These results demonstrate that transit route planning can be learned entirely from data, enabling end-to-end, map-free route generation directly from origin-destination information. The dataset and benchmark are available at with evaluation code at. ([TransitLM: A Large-Scale Dataset and Benchmark for Map-Free Transit Route Generation](https://huggingface.co/papers/2605.22355))",
+      "sources": [
+        {
+          "title": "TransitLM: A Large-Scale Dataset and Benchmark for Map-Free Transit Route Generation",
+          "url": "https://huggingface.co/papers/2605.22355",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "large language models",
+        "transit route planning",
+        "structured map infrastructure",
+        "routing engines",
+        "continual pre-training",
+        "evaluation tasks",
+        "GPS coordinates",
+        "origin-destination information",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "Spreadsheet-RL: Advancing Large Language Model Agents on Realistic Spreadsheet Tasks via Reinforcement Learning",
+      "summary": "Spreadsheet systems (e.g., Microsoft Excel, Google Sheets) play a central role in modern data-centric workflows. As AI agents grow increasingly capable of automating complex tasks, such as controlling computers and generating presentations, building an AI-driven spreadsheet agent has emerged as a promising research direction. Most existing spreadsheet agents rely on specialized prompting over general-purpose LLMs; while this design has potentials on simple spreadsheet operations, it struggles to manage the complex, multi-step workflows typical of real-world applications. We introduce Spreadsheet-RL, a reinforcement learning (RL) fine-tuning framework designed to train specialized spreadsheet agents within a realistic Microsoft Excel environment. Spreadsheet-RL features an automated pipeline for scalable collection of paired start-goal spreadsheets from online forums, as well as domain-specific evaluation tasks in areas such as finance and supply chain management, which we compile into the new Domain-Spreadsheet benchmark dataset. It also includes a Spreadsheet Gym environment designed for multi-turn RL: Spreadsheet Gym exposes extensive Excel functionality through a Python sandbox, along with a refined harness that incorporates a comprehensive tool set and carefully designed tool-routing rules for spreadsheet tasks. Through comprehensive experiments, we show that Spreadsheet-RL substantially enhances AI agent's performance on both general and domain-specific spreadsheet tasks: it improves Qwen3-4B-Thinking-2507's Pass@1 on SpreadsheetBench from 12.0% to 23.4%, and raises Pass@1 from 8.4% to 17.2% on our curated Domain-Spreadsheet dataset. These results highlight Spreadsheet-RL's strong potential for generalization and real-world adoption in spreadsheet automation, and broadly, its promise for advancing LLM-based interactions with data interfaces in everyday work. ([Spreadsheet-RL: Advancing Large Language Model Agents on Realistic Spreadsheet Tasks via Reinforcement Learning](https://huggingface.co/papers/2605.22642))",
+      "sources": [
+        {
+          "title": "Spreadsheet-RL: Advancing Large Language Model Agents on Realistic Spreadsheet Tasks via Reinforcement Learning",
+          "url": "https://huggingface.co/papers/2605.22642",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "reinforcement learning",
+        "fine-tuning",
+        "spreadsheet agents",
+        "Microsoft Excel",
+        "automated pipeline",
+        "domain-specific evaluation",
+        "Domain-Spreadsheet benchmark",
+        "Spreadsheet Gym",
+        "multi-turn RL",
+        "tool-routing rules",
+        "Pass@1",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "ClinSeekAgent: Automating Multimodal Evidence Seeking for Agentic Clinical Reasoning",
+      "summary": "Large language models (LLMs) and agentic systems have shown promise for clinical decision support, but existing works largely assume that evidence has already been curated and handed to the model. Real-world clinical workflows instead require agents to actively seek, iteratively plan, and synthesize multimodal evidence from heterogeneous sources. In this paper, we introduce ClinSeekAgent, an automated agentic framework for dynamic multimodal evidence seeking that shifts the paradigm from passive evidence consumption to active evidence acquisition. Given only a clinical query and access to raw data sources, ClinSeekAgent gathers evidence by querying medical knowledge bases, navigating raw EHRs, and invoking medical imaging tools; refines its hypotheses as new information emerges; and integrates the collected evidence into grounded clinical decisions. ClinSeekAgent serves both as an inference-time agent for frontier LLMs and as a training-time pipeline for distilling high-quality agent trajectories into compact open-source models. To validate its inference-time effectiveness, we construct ClinSeek-Bench, which pairs Curated Input reasoning from fixed pre-selected evidence with Automated Evidence-Seeking over raw clinical data. On text-only EHR tasks, ClinSeekAgent improves Claude Opus 4.6 from 60.0 to 63.2 overall F1 and MiniMax M2.5 from 43.1 to 47.3, with positive risk-prediction gains in 7 out of 9 evaluated host models. On multimodal tasks, ClinSeekAgent improves Claude Opus 4.6 from 47.5 to 62.6 (+15.1); all evaluated models improve across the three CXR-related task groups. We further validate ClinSeekAgent as a training pipeline by distilling agentic evidence-seeking trajectories into ClinSeek-35B-A3B, which achieves 34.0 average F1 on existing AgentEHR-Bench, improving over its Qwen3.5-35B-A3B baseline by +11.9 points and approaching Claude Opus 4.6. ([ClinSeekAgent: Automating Multimodal Evidence Seeking for Agentic Clinical Reasoning](https://huggingface.co/papers/2605.20176))",
+      "sources": [
+        {
+          "title": "ClinSeekAgent: Automating Multimodal Evidence Seeking for Agentic Clinical Reasoning",
+          "url": "https://huggingface.co/papers/2605.20176",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "large language models",
+        "agentic systems",
+        "clinical decision support",
+        "multimodal evidence seeking",
+        "automated agentic framework",
+        "medical knowledge bases",
+        "electronic health records",
+        "medical imaging tools",
+        "hypothesis refinement",
+        "grounded clinical decisions",
+        "inference-time agent",
+        "training-time pipeline",
+        "agent trajectories",
+        "compact open-source models",
+        "ClinSeek-Bench",
+        "AgentEHR-Bench",
+        "ai-agents"
+      ]
+    },
+    {
+      "title": "π-Bench: Evaluating Proactive Personal Assistant Agents in Long-Horizon Workflows",
+      "summary": "The rise of personal assistant agents, e.g., OpenClaw, highlights the growing potential of large language models to support users across everyday life and work. A core challenge in these settings is proactive assistance, since users often begin with underspecified requests and leave important needs, constraints, or preferences unstated. However, existing benchmarks rarely evaluate whether agents can identify and act on such hidden intents before they are explicitly stated, especially in sustained multi-turn interactions where user needs emerge gradually. To address this gap, we introduce π-Bench, a benchmark for proactive assistance comprising 100 multi-turn tasks across 5 domain-specific user personas. By incorporating hidden user intents, inter-task dependencies, and cross-session continuity, π-Bench evaluates agents' ability to anticipate and address user needs over extended interactions, jointly measuring proactivity and task completion in long-horizon trajectories that better reflect real-world use. Experiments show (1) proactive assistance remains challenging, (2) a clear distinction between task completion and proactivity, and (3) the value of prior interaction for proactive intent resolution in later tasks. ([π-Bench: Evaluating Proactive Personal Assistant Agents in Long-Horizon Workflows](https://huggingface.co/papers/2605.14678))",
+      "sources": [
+        {
+          "title": "π-Bench: Evaluating Proactive Personal Assistant Agents in Long-Horizon Workflows",
+          "url": "https://huggingface.co/papers/2605.14678",
+          "type": "paper"
+        }
+      ],
+      "tags": [
+        "personal assistant agents",
+        "large language models",
+        "proactive assistance",
+        "user intents",
+        "multi-turn interactions",
+        "domain-specific user personas",
+        "long-horizon trajectories",
+        "task completion",
+        "proactivity",
+        "ai-agents"
+      ]
+    }
+  ]
+}
