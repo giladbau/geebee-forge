@@ -4,6 +4,7 @@ const pathname = Astro.url.pathname;
 const demos = [
   { href: '/unicorn-farm', label: 'Unicorn Farm' },
   { href: '/growing-tree', label: 'Growing Tree' },
+  { href: '/ascii-number-video', label: 'ASCII Video' },
   { href: '/receipt', label: 'Receipt' },
   { href: '/wandering-inn', label: 'Wandering Inn' },
 ];
@@ -127,6 +128,7 @@ const archive = [
 
   .nav-links {
     gap: 0.85rem;
+    min-width: 0;
   }
 
   .demo-links,
@@ -177,8 +179,22 @@ const archive = [
       display: none;
     }
 
+    .global-nav {
+      gap: 0.4rem;
+    }
+
+    .left {
+      flex: 0 0 auto;
+    }
+
     .nav-links {
       gap: 0.35rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .nav-links::-webkit-scrollbar {
+      display: none;
     }
 
     .archive-links {
