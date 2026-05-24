@@ -5,13 +5,13 @@ import { getDefaultSubjectsConfig } from './subjects.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const repoRoot = path.resolve(__dirname, '../../..');
+const repoRoot = path.resolve(__dirname, '../../../../..');
 const stateRoot = process.env.DIGEST_STATE_ROOT || '/home/gilad/work/geebee-forge-digest';
 const configPath = path.join(stateRoot, 'config.json');
 
 export const DEFAULT_CONFIG = {
   repo_path: repoRoot,
-  publish_path: 'src/lib/digest-data',
+  publish_path: 'src/lib/archive/digest-data',
   sources: {
     reddit: { enabled: true, subreddits: [], min_score: 50, window_days: 7 },
     x_following: { enabled: true, window_days: 7 },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dedupeItems } from '../../../scripts/digest/shared/dedupe.mjs';
+import { dedupeItems } from '../../scripts/digest/shared/dedupe.mjs';
 
 describe('digest dedupe', () => {
 	it('collapses exact duplicate source ids', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPreviewDigest } from '../../../scripts/digest/shared/render.mjs';
+import { buildPreviewDigest } from '../../scripts/digest/shared/render.mjs';
 
 const items = [
   {

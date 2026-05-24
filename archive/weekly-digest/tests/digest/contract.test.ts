@@ -1,4 +1,4 @@
-import digest20260329 from '../digest-data/2026-03-29.json';
+import digest20260329 from '../../../../src/lib/archive/digest-data/2026-03-29.json';
 import { describe, expect, it } from 'vitest';
 import { validateDigestContract } from './contract';
 
