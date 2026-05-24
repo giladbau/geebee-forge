@@ -3,7 +3,7 @@ import {
 	normalizeHuggingFacePaper,
 	normalizeRedditPost,
 	normalizeXPost
-} from '../../../scripts/digest/shared/normalize.mjs';
+} from '../../scripts/digest/shared/normalize.mjs';
 
 describe('digest normalization', () => {
 	it('normalizes a reddit post into the canonical item shape', () => {

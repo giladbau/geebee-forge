@@ -5,7 +5,7 @@ import { normalizeSource } from './shared/render.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataDir = path.resolve(__dirname, '../../src/lib/digest-data');
+const dataDir = path.resolve(__dirname, '../../../../src/lib/archive/digest-data');
 
 async function main() {
   const entries = (await fs.readdir(dataDir))

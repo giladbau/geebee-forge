@@ -21,7 +21,7 @@
   - `constellation/` — Three.js star field
   - `unicorn-farm/` — Threlte 3D farm scene
   - `alerts/` — AlertsDashboard + AlertsMap (Chart.js, Leaflet)
-  - `digest/` — DigestBrowser (tag filtering)
+  - `archive/digest/` — retired DigestBrowser for historical issues only
 - **Worker**: `worker/` — standalone CF Worker for alerts API
   - `worker/src/index.ts` — fetch handler with URL routing
   - `worker/src/routes/` — one handler per API endpoint
@@ -30,6 +30,7 @@
 - **Layout**: `src/layouts/BaseLayout.astro` — shared HTML shell + global styles
 - **Lib**: `src/lib/` — shared utils, data files (frontend only)
 - **Static**: `public/` (was `static/` in SvelteKit)
+- **Archive**: retired forge surfaces live under `/archive/*` routes and archive-labeled navigation/homepage sections.
 
 ## Todoist
 Track all work in the **🤖 Data Dev** project via the Todoist MCP tool (configured in your MCP servers).

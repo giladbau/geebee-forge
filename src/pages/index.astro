@@ -14,12 +14,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 			</article>
 
 			<article role="article" data-testid="demo-card" class="card">
-				<h2 data-testid="card-title">Digest</h2>
-				<p class="card-desc">Weekly signal from the noise — AI, 3D, and the tools that matter.</p>
-				<a href="/digest" class="card-link">Read the Digest</a>
-			</article>
-
-			<article role="article" data-testid="demo-card" class="card">
 				<h2 data-testid="card-title">Receipt</h2>
 				<p class="card-desc">Interactive 3D cloth-simulated paper receipt. Grab and drag it.</p>
 				<a href="/receipt" class="card-link">Play with Receipt</a>
@@ -41,6 +35,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 		<section class="archive-section" aria-labelledby="archive-heading">
 			<h2 id="archive-heading">Archive</h2>
 			<div class="grid archive-grid">
+				<article role="article" data-testid="demo-card" class="card archive-card">
+					<h3 data-testid="card-title">Digest</h3>
+					<p class="card-desc">Historical weekly AI, 3D, and tools signal digests.</p>
+					<a href="/archive/digest" class="card-link">Open Digest Archive</a>
+				</article>
+
 				<article role="article" data-testid="demo-card" class="card archive-card">
 					<h3 data-testid="card-title">Rocket Alerts</h3>
 					<p class="card-desc">Israel rocket alert statistics dashboard.</p>

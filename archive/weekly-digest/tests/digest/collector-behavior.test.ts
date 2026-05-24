@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { collectHuggingFaceDailyPapers } from '../../../scripts/digest/sources/huggingface-papers.mjs';
-import { collectRedditSource } from '../../../scripts/digest/sources/reddit.mjs';
-import { parseBookmarkSearchTimelineToItems } from '../../../scripts/digest/shared/x-bookmarks-parse.mjs';
+import { collectHuggingFaceDailyPapers } from '../../scripts/digest/sources/huggingface-papers.mjs';
+import { collectRedditSource } from '../../scripts/digest/sources/reddit.mjs';
+import { parseBookmarkSearchTimelineToItems } from '../../scripts/digest/shared/x-bookmarks-parse.mjs';
 
 describe('digest source collectors', () => {
 	it('extracts HuggingFace paper ids from the real nested daily papers shape', async () => {

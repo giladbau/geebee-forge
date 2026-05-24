@@ -233,8 +233,8 @@
 
 <div class="digest-page">
 	<header class="page-header">
-		<h1>Digest</h1>
-		<p class="tagline">Weekly signal from the noise — AI, 3D, and the tools that matter.</p>
+		<h1>Digest Archive</h1>
+		<p class="tagline">Retired weekly signal from the noise — AI, 3D, and the tools that mattered.</p>
 	</header>
 
 	<div class="filter-actions">

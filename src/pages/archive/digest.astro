@@ -1,8 +1,8 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import DigestBrowser from '../components/svelte/digest/DigestBrowser.svelte';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import DigestBrowser from '../../components/svelte/archive/digest/DigestBrowser.svelte';
 
-const modules = import.meta.glob('/src/lib/digest-data/*.json', { eager: true });
+const modules = import.meta.glob('/src/lib/archive/digest-data/*.json', { eager: true });
 
 interface Digest {
 	week: string;
@@ -20,6 +20,6 @@ const digests: Digest[] = Object.entries(modules).map(([path, mod]) => {
 
 digests.sort((a, b) => b.published_at.localeCompare(a.published_at));
 ---
-<BaseLayout title="Digest — GeeBee Forge">
+<BaseLayout title="Digest Archive — GeeBee Forge">
 	<DigestBrowser digests={digests} client:load />
 </BaseLayout>

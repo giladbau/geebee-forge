@@ -7,7 +7,7 @@ import {
 	markAccumulationRun,
 	markCompileRun,
 	filterItemsNewerThan
-} from '../../../scripts/digest/shared/pool.mjs';
+} from '../../scripts/digest/shared/pool.mjs';
 
 describe('digest pool helpers', () => {
 	it('creates an empty active pool', () => {

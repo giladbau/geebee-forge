@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { classifyDigestItem, collectSubjectCounts } from '../../../scripts/digest/shared/subjects.mjs';
+import { classifyDigestItem, collectSubjectCounts } from '../../scripts/digest/shared/subjects.mjs';
 
 const config = {
   enabled: true,
