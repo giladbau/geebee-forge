@@ -1,0 +1,7 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ShapeSudoku from '../components/svelte/shape-sudoku/ShapeSudoku.svelte';
+---
+<BaseLayout title="Shape Sudoku | GeeBee Forge">
+	<ShapeSudoku client:only="svelte" />
+</BaseLayout>
