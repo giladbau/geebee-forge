@@ -1,14 +1,14 @@
 <script module lang="ts">
 	export const SHAPES = [
-		{ name: 'triangle', color: '#e45756' },
-		{ name: 'square', color: '#2f80ed' },
-		{ name: 'faceted heart', color: '#d94f9d' },
-		{ name: 'star', color: '#f2b134' },
-		{ name: 'pentagon', color: '#27ae60' },
-		{ name: 'hexagon', color: '#8e5cc7' },
-		{ name: 'cross', color: '#e67e22' },
-		{ name: 'trapezoid', color: '#16a6a1' },
-		{ name: 'arrow', color: '#6c63d9' },
+		{ name: 'triangle', color: '#D97872' },
+		{ name: 'square', color: '#6489C4' },
+		{ name: 'faceted heart', color: '#C8759E' },
+		{ name: 'star', color: '#C99C43' },
+		{ name: 'pentagon', color: '#6C9B79' },
+		{ name: 'hexagon', color: '#8976B6' },
+		{ name: 'cross', color: '#CE8559' },
+		{ name: 'trapezoid', color: '#559995' },
+		{ name: 'arrow', color: '#7376B5' },
 	] as const;
 </script>
 
@@ -48,6 +48,6 @@
 		height: 100%;
 		overflow: visible;
 		pointer-events: none;
-		filter: drop-shadow(0 2px 1px rgba(24, 33, 51, 0.14));
+		filter: drop-shadow(0 1px 0 rgba(38, 51, 49, 0.12));
 	}
 </style>

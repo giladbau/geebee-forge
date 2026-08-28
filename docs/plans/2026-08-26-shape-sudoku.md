@@ -251,3 +251,4 @@ Use `showModal()` and platform focus semantics where available. Keep a small exp
 6. Serve `dist/` and browser-exercise place, replace, erase, hint, conflict, reset, New Puzzle, size change, move-completion, hint-completion, both modal actions, Escape, focus restoration, rapid cancellation, offline-after-load, and reduced motion.
 7. Capture desktop and mobile screenshots for visual review against `docs/design/shape-sudoku/quiet-garden-preview.html`.
 8. Run `git diff --check` and review the final diff for scope. Do not commit or push until the user approves the implemented skin.
+
