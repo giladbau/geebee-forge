@@ -700,6 +700,7 @@
 	.grid button {
 		position: relative;
 		display: grid;
+		aspect-ratio: 1;
 		min-width: 0;
 		min-height: 0;
 		padding: 6px;

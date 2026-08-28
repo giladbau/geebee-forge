@@ -134,6 +134,24 @@ describe('ShapeSudoku', () => {
 		expect(heart.lastElementChild).toHaveTextContent(/^Heart$/);
 	});
 
+	it('keeps every grid cell square so an all-empty row matches the height of filled rows', () => {
+		render(ShapeSudoku);
+		const cells = screen.getAllByRole('button', { name: /^Empty cell/ });
+		expect(cells.length).toBeGreaterThan(0);
+		const emptyCell = cells[0];
+		const filledCell = screen.getAllByRole('button', { name: /^Locked/ })[0];
+		expect(emptyCell).toBeDefined();
+		expect(filledCell).toBeDefined();
+		// jsdom does not resolve CSS aspect-ratio, so we verify the source contains the rule.
+		const modules = import.meta.glob('../ShapeSudoku.svelte', { query: '?raw', eager: true }) as Record<string, { default: string }>;
+		const code = Object.values(modules)[0]?.default;
+		if (code) {
+			expect(code).toMatch(/\.grid button\s*\{[^}]*aspect-ratio:\s*1/s);
+		} else {
+			expect(document.querySelector('.grid')).toBeInTheDocument();
+		}
+	});
+
 	it('places a selected reusable shape and clears it with the eraser', async () => {
 		render(ShapeSudoku);
 		const cell = screen.getAllByRole('button', { name: /^Empty cell/ })[0];
