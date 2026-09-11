@@ -9,6 +9,10 @@ const demos = [
   { href: '/wandering-inn', label: 'Wandering Inn' },
 ];
 
+const labs = [
+  { href: '/shape-sudoku-lab', label: 'Shape Sudoku Lab' },
+];
+
 const archive = [
   { href: '/archive/digest', label: 'Digest' },
   { href: '/alerts', label: 'Alerts' },
@@ -33,6 +37,18 @@ const archive = [
         <a
           href={href}
           class:list={['demo-link', { active: pathname.startsWith(href) }]}
+        >
+          {label}
+        </a>
+      ))}
+    </div>
+
+    <div class="lab-links" aria-label="Labs">
+      <span class="lab-label">Lab</span>
+      {labs.map(({ href, label }) => (
+        <a
+          href={href}
+          class:list={['demo-link', 'lab-link', { active: pathname.startsWith(href) }]}
         >
           {label}
         </a>
@@ -121,6 +137,7 @@ const archive = [
 
   .nav-links,
   .demo-links,
+  .lab-links,
   .archive-links {
     display: flex;
     align-items: center;
@@ -131,15 +148,18 @@ const archive = [
   }
 
   .demo-links,
+  .lab-links,
   .archive-links {
     gap: 0.25rem;
   }
 
+  .lab-links,
   .archive-links {
     padding-left: 0.85rem;
     border-left: 1px solid rgba(255, 255, 255, 0.08);
   }
 
+  .lab-label,
   .archive-label {
     color: #555;
     font-size: 0.68rem;
@@ -171,6 +191,10 @@ const archive = [
 
   .archive-link {
     color: #555;
+  }
+
+  .lab-link {
+    color: #6b7a8f;
   }
 
   @media (max-width: 500px) {
