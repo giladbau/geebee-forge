@@ -273,6 +273,7 @@
 			function pointerDown(e: PointerEvent) {
 				if (!penMode || e.pointerType !== 'pen') return;
 				e.preventDefault();
+				try { inkCanvas.setPointerCapture(e.pointerId); } catch {}
 				startStroke(...getXY(e) as [number, number]);
 			}
 			function pointerMove(e: PointerEvent) {
@@ -283,6 +284,7 @@
 			function pointerUp(e: PointerEvent) {
 				if (!penMode || e.pointerType !== 'pen' || state.current.length === 0) return;
 				e.preventDefault();
+				try { inkCanvas.releasePointerCapture(e.pointerId); } catch {}
 				addPoint(...getXY(e) as [number, number]);
 				const scratchCandidate = state.current.length > 0 ? state.current : state.strokes[state.strokes.length - 1];
 				if (state.strokes.length > 0 && isScratch(scratchCandidate)) {
@@ -293,8 +295,9 @@
 			}
 
 			inkCanvas.addEventListener('pointerdown', pointerDown);
-			window.addEventListener('pointermove', pointerMove);
-			window.addEventListener('pointerup', pointerUp);
+			inkCanvas.addEventListener('pointermove', pointerMove);
+			inkCanvas.addEventListener('pointerup', pointerUp);
+			inkCanvas.addEventListener('pointercancel', pointerUp);
 
 			renderInk();
 			return tile;
@@ -333,8 +336,7 @@
 		});
 
 		return () => {
-			window.removeEventListener('pointermove', pointerMove);
-			window.removeEventListener('pointerup', pointerUp);
+			// per-tile listeners are discarded with the DOM elements
 		};
 	});
 
@@ -402,8 +404,10 @@
 		border-radius: 12px;
 		border: 2px solid rgba(255,255,255,0.08);
 		overflow: hidden;
+		touch-action: none;
+		user-select: none;
 	}
-	.tile :global(canvas) { position: absolute; inset: 0; width: 100%; height: 100%; }
+	.tile :global(canvas) { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
 	.tile :global(.overlay) {
 		position: absolute; inset: 0; pointer-events: none; opacity: 0;
 		transition: opacity 0.18s ease;
