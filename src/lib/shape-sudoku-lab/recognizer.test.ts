@@ -20,6 +20,16 @@ describe('diagnostic contract (synthetic inputs)', () => {
     expect(recognizer.recognize(drawingFixtures[0].strokes).rejectionReasons).toEqual([]);
   });
 });
+describe('rotation and aspect without lowering rejection gates', () => {
+  for (const angle of [10, -20, 45]) it(`tilted square ${angle}`, () => {
+    const a=angle*Math.PI/180;
+    const points=[[15,15],[85,15],[85,85],[15,85],[15,15]].map(([x,y]) => [50+(x-50)*Math.cos(a)-(y-50)*Math.sin(a),50+(x-50)*Math.sin(a)+(y-50)*Math.cos(a)]);
+    expect(recognizer.recognize(points).name).toBe('square');
+  });
+  it('tall freehand rectangle remains square', () => {
+    expect(recognizer.recognize([[[25,10],[75,10],[75,90],[25,90],[25,10]]]).name).toBe('square');
+  });
+});
 describe('canonical compatibility', () => {
   for (const [index, template] of allCanonical(64).entries()) {
     it(`${template.name} variant ${index}`, () => {

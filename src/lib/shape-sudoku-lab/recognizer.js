@@ -88,7 +88,15 @@ function cloud(strokes, count) {
   return [...unique.values()];
 }
 function distance(a, b) {
-  const directed = (from, to) => from.reduce((sum, p) => sum + Math.min(...to.map(q => (p[0]-q[0])**2 + (p[1]-q[1])**2)), 0) / from.length;
+  const directed = (from, to) => {
+    let sum = 0;
+    for (const p of from) {
+      let nearest = Infinity;
+      for (const q of to) nearest = Math.min(nearest, (p[0]-q[0])**2 + (p[1]-q[1])**2);
+      sum += nearest;
+    }
+    return sum / from.length;
+  };
   return Math.sqrt((directed(a,b) + directed(b,a)) / 2);
 }
 
@@ -109,8 +117,18 @@ export class Recognizer {
     const names = new Set(templates.map(t => t.name));
     const variants = allCanonical(this.sampleCount).filter(t => t.strokes && names.has(t.name));
     for (const t of [...templates, ...variants]) {
-      const forward = cloud(asStrokes(t.strokes ?? t.points), this.sampleCount);
-      this.templates.push({ name: t.name, points: forward });
+      // Match geometry under bounded hand tilt and stretch, rather than forcing
+      // every drawing into the one upright, equal-aspect prototype. Square has
+      // quarter-turn symmetry; line crosses deliberately do not include X.
+      const angles = Array.from({length:t.name === 'square' ? 19 : 9}, (_,i) => i*5-(t.name === 'square' ? 45 : 20));
+      for (const angle of angles) for (const aspect of [0.625,0.7,0.8,0.9,1,1.1,1.25,1.4,1.6]) {
+        const a = angle*Math.PI/180;
+        const transformed = asStrokes(t.strokes ?? t.points).map(s => s.map(([x,y]) => {
+          const px=(x-50)*aspect, py=y-50;
+          return [px*Math.cos(a)-py*Math.sin(a),px*Math.sin(a)+py*Math.cos(a)];
+        }));
+        this.templates.push({ name:t.name, points:cloud(transformed,this.sampleCount) });
+      }
     }
   }
 
@@ -149,7 +167,9 @@ export class Recognizer {
     const ranked = Object.values(distances).sort((a, b) => a - b);
     // A good absolute fit is not enough when two different symbols fit alike.
     const ambiguous = ranked.length > 1 && ranked[1] - ranked[0] < 0.012;
-    const circleDistance = distance(input, circle);
+    // Reject rounded outlines under the same aspect freedom as symbols.
+    const circleDistance = Math.min(...[0.625,0.8,1,1.25,1.6].map(aspect =>
+      distance(input, normalize(circle.map(([x,y]) => [x*aspect,y])))));
     const rejectionReasons = [];
     if (bestDist >= this.uncertainThreshold) rejectionReasons.push('distance-threshold');
     if (ambiguous) rejectionReasons.push('ambiguous-candidates');

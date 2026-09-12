@@ -74,7 +74,11 @@ try {
   await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', ...points[0], button: 'left', buttons: 1, clickCount: 1, pointerType: 'pen' });
   for (const point of points.slice(1)) await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point, button: 'left', buttons: 1, pointerType: 'pen' });
   await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', ...points.at(-1), button: 'left', buttons: 0, clickCount: 1, pointerType: 'pen' });
-  await sleep(1000);
+  // Wait for recognition plus its CSS fade, not a fixed CPU-speed assumption.
+  for (let i=0;i<40;i++) {
+    if (await evaluate(`getComputedStyle(document.querySelector('.tile .overlay')).opacity === '0.45'`)) break;
+    await sleep(100);
+  }
   const recognized = await evaluate(`(() => { const tile = document.querySelector('.tile'), o = tile.querySelector('.overlay'); const r = o.getBoundingClientRect(), t = tile.getBoundingClientRect(); return { label: tile.querySelector('.label').textContent, opacity: getComputedStyle(o).opacity, shape: !!o.querySelector('polygon'), inside: r.x >= t.x && r.y >= t.y && r.right <= t.right && r.bottom <= t.bottom, width: r.width, height: r.height }; })()`);
   console.log('Pen drawing result:', recognized);
   assert.equal(recognized.label, 'triangle');
