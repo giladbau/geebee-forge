@@ -1,0 +1,4 @@
+# Generated evidence from local browser/evaluation runs — keep local, do not commit.
+evidence/*.png
+evidence/*.json
+evidence/*.txt

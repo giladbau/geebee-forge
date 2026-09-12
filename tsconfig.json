@@ -14,5 +14,6 @@
 			"$lib/*": ["./src/lib/*"]
 		}
 	},
-	"include": ["src/**/*", ".astro/types.d.ts"]
+	"include": ["src/**/*", ".astro/types.d.ts"],
+	"exclude": ["src/lib/shape-sudoku-lab/**/*"]
 }

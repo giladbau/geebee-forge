@@ -1,0 +1,769 @@
+{
+  "note": "SYNTHETIC, not human/Pencil samples. Recognition decisions intentionally unchanged. Before diagnostic patch and after.",
+  "before": {
+    "source": "synthetic stress probes, not user drawings",
+    "rows": [
+      {
+        "id": "square rotation=0 aspect=0.65",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07311555718253145,
+        "margin": 0.006171147577676242
+      },
+      {
+        "id": "square rotation=0 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05942980781023906,
+        "margin": 0.009407343641815669
+      },
+      {
+        "id": "square rotation=0 aspect=1",
+        "result": "square",
+        "best": "square",
+        "distance": 0.00652755384066613,
+        "margin": 0.09204495754890081
+      },
+      {
+        "id": "square rotation=0 aspect=1.2",
+        "result": "square",
+        "best": "square",
+        "distance": 0.05940867546200154,
+        "margin": 0.019763016267279332
+      },
+      {
+        "id": "square rotation=0 aspect=1.5",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.09425694719802878,
+        "margin": 0.0013391380565985628
+      },
+      {
+        "id": "square rotation=5 aspect=0.65",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07938484571727912,
+        "margin": 0.0014488072219495385
+      },
+      {
+        "id": "square rotation=5 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.051930702166944696,
+        "margin": 0.004973668868800109
+      },
+      {
+        "id": "square rotation=5 aspect=1",
+        "result": "square",
+        "best": "square",
+        "distance": 0.04470459070949457,
+        "margin": 0.021090085028748408
+      },
+      {
+        "id": "square rotation=5 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06746035366537774,
+        "margin": 0.0008198180091041618
+      },
+      {
+        "id": "square rotation=5 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.08962180589514232,
+        "margin": 0.004954078526604677
+      },
+      {
+        "id": "square rotation=10 aspect=0.65",
+        "result": null,
+        "best": "trapezoid",
+        "distance": 0.08720757553146166,
+        "margin": 0.0015198233265446143
+      },
+      {
+        "id": "square rotation=10 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05837687117355302,
+        "margin": 0.002544343711660603
+      },
+      {
+        "id": "square rotation=10 aspect=1",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05180168707822053,
+        "margin": 0.008166708173702804
+      },
+      {
+        "id": "square rotation=10 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06652883172609753,
+        "margin": 0.00201036691228762
+      },
+      {
+        "id": "square rotation=10 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.0825124229815928,
+        "margin": 0.015562108873106134
+      },
+      {
+        "id": "square rotation=15 aspect=0.65",
+        "result": null,
+        "best": "trapezoid",
+        "distance": 0.09536842263458559,
+        "margin": 0.002562737697012679
+      },
+      {
+        "id": "square rotation=15 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.0690877886251796,
+        "margin": 0.0016946813626258633
+      },
+      {
+        "id": "square rotation=15 aspect=1",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05203961154515025,
+        "margin": 0.01084369385938646
+      },
+      {
+        "id": "square rotation=15 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07119874205362359,
+        "margin": 0.004375628955060343
+      },
+      {
+        "id": "square rotation=15 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.07987866405229857,
+        "margin": 0.019083609838050977
+      },
+      {
+        "id": "square rotation=20 aspect=0.65",
+        "result": null,
+        "best": "cross",
+        "distance": 0.0971001656730726,
+        "margin": 0.005001655928251955
+      },
+      {
+        "id": "square rotation=20 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07954003072153909,
+        "margin": 0.0025787333211556296
+      },
+      {
+        "id": "square rotation=20 aspect=1",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06002554065311806,
+        "margin": 0.007118382520728536
+      },
+      {
+        "id": "square rotation=20 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07729365480549688,
+        "margin": 0.0018115469460623507
+      },
+      {
+        "id": "square rotation=20 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.07922454697715009,
+        "margin": 0.0159374864751705
+      },
+      {
+        "id": "square rotation=30 aspect=0.65",
+        "result": null,
+        "best": "cross",
+        "distance": 0.09352317337059164,
+        "margin": 0.006015919145092197
+      },
+      {
+        "id": "square rotation=30 aspect=0.8",
+        "result": null,
+        "best": "cross",
+        "distance": 0.07808663955854002,
+        "margin": 0.011559139292016074
+      },
+      {
+        "id": "square rotation=30 aspect=1",
+        "result": null,
+        "best": "cross",
+        "distance": 0.06790686906640328,
+        "margin": 0.007817562897874247
+      },
+      {
+        "id": "square rotation=30 aspect=1.2",
+        "result": null,
+        "best": "cross",
+        "distance": 0.07490707878544425,
+        "margin": 0.0060513774683041005
+      },
+      {
+        "id": "square rotation=30 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.08349757465210801,
+        "margin": 0.007135698151079964
+      },
+      {
+        "id": "square rotation=45 aspect=0.65",
+        "result": null,
+        "best": "cross",
+        "distance": 0.08722431882783338,
+        "margin": 0.006261127955069737
+      },
+      {
+        "id": "square rotation=45 aspect=0.8",
+        "result": null,
+        "best": "cross",
+        "distance": 0.06691924174436083,
+        "margin": 0.016264841891513726
+      },
+      {
+        "id": "square rotation=45 aspect=1",
+        "result": "cross",
+        "best": "cross",
+        "distance": 0.057419738091021584,
+        "margin": 0.01960632248360244
+      },
+      {
+        "id": "square rotation=45 aspect=1.2",
+        "result": null,
+        "best": "cross",
+        "distance": 0.06324133851948342,
+        "margin": 0.017873437166394904
+      },
+      {
+        "id": "square rotation=45 aspect=1.5",
+        "result": null,
+        "best": "cross",
+        "distance": 0.08364825327634605,
+        "margin": 0.00862516404447479
+      },
+      {
+        "id": "square top skew=3",
+        "result": "square",
+        "best": "square",
+        "distance": 0.020745623865354033,
+        "margin": 0.06581882646252307
+      },
+      {
+        "id": "square top skew=6",
+        "result": "square",
+        "best": "square",
+        "distance": 0.04067682208238842,
+        "margin": 0.03155660527230736
+      },
+      {
+        "id": "square top skew=10",
+        "result": null,
+        "best": "trapezoid",
+        "distance": 0.055921458599373794,
+        "margin": 0.011312095548600146
+      },
+      {
+        "id": "square top skew=15",
+        "result": "trapezoid",
+        "best": "trapezoid",
+        "distance": 0.04960817654509434,
+        "margin": 0.02847828385983537
+      },
+      {
+        "id": "retry offset=0",
+        "result": "square",
+        "best": "square",
+        "distance": 0.00652755384066613,
+        "margin": 0.09204495754890081
+      },
+      {
+        "id": "retry offset=3",
+        "result": "square",
+        "best": "square",
+        "distance": 0.02392902718483678,
+        "margin": 0.04988126584220666
+      },
+      {
+        "id": "retry offset=6",
+        "result": "square",
+        "best": "square",
+        "distance": 0.04521842840351598,
+        "margin": 0.020052894100443884
+      },
+      {
+        "id": "retry offset=10",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06894423896583138,
+        "margin": 0.0012554328412728993
+      },
+      {
+        "id": "retry offset=20",
+        "result": null,
+        "best": "cross",
+        "distance": 0.08526625976711033,
+        "margin": 0.015961562096123483
+      }
+    ],
+    "acceptedAsSquare": 8,
+    "total": 44
+  },
+  "after": {
+    "source": "synthetic stress probes, not user drawings",
+    "rows": [
+      {
+        "id": "square rotation=0 aspect=0.65",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07311555718253145,
+        "margin": 0.006171147577676242,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=0 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05942980781023906,
+        "margin": 0.009407343641815669,
+        "reasons": [
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=0 aspect=1",
+        "result": "square",
+        "best": "square",
+        "distance": 0.00652755384066613,
+        "margin": 0.09204495754890081,
+        "reasons": []
+      },
+      {
+        "id": "square rotation=0 aspect=1.2",
+        "result": "square",
+        "best": "square",
+        "distance": 0.05940867546200154,
+        "margin": 0.019763016267279332,
+        "reasons": []
+      },
+      {
+        "id": "square rotation=0 aspect=1.5",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.09425694719802878,
+        "margin": 0.0013391380565985628,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates",
+          "circle-veto"
+        ]
+      },
+      {
+        "id": "square rotation=5 aspect=0.65",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07938484571727912,
+        "margin": 0.0014488072219495385,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=5 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.051930702166944696,
+        "margin": 0.004973668868800109,
+        "reasons": [
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=5 aspect=1",
+        "result": "square",
+        "best": "square",
+        "distance": 0.04470459070949457,
+        "margin": 0.021090085028748408,
+        "reasons": []
+      },
+      {
+        "id": "square rotation=5 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06746035366537774,
+        "margin": 0.0008198180091041618,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates",
+          "circle-veto"
+        ]
+      },
+      {
+        "id": "square rotation=5 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.08962180589514232,
+        "margin": 0.004954078526604677,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=10 aspect=0.65",
+        "result": null,
+        "best": "trapezoid",
+        "distance": 0.08720757553146166,
+        "margin": 0.0015198233265446143,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=10 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05837687117355302,
+        "margin": 0.002544343711660603,
+        "reasons": [
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=10 aspect=1",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05180168707822053,
+        "margin": 0.008166708173702804,
+        "reasons": [
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=10 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06652883172609753,
+        "margin": 0.00201036691228762,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=10 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.0825124229815928,
+        "margin": 0.015562108873106134,
+        "reasons": [
+          "distance-threshold"
+        ]
+      },
+      {
+        "id": "square rotation=15 aspect=0.65",
+        "result": null,
+        "best": "trapezoid",
+        "distance": 0.09536842263458559,
+        "margin": 0.002562737697012679,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=15 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.0690877886251796,
+        "margin": 0.0016946813626258633,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=15 aspect=1",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.05203961154515025,
+        "margin": 0.01084369385938646,
+        "reasons": [
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=15 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07119874205362359,
+        "margin": 0.004375628955060343,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=15 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.07987866405229857,
+        "margin": 0.019083609838050977,
+        "reasons": [
+          "distance-threshold"
+        ]
+      },
+      {
+        "id": "square rotation=20 aspect=0.65",
+        "result": null,
+        "best": "cross",
+        "distance": 0.0971001656730726,
+        "margin": 0.005001655928251955,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=20 aspect=0.8",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07954003072153909,
+        "margin": 0.0025787333211556296,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=20 aspect=1",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06002554065311806,
+        "margin": 0.007118382520728536,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=20 aspect=1.2",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.07729365480549688,
+        "margin": 0.0018115469460623507,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=20 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.07922454697715009,
+        "margin": 0.0159374864751705,
+        "reasons": [
+          "distance-threshold"
+        ]
+      },
+      {
+        "id": "square rotation=30 aspect=0.65",
+        "result": null,
+        "best": "cross",
+        "distance": 0.09352317337059164,
+        "margin": 0.006015919145092197,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=30 aspect=0.8",
+        "result": null,
+        "best": "cross",
+        "distance": 0.07808663955854002,
+        "margin": 0.011559139292016074,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=30 aspect=1",
+        "result": null,
+        "best": "cross",
+        "distance": 0.06790686906640328,
+        "margin": 0.007817562897874247,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=30 aspect=1.2",
+        "result": null,
+        "best": "cross",
+        "distance": 0.07490707878544425,
+        "margin": 0.0060513774683041005,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=30 aspect=1.5",
+        "result": null,
+        "best": "arrow",
+        "distance": 0.08349757465210801,
+        "margin": 0.007135698151079964,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=45 aspect=0.65",
+        "result": null,
+        "best": "cross",
+        "distance": 0.08722431882783338,
+        "margin": 0.006261127955069737,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square rotation=45 aspect=0.8",
+        "result": null,
+        "best": "cross",
+        "distance": 0.06691924174436083,
+        "margin": 0.016264841891513726,
+        "reasons": [
+          "distance-threshold"
+        ]
+      },
+      {
+        "id": "square rotation=45 aspect=1",
+        "result": "cross",
+        "best": "cross",
+        "distance": 0.057419738091021584,
+        "margin": 0.01960632248360244,
+        "reasons": []
+      },
+      {
+        "id": "square rotation=45 aspect=1.2",
+        "result": null,
+        "best": "cross",
+        "distance": 0.06324133851948342,
+        "margin": 0.017873437166394904,
+        "reasons": [
+          "distance-threshold"
+        ]
+      },
+      {
+        "id": "square rotation=45 aspect=1.5",
+        "result": null,
+        "best": "cross",
+        "distance": 0.08364825327634605,
+        "margin": 0.00862516404447479,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square top skew=3",
+        "result": "square",
+        "best": "square",
+        "distance": 0.020745623865354033,
+        "margin": 0.06581882646252307,
+        "reasons": []
+      },
+      {
+        "id": "square top skew=6",
+        "result": "square",
+        "best": "square",
+        "distance": 0.04067682208238842,
+        "margin": 0.03155660527230736,
+        "reasons": []
+      },
+      {
+        "id": "square top skew=10",
+        "result": null,
+        "best": "trapezoid",
+        "distance": 0.055921458599373794,
+        "margin": 0.011312095548600146,
+        "reasons": [
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "square top skew=15",
+        "result": "trapezoid",
+        "best": "trapezoid",
+        "distance": 0.04960817654509434,
+        "margin": 0.02847828385983537,
+        "reasons": []
+      },
+      {
+        "id": "retry offset=0",
+        "result": "square",
+        "best": "square",
+        "distance": 0.00652755384066613,
+        "margin": 0.09204495754890081,
+        "reasons": []
+      },
+      {
+        "id": "retry offset=3",
+        "result": "square",
+        "best": "square",
+        "distance": 0.02392902718483678,
+        "margin": 0.04988126584220666,
+        "reasons": []
+      },
+      {
+        "id": "retry offset=6",
+        "result": "square",
+        "best": "square",
+        "distance": 0.04521842840351598,
+        "margin": 0.020052894100443884,
+        "reasons": []
+      },
+      {
+        "id": "retry offset=10",
+        "result": null,
+        "best": "hexagon",
+        "distance": 0.06894423896583138,
+        "margin": 0.0012554328412728993,
+        "reasons": [
+          "distance-threshold",
+          "ambiguous-candidates"
+        ]
+      },
+      {
+        "id": "retry offset=20",
+        "result": null,
+        "best": "cross",
+        "distance": 0.08526625976711033,
+        "margin": 0.015961562096123483,
+        "reasons": [
+          "distance-threshold"
+        ]
+      }
+    ],
+    "acceptedAsSquare": 8,
+    "total": 44
+  }
+}

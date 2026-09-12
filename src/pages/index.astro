@@ -38,6 +38,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 			</article>
 		</div>
 
+		<section class="lab-section" aria-labelledby="lab-heading">
+			<h2 id="lab-heading">Labs</h2>
+			<div class="grid lab-grid">
+				<article role="article" data-testid="demo-card" class="card lab-card">
+					<h3 data-testid="card-title">Shape Sudoku Recognizer Lab</h3>
+					<p class="card-desc">Experimental recognizer feasibility UI. Pen-only drawing, scratch erase, canonical overlays, undo.</p>
+					<a href="/shape-sudoku-lab" class="card-link">Open Lab</a>
+				</article>
+			</div>
+		</section>
+
 		<section class="archive-section" aria-labelledby="archive-heading">
 			<h2 id="archive-heading">Archive</h2>
 			<div class="grid archive-grid">
@@ -146,6 +157,32 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
 	.archive-grid {
 		max-width: none;
+	}
+
+	.lab-section {
+		width: 100%;
+		max-width: 900px;
+		margin-top: 3rem;
+		padding-top: 2rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.08);
+	}
+
+	.lab-section h2 {
+		margin: 0 0 1rem;
+		color: #777;
+		font-size: 0.85rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.lab-grid {
+		max-width: none;
+	}
+
+	.lab-card {
+		background: #14171a;
+		border-color: #252a30;
 	}
 
 	.card {
