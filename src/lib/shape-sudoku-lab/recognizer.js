@@ -123,7 +123,7 @@ export class Recognizer {
     const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
     const span = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
     if (!points.length || !points.every(p => p.every(Number.isFinite)) || span < this.minSpan) {
-      return { name: null, confidence: 0, uncertain: true, distances: {} };
+      return { name: null, confidence: 0, uncertain: true, distances: {}, rankedDistances: [], rejectionReasons: [!points.length ? 'no-usable-ink' : !points.every(p => p.every(Number.isFinite)) ? 'non-finite-coordinates' : 'below-minimum-span'], span: Number.isFinite(span) ? span : null };
     }
 
     const input = cloud(strokes, this.sampleCount);
@@ -149,8 +149,17 @@ export class Recognizer {
     const ranked = Object.values(distances).sort((a, b) => a - b);
     // A good absolute fit is not enough when two different symbols fit alike.
     const ambiguous = ranked.length > 1 && ranked[1] - ranked[0] < 0.012;
-    const uncertain = bestDist >= this.uncertainThreshold || ambiguous || distance(input, circle) < bestDist;
+    const circleDistance = distance(input, circle);
+    const rejectionReasons = [];
+    if (bestDist >= this.uncertainThreshold) rejectionReasons.push('distance-threshold');
+    if (ambiguous) rejectionReasons.push('ambiguous-candidates');
+    if (circleDistance < bestDist) rejectionReasons.push('circle-veto');
+    const uncertain = rejectionReasons.length > 0;
     return {
+      rankedDistances: Object.entries(distances).map(([name, distance]) => ({ name, distance })).sort((a,b) => a.distance-b.distance),
+      rejectionReasons, bestName, bestDistance: bestDist, circleDistance,
+      margin: ranked[1] - ranked[0], span,
+      thresholds: { distance: this.uncertainThreshold, ambiguityMargin: 0.012, minSpan: this.minSpan },
       name: uncertain ? null : bestName,
       confidence: uncertain ? 0 : confidence,
       uncertain,

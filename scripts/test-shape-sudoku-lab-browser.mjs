@@ -118,6 +118,27 @@ try {
   }
   console.log('Synthetic pen fixture results:', JSON.stringify(fixtureResults));
   console.log(`PASS: ${fixtureResults.length} authored pen fixtures, including quick/imperfect/multistroke and uncertainty; no mid-stroke guesses; ink preserved`);
+  // Explicit download: read the actual file Chromium saved, not a mocked payload.
+  await cdp('Browser.setDownloadBehavior', {behavior:'allow', downloadPath:profile});
+  await evaluate(`(() => { const details = document.querySelector('.diagnostics'); details.open = true; const input = details.querySelector('input'); input.value = 'synthetic oval'; input.dispatchEvent(new Event('input', {bubbles:true})); })()`);
+  await evaluate(`document.querySelector('.diagnostics button').click()`);
+  let exported;
+  for (let i=0;i<50;i++) { try { exported=JSON.parse(await readFile(resolve(profile,'shape-sudoku-attempts.json'),'utf8')); break; } catch { await sleep(100); } }
+  assert.ok(exported, 'actual JSON download must complete');
+  assert.match(exported.buildVersion, /^[a-f0-9]{40}$/);
+  assert.equal(exported.attempts.at(-1).intendedShape, 'synthetic oval');
+  assert.equal(exported.attempts.at(-1).result.name, null);
+  assert.ok(exported.attempts.at(-1).result.rejectionReasons.length);
+  assert.equal(exported.attempts.at(-1).result.rankedDistances.length, 9);
+  assert.ok(exported.attempts.at(-1).strokes[0].length > 20);
+  assert.ok(exported.attempts.some(a => a.kind === 'pointer-cancel'));
+  console.log('PASS: actual local JSON download with strokes, ranked scores, rejection reasons, annotation, build', exported.buildVersion);
+  // Synthetic multi-tile retry: clear must target the last drawn tile, cancel its timer.
+  await evaluate(`(() => { const canvas = document.querySelectorAll('.tile canvas')[1], r=canvas.getBoundingClientRect(); for (const [type,x,y] of [['pointerdown',20,20],['pointermove',80,20],['pointerup',80,80]]) canvas.dispatchEvent(new PointerEvent(type,{pointerType:'pen',pointerId:7,clientX:r.x+x*r.width/100,clientY:r.y+y*r.height/100,bubbles:true})); [...document.querySelectorAll('.controls button')].find(b=>b.textContent==='Clear tile').click(); })()`);
+  await sleep(900);
+  assert.equal(await evaluate(`document.querySelectorAll('.tile .label')[1].textContent`), 'draw a shape');
+  assert.equal(await evaluate(`document.querySelector('.tile .label').textContent`), 'uncertain - keep drawing');
+  console.log('PASS: clear targets last drawn tile and cancels pending recognition');
   await cdp('Emulation.setDeviceMetricsOverride', { width: 1024, height: 900, deviceScaleFactor: 1, mobile: false });
   const desktop = await evaluate(`(() => { const r = document.querySelector('.tile').getBoundingClientRect(); return { width: r.width, height: r.height }; })()`);
   assert.equal(desktop.width, desktop.height);

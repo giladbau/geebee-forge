@@ -4,6 +4,11 @@
 	import { isScratch } from '$lib/shape-sudoku-lab/scratch.js';
 	import { canonicalPoints, SHAPE_NAMES } from '$lib/shape-sudoku-lab/shapes.js';
 
+	let { buildVersion = 'unknown' }: { buildVersion?: string } = $props();
+	let downloadBtn: HTMLButtonElement;
+	let intendedShape = $state('');
+	let attemptCount = $state(0);
+	let debugSummary = $state('No completed drawing yet.');
 	const COLORS: Record<string, string> = {
 		triangle: '#D97872', square: '#6489C4', heart: '#C8759E', star: '#C99C43',
 		pentagon: '#6C9B79', hexagon: '#8976B6', cross: '#CE8559', trapezoid: '#559995', arrow: '#7376B5'
@@ -48,6 +53,21 @@
 		const tiles: TileApi[] = [];
 		const RECOGNITION_PAUSE_MS = 650;
 		const undoStack: { tile: TileApi; previous: any }[] = [];
+		let activeTile = 0;
+		const attempts: any[] = [];
+		function capture(tileIndex: number, kind: string, strokes: number[][][], extra: any = {}) {
+			const result = recognizer.recognize(strokes);
+			attempts.push({ id: ++attemptCount, at: new Date().toISOString(), tile: tileIndex + 1, kind, strokes: structuredClone(strokes), result, ...extra });
+			if (attempts.length > 100) attempts.shift();
+			intendedShape = '';
+			debugSummary = `Tile ${tileIndex + 1}: ${kind}; ${result.name || result.rejectionReasons.join(', ')}. ${strokes.length} stroke(s).`;
+		}
+		downloadBtn.addEventListener('click', () => {
+			const data = { schemaVersion: 1, buildVersion, recognizerVersion: 'occupancy-v1-diagnostics-v1', exportedAt: new Date().toISOString(), source: 'browser pen input (not verified human)', coordinateSystem: 'tile percentages, unfiltered pointer coordinates; stroke boundaries retained', userAgent: navigator.userAgent, viewport: {width: innerWidth, height: innerHeight, devicePixelRatio}, retention: 'latest 100 events; memory only until page closes', totalEvents: attemptCount, attempts: attempts.map((a,i) => ({...a, intendedShape: i === attempts.length - 1 ? intendedShape.trim() || null : null})), currentTiles: tiles.map(t => ({tile:t.index+1, strokes:t.state.strokes, current:t.state.current, result:recognizer.recognize(t.state.strokes)})) };
+			const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], {type:'application/json'}));
+			const a = document.createElement('a'); a.href = url; a.download = 'shape-sudoku-attempts.json'; a.click();
+			setTimeout(() => URL.revokeObjectURL(url), 10000);
+		});
 		let penMode = true;
 		let recognitionPaused = false;
 
@@ -183,13 +203,14 @@
 				if (recognitionPaused) return;
 				// Geometry, not browser event frequency, decides whether ink is usable.
 				const result = recognizer.recognize(state.strokes);
+				capture(index, 'recognition', state.strokes);
 				if (result.uncertain) {
 					state.recognized = false;
 					state.recognizedName = null;
 					label.textContent = 'uncertain - keep drawing';
 					label.className = 'label uncertain';
 					renderOverlay();
-					log(`Tile ${index + 1}: uncertain`);
+					log(`Tile ${index + 1}: uncertain (${result.rejectionReasons.join(', ')})`);
 					return;
 				}
 				state.recognized = true;
@@ -197,7 +218,7 @@
 				label.textContent = result.name;
 				label.className = 'label confident';
 				renderOverlay();
-				log(`Tile ${index + 1}: ${result.name} (${(result.confidence * 100).toFixed(0)}%)`);
+				log(`Tile ${index + 1}: ${result.name} (geometric distance ${result.bestDistance?.toFixed(4)}; not a probability)`);
 			}
 
 			function startStroke(x: number, y: number) {
@@ -233,6 +254,8 @@
 			}
 
 			function clear() {
+				capture(index, 'clear', state.strokes);
+				if (state.pending) clearTimeout(state.pending);
 				pushUndo(tile);
 				state.strokes = [];
 				state.current = [];
@@ -245,6 +268,7 @@
 			}
 
 			function eraseByScratch() {
+				capture(index, 'scratch-erase', [...state.strokes, state.current], { scratchDetected: true });
 				pushUndo(tile);
 				state.beforeStroke = null;
 				if (state.pending) clearTimeout(state.pending);
@@ -273,6 +297,7 @@
 				if (!penMode || e.pointerType !== 'pen') return;
 				e.preventDefault();
 				try { inkCanvas.setPointerCapture(e.pointerId); } catch {}
+				activeTile = index;
 				startStroke(...getXY(e) as [number, number]);
 			}
 			function pointerMove(e: PointerEvent) {
@@ -290,6 +315,7 @@
 					eraseByScratch();
 					return;
 				}
+				capture(index, 'stroke-end', [...state.strokes, state.current], { pointerType: e.pointerType, recognitionPaused });
 				endStroke();
 			}
 
@@ -299,6 +325,7 @@
 			inkCanvas.addEventListener('pointercancel', (e: PointerEvent) => {
 				if (e.pointerType !== 'pen' || !state.beforeStroke) return;
 				try { inkCanvas.releasePointerCapture(e.pointerId); } catch {}
+				capture(index, 'pointer-cancel', [...state.strokes, state.current]);
 				restoreState(state.beforeStroke);
 			});
 
@@ -333,12 +360,13 @@
 			if (!undoStack.length) undoDisabled = true;
 		});
 		clearBtn.addEventListener('click', () => {
-			const target = tiles.find(t => t.state.strokes.length) || tiles[0];
+			const target = tiles[activeTile];
 			target.clear();
 			log(`Cleared tile ${target.index + 1}`);
 		});
 
 		return () => {
+			for (const tile of tiles) if (tile.state.pending) clearTimeout(tile.state.pending);
 			// per-tile listeners are discarded with the DOM elements
 		};
 	});
@@ -364,6 +392,14 @@
 		<button bind:this={undoBtn} disabled={undoDisabled}>Undo</button>
 		<button bind:this={clearBtn}>Clear tile</button>
 	</div>
+	<details class="diagnostics">
+		<summary>Drawing diagnostics (local download only)</summary>
+		<p>Build: <code>{buildVersion}</code></p>
+		<p>{debugSummary}</p>
+		<p>Uncertain ink accumulates across retries. Use Clear tile to restart the last tile you drew in. Nothing is uploaded; the latest 100 events stay in memory until this page closes.</p>
+		<label>Optional note for the latest attempt, after drawing (e.g. intended square): <input aria-label="Intended shape debugging note" bind:value={intendedShape} disabled={attemptCount === 0} maxlength="200" /></label>
+		<button bind:this={downloadBtn} disabled={attemptCount === 0}>Download attempts JSON</button>
+	</details>
 	<p class="mode-note" bind:this={modeNoteEl}>{modeNote}</p>
 	<div class="log" bind:this={logEl}>{logText}</div>
 </div>
@@ -433,6 +469,8 @@
 	}
 	button.active { outline: 2px solid var(--accent); }
 	button:disabled { opacity: 0.45; cursor: not-allowed; }
+	.diagnostics { max-width: 540px; margin-top: 14px; overflow-wrap: anywhere; }
+	.diagnostics input { display: block; max-width: 100%; color: #111; background: #fff; }
 	.log {
 		margin-top: 14px; width: min(540px, 100%); min-height: 80px; max-height: 160px;
 		overflow: auto; background: var(--panel); border-radius: 8px; padding: 10px 12px;

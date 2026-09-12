@@ -5,6 +5,21 @@ import { isScratch } from './scratch.js';
 import { drawingFixtures, negativeFixtures, densify } from './drawing-fixtures.js';
 const recognizer = new Recognizer();
 recognizer.train(allCanonical(64));
+describe('diagnostic contract (synthetic inputs)', () => {
+  it('reports all candidate scores without changing rejection', () => {
+    const result = recognizer.recognize(negativeFixtures.find(f => f.id === 'circle')!.strokes);
+    expect(result.name).toBeNull();
+    expect(result.rejectionReasons).toContain('circle-veto');
+    expect(result.rankedDistances).toHaveLength(9);
+    expect(result.rankedDistances.map(r => r.distance)).toEqual(result.rankedDistances.map(r => r.distance).toSorted((a,b) => a-b));
+    expect(result.thresholds?.distance).toBe(0.06);
+  });
+  it('explains taps and retains no false probabilities', () => {
+    expect(recognizer.recognize([]).rejectionReasons).toEqual(['no-usable-ink']);
+    expect(recognizer.recognize([[[50,50],[51,51]]]).rejectionReasons).toEqual(['below-minimum-span']);
+    expect(recognizer.recognize(drawingFixtures[0].strokes).rejectionReasons).toEqual([]);
+  });
+});
 describe('canonical compatibility', () => {
   for (const [index, template] of allCanonical(64).entries()) {
     it(`${template.name} variant ${index}`, () => {
