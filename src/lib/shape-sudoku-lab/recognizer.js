@@ -70,9 +70,22 @@ function pathLength(pts) {
   return pts.reduce((sum, p, i) => sum + (i ? Math.hypot(p[0]-pts[i-1][0], p[1]-pts[i-1][1]) : 0), 0);
 }
 function cloud(strokes, count) {
-  const total = strokes.reduce((sum, s) => sum + pathLength(s), 0);
-  // Allocate by ink length, never interpolate across a pen lift.
-  return normalize(strokes.flatMap(s => resample(s, Math.max(2, Math.round(count * pathLength(s) / total)))));
+  // Normalize the actual geometry BEFORE sampling: resampling may miss a
+  // corner/extremum. Sample by spatial resolution, not a shared point budget:
+  // retracing one edge must not starve the other edges of representative ink.
+  const normalized = normalize(strokes.flat());
+  let offset = 0;
+  const unique = new Map();
+  for (const stroke of strokes) {
+    const s = normalized.slice(offset, offset + stroke.length);
+    offset += stroke.length;
+    for (const p of resample(s, Math.max(2, Math.ceil(pathLength(s) * count) + 1))) {
+      // Occupancy, rather than time spent on an edge, determines cloud weight.
+      const key = p.map(v => Math.round(v * count)).join(',');
+      if (!unique.has(key)) unique.set(key, p);
+    }
+  }
+  return [...unique.values()];
 }
 function distance(a, b) {
   const directed = (from, to) => from.reduce((sum, p) => sum + Math.min(...to.map(q => (p[0]-q[0])**2 + (p[1]-q[1])**2)), 0) / from.length;
@@ -84,8 +97,9 @@ export class Recognizer {
     this.sampleCount = opts.sampleCount || 48;
     this.templates = [];
     // Single Relaxed mode. Distances are geometric scores, not probabilities.
-    this.minPoints = opts.minPoints || 12;
-    this.minStrokeLength = opts.minStrokeLength || 18;
+    // Input coordinates are tile percentages. Gate accidental taps by extent,
+    // not event count or accumulated length (both depend on delivery/retracing).
+    this.minSpan = opts.minSpan ?? 4;
     this.uncertainThreshold = opts.uncertainThreshold || 0.06;
     this.distanceCap = opts.distanceCap || 0.9;
   }
@@ -104,12 +118,11 @@ export class Recognizer {
     if (this.templates.length === 0) {
       throw new Error('No templates trained');
     }
-    const strokes = asStrokes(rawPoints).filter(s => s.length);
-    if (strokes.flat().length < this.minPoints) {
-      return { name: null, confidence: 0, uncertain: true, distances: {} };
-    }
-    const strokeLength = strokes.reduce((sum, s) => sum + pathLength(s), 0);
-    if (strokeLength < this.minStrokeLength) {
+    const strokes = asStrokes(rawPoints).filter(s => s.length > 1 && pathLength(s) > 0);
+    const points = strokes.flat();
+    const xs = points.map(p => p[0]), ys = points.map(p => p[1]);
+    const span = Math.max(Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys));
+    if (!points.length || !points.every(p => p.every(Number.isFinite)) || span < this.minSpan) {
       return { name: null, confidence: 0, uncertain: true, distances: {} };
     }
 
@@ -133,7 +146,10 @@ export class Recognizer {
       0.5 * Math.cos(i * 2 * Math.PI / this.sampleCount),
       0.5 * Math.sin(i * 2 * Math.PI / this.sampleCount),
     ]);
-    const uncertain = bestDist >= this.uncertainThreshold || distance(input, circle) < bestDist;
+    const ranked = Object.values(distances).sort((a, b) => a - b);
+    // A good absolute fit is not enough when two different symbols fit alike.
+    const ambiguous = ranked.length > 1 && ranked[1] - ranked[0] < 0.012;
+    const uncertain = bestDist >= this.uncertainThreshold || ambiguous || distance(input, circle) < bestDist;
     return {
       name: uncertain ? null : bestName,
       confidence: uncertain ? 0 : confidence,

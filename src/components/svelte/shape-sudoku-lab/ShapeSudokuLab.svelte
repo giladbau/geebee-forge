@@ -181,8 +181,7 @@
 
 			function recognize() {
 				if (recognitionPaused) return;
-				const flat = state.strokes.flat();
-				if (flat.length < 12) return;
+				// Geometry, not browser event frequency, decides whether ink is usable.
 				const result = recognizer.recognize(state.strokes);
 				if (result.uncertain) {
 					state.recognized = false;
@@ -263,7 +262,7 @@
 			const tile: TileApi = { el, state, saveState, restoreState, clear, eraseByScratch, renderInk, index };
 
 			function getXY(e: PointerEvent) {
-				const rect = el.getBoundingClientRect();
+				const rect = inkCanvas.getBoundingClientRect();
 				return [
 					((e.clientX - rect.left) / rect.width) * 100,
 					((e.clientY - rect.top) / rect.height) * 100,
@@ -353,7 +352,8 @@
 <div class="lab-shell">
 	<h1>Shape Sudoku Recognizer Lab</h1>
 	<p class="subtitle">
-		Draw one of the nine silhouettes in any tile. Pause to see a translucent canonical overlay.
+		Draw freely in any tile: triangle, square, heart, star, pentagon, hexagon, cross, trapezoid or arrow.
+		Pause to recognize; lift your pen between strokes if you like. Uncertain ink stays so you can keep drawing.
 		A continuous back-and-forth scribble over existing ink erases. This is an experimental feasibility lab, not the full game.
 	</p>
 	<div class="board" bind:this={boardEl}></div>

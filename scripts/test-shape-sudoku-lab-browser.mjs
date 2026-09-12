@@ -6,6 +6,7 @@ import { readFile, mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve, extname } from 'node:path';
 import { canonicalPoints } from '../src/lib/shape-sudoku-lab/shapes.js';
+import { drawingFixtures, negativeFixtures } from '../src/lib/shape-sudoku-lab/drawing-fixtures.js';
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 const server = createServer(async (req, res) => {
@@ -93,6 +94,30 @@ try {
   assert.equal(await evaluate(`document.querySelector('.tile .label').textContent`), 'draw a shape', 'cancel must not add an undo entry or commit ink');
   assert.equal(await evaluate(`[...document.querySelectorAll('.controls button')].find(b => b.textContent === 'Undo').disabled`), true);
   console.log('PASS: cancelled pen stroke restores prior overlay without committing ink or undo history');
+  // Replay authored synthetic paths through the actual Astro island's pen input.
+  // This is Chromium/CDP, not physical iPad/Pencil validation.
+  const fixtureResults = [];
+  for (const fixture of [...drawingFixtures, ...negativeFixtures]) {
+    await evaluate(`[...document.querySelectorAll('.controls button')].find(b => b.textContent === 'Clear tile').click()`);
+    for (const stroke of fixture.strokes) {
+      const ps = stroke.map(([x,y]) => ({x:rect.x+x*rect.width/100, y:rect.y+y*rect.height/100}));
+      await cdp('Input.dispatchMouseEvent', {type:'mousePressed', ...ps[0], button:'left', buttons:1, clickCount:1, pointerType:'pen'});
+      for (const p of ps.slice(1,-1)) await cdp('Input.dispatchMouseEvent', {type:'mouseMoved', ...p, button:'left', buttons:1, pointerType:'pen'});
+      assert.equal(await evaluate(`document.querySelector('.tile .overlay').classList.contains('visible')`), false, 'no mid-stroke guess');
+      await cdp('Input.dispatchMouseEvent', {type:'mouseReleased', ...ps.at(-1), button:'left', buttons:0, clickCount:1, pointerType:'pen'});
+      // Real pen lifts, including a pause long enough to evaluate incomplete ink.
+      if (fixture.id === 'separate-square-sides') await sleep(850);
+    }
+    const inkBefore = await evaluate(`document.querySelector('.tile canvas').toDataURL()`);
+    await sleep(900);
+    const result = await evaluate(`({label:document.querySelector('.tile .label').textContent, visible:document.querySelector('.tile .overlay').classList.contains('visible'), ink:document.querySelector('.tile canvas').toDataURL()})`);
+    assert.equal(result.label, fixture.name || 'uncertain - keep drawing', fixture.id);
+    assert.equal(result.visible, !!fixture.name, fixture.id);
+    assert.equal(result.ink, inkBefore, fixture.id + ': recognition must preserve ink');
+    fixtureResults.push({id:fixture.id, label:result.label, inkPreserved:true});
+  }
+  console.log('Synthetic pen fixture results:', JSON.stringify(fixtureResults));
+  console.log(`PASS: ${fixtureResults.length} authored pen fixtures, including quick/imperfect/multistroke and uncertainty; no mid-stroke guesses; ink preserved`);
   await cdp('Emulation.setDeviceMetricsOverride', { width: 1024, height: 900, deviceScaleFactor: 1, mobile: false });
   const desktop = await evaluate(`(() => { const r = document.querySelector('.tile').getBoundingClientRect(); return { width: r.width, height: r.height }; })()`);
   assert.equal(desktop.width, desktop.height);
