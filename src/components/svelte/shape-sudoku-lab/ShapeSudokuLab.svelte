@@ -297,7 +297,11 @@
 			inkCanvas.addEventListener('pointerdown', pointerDown);
 			inkCanvas.addEventListener('pointermove', pointerMove);
 			inkCanvas.addEventListener('pointerup', pointerUp);
-			inkCanvas.addEventListener('pointercancel', pointerUp);
+			inkCanvas.addEventListener('pointercancel', (e: PointerEvent) => {
+				if (e.pointerType !== 'pen' || !state.beforeStroke) return;
+				try { inkCanvas.releasePointerCapture(e.pointerId); } catch {}
+				restoreState(state.beforeStroke);
+			});
 
 			renderInk();
 			return tile;
@@ -396,7 +400,8 @@
 		touch-action: pan-x pan-y;
 		user-select: none;
 	}
-	.tile {
+	/* Imperatively created descendants do not receive Svelte's scope class. */
+	.board :global(.tile) {
 		position: relative;
 		width: 112px;
 		height: 112px;
@@ -407,18 +412,18 @@
 		touch-action: none;
 		user-select: none;
 	}
-	.tile :global(canvas) { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
-	.tile :global(.overlay) {
+	.board :global(.tile canvas) { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+	.board :global(.tile .overlay) {
 		position: absolute; inset: 0; pointer-events: none; opacity: 0;
 		transition: opacity 0.18s ease;
 	}
-	.tile :global(.overlay.visible) { opacity: 0.45; }
-	.tile :global(.label) {
+	.board :global(.tile .overlay.visible) { opacity: 0.45; }
+	.board :global(.tile .label) {
 		position: absolute; bottom: 4px; left: 0; right: 0; text-align: center;
 		font-size: 0.7rem; color: var(--muted); pointer-events: none;
 	}
-	.tile :global(.label.confident) { color: var(--accent); font-weight: 600; }
-	.tile :global(.label.uncertain) { color: var(--muted); }
+	.board :global(.tile .label.confident) { color: var(--accent); font-weight: 600; }
+	.board :global(.tile .label.uncertain) { color: var(--muted); }
 	.controls {
 		display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 540px;
 	}
@@ -436,6 +441,6 @@
 	}
 	.mode-note { margin-top: 8px; font-size: 0.8rem; color: var(--muted); text-align: center; }
 	@media (max-width: 420px) {
-		.tile { width: 92px; height: 92px; }
+		.board :global(.tile) { width: 92px; height: 92px; }
 	}
 </style>
