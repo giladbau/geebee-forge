@@ -1,5 +1,10 @@
 node_modules
 
+# Local CNN verification screenshots / diagnostics; never publish private captures.
+/verification/
+*.pt
+shape-cnn-diagnostics*.json
+
 # Output
 .output
 .vercel
