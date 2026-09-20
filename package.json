@@ -10,7 +10,8 @@
 		"preview": "astro preview",
 		"check": "astro check",
 		"test": "vitest run --passWithNoTests",
-    "test:drawing:browser": "node scripts/test-shape-drawing-browser.mjs",
+		"test:drawing:browser": "node scripts/test-shape-drawing-browser.mjs",
+		"test:shape-cnn:browser": "node scripts/test-shape-cnn-browser.mjs",
 		"test:watch": "vitest"
 	},
 	"devDependencies": {
