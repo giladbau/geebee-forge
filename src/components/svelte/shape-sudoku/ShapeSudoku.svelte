@@ -75,9 +75,9 @@
 	let size = $state(4);
 	let puzzle = $state(initialPuzzle);
 	const drawingState = new DrawingState(initialPuzzle);
-	drawingState.setMode(false);
+	drawingState.setMode(true);
 	let board = $state(drawingState.board());
-	let drawingMode = $state(false);
+	let drawingMode = $state(true);
 	let drawingCells = $state(initialPuzzle.initialBoard.map((row,r)=>row.map((_,c)=>drawingState.cell(r,c))));
 	let activeInk = $state<{row:number;col:number;points:number[][]}|null>(null);
 	let modelStatus = $state('idle');
@@ -447,6 +447,7 @@
 	});
 
 	onMount(() => {
+		drawing.load();
 		if (typeof window.matchMedia !== 'function') return;
 		const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
 		const updatePreference = (event: MediaQueryListEvent | MediaQueryList): void => {
@@ -565,6 +566,7 @@
 						class:clue={isClue}
 						class:invalid-drawing={drawingMode && inkCell.invalid}
 						class:has-ink={drawingMode && inkCell.ink.length > 0}
+						class:accepted-ink={drawingMode && cell !== null && inkCell.ink.length > 0}
 						onpointerdown={(e)=>penStart(e,rowIndex,columnIndex)}
 						onpointermove={penMove}
 						onpointerup={(e)=>penEnd(e)}
@@ -595,8 +597,9 @@
 						{#if drawingMode}
 							<svg class="ink-layer" viewBox="0 0 100 100" aria-hidden="true">
 								{#each inkCell.ink as stroke}<path d={inkPath(stroke)} />{/each}
-								{#if live}<path d={inkPath(live)} />{/if}
 							</svg>
+							<!-- Live scrub remains visible after accepted ink fades. -->
+							{#if live}<svg class="ink-layer live-ink" viewBox="0 0 100 100" aria-hidden="true"><path d={inkPath(live)} /></svg>{/if}
 							{#if cell === null && inkCell.overlay !== null}<span class="shape-layer recognition-overlay"><ShapeIcon symbol={inkCell.overlay} /></span>{/if}
 							{#if inkCell.invalid}<span class="invalid-cue" aria-label="This shape does not fit here">!</span>{/if}
 						{/if}
@@ -654,6 +657,15 @@
 </main>
 
 <style>
+ .accepted-ink .ink-layer:not(.live-ink) { animation: settle-ink 300ms ease 500ms both; }
+ .accepted-ink .current-shape { animation: settle-shape 300ms ease 500ms both; }
+ @keyframes settle-ink { from { opacity: 1; } to { opacity: 0; } }
+ @keyframes settle-shape { from { opacity: .32; } to { opacity: 1; } }
+ @media (prefers-reduced-motion: reduce) {
+  .accepted-ink .ink-layer:not(.live-ink) { animation: none; opacity: 0; }
+  .accepted-ink.has-ink .current-shape { animation: none; opacity: 1; }
+ }
+
 	.mode-actions { margin-bottom: 16px; }
 	.drawing-help { color: var(--color-text-muted); font-size: .88rem; }
 	.board-scroll { max-width: 100%; overflow: auto; touch-action: pan-x pan-y; }

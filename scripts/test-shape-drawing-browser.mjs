@@ -1,5 +1,8 @@
 // Run after npm run build. Optional URL argument tests a deployed Astro route.
 import assert from 'node:assert/strict';
+import { hasCompletionAfterMove } from '../src/lib/shape-sudoku.ts';
+const names=['triangle','square','star','circle','sun','crescent','cloud','lightning','rainbow'];
+const boardFrom=cs=>{const n=Math.sqrt(cs.length);return Array.from({length:n},(_,r)=>cs.slice(r*n,(r+1)*n).map(c=>{const i=names.findIndex(name=>new RegExp('^(Locked )?'+name+'( |,)','i').test(c.label));return i<0?null:i;}));};
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { readFile, mkdtemp, rm, mkdir, writeFile, readdir } from 'node:fs/promises';
@@ -64,21 +67,26 @@ try {
   const rect=async(i)=>evaluate(`(()=>{const b=document.querySelectorAll('.grid>button')[${i}];b.scrollIntoView({block:'center',inline:'center'});const r=b.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
   const draw=async(i,points,type='pen')=>{const r=await rect(i);const ps=points.map(([x,y])=>({x:r.x+x*r.width,y:r.y+y*r.height}));await cdp('Input.dispatchMouseEvent',{type:'mousePressed',...ps[0],button:'left',buttons:1,clickCount:1,pointerType:type});for(const p of ps.slice(1))await cdp('Input.dispatchMouseEvent',{type:'mouseMoved',...p,button:'left',buttons:1,pointerType:type});await cdp('Input.dispatchMouseEvent',{type:'mouseReleased',...ps.at(-1),button:'left',buttons:0,clickCount:1,pointerType:type});};
   const triangle=[[.5,.1],[.9,.85],[.1,.85],[.5,.1]],base=`http://127.0.0.1:${server.address().port}`;
-  await cdp('Emulation.setDeviceMetricsOverride',{width:1024,height:900,deviceScaleFactor:1,mobile:false});await cdp('Page.navigate',{url:process.argv[2]||base+'/shape-sudoku/'});await waitFor(`document.querySelector('.mode-actions button')`);await click('Drawing mode');
+  await cdp('Emulation.setDeviceMetricsOverride',{width:1024,height:900,deviceScaleFactor:1,mobile:false});await cdp('Page.navigate',{url:process.argv[2]||base+'/shape-sudoku/'});await waitFor(`document.querySelector('.mode-actions button')?.getAttribute('aria-pressed')==='true'`);
   await check('real CNN loaded',()=>waitFor(`document.querySelector('.drawing-help')?.textContent.includes('Experimental recognition')`));
   // Random puzzles may already contain every triangle; choose a usable fixture.
   for(let attempt=0;attempt<20;attempt++){
     const cs=await cells(),size=Math.sqrt(cs.length);
-    if(cs.some((c,i)=>!c.clue&&!cs.some((d,j)=>/triangle/i.test(d.label)&&(Math.floor(i/size)===Math.floor(j/size)||i%size===j%size))))break;
+    if(cs.some((c,i)=>!c.clue&&hasCompletionAfterMove(boardFrom(cs),Math.floor(i/size),i%size,0)))break;
     await click('New Puzzle');
   }
   const initial=await cells(),n=Math.sqrt(initial.length),isTriangle=c=>/triangle/i.test(c.label);
-  const valid=initial.findIndex((c,i)=>!c.clue&&!initial.some((d,j)=>isTriangle(d)&&(Math.floor(i/n)===Math.floor(j/n)||i%n===j%n))),invalid=initial.findIndex((c,i)=>!c.clue&&initial.some((d,j)=>isTriangle(d)&&(Math.floor(i/n)===Math.floor(j/n)||i%n===j%n))),editable=initial.findIndex(c=>!c.clue);
+  const valid=initial.findIndex((c,i)=>!c.clue&&hasCompletionAfterMove(boardFrom(initial),Math.floor(i/n),i%n,0)),invalid=initial.findIndex((c,i)=>!c.clue&&initial.some((d,j)=>isTriangle(d)&&(Math.floor(i/n)===Math.floor(j/n)||i%n===j%n))),editable=initial.findIndex(c=>!c.clue);
   await check('mouse does not ink',async()=>{await draw(editable,triangle,'mouse');assert.deepEqual(await cells(),initial);});
   await check('touch does not ink',async()=>{await cdp('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});const r=await rect(editable);await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:r.x+r.width/2,y:r.y+r.height/2}]});await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await sleep(150);assert.deepEqual(await cells(),initial);});
   await check('clues immutable',async()=>{const i=initial.findIndex(c=>c.clue);await draw(i,triangle);assert.deepEqual((await cells())[i],initial[i]);});
   const preview=i=>`!!document.querySelectorAll('.grid>button')[${i}].querySelector('.recognition-overlay')`;
   await check('real CNN triangle preview and valid auto-placement',async()=>{assert.ok(valid>=0);await draw(valid,triangle);await waitFor(preview(valid));await waitFor(`document.querySelectorAll('.grid>button')[${valid}].getAttribute('aria-label').toLowerCase().startsWith('triangle')`);});
+  await check('accepted ink crossfades to canonical icon',async()=>{
+    await sleep(900);
+    const styles=await evaluate(`(()=>{const b=document.querySelectorAll('.grid>button')[${valid}];return [getComputedStyle(b.querySelector('.ink-layer')).opacity,getComputedStyle(b.querySelector('.current-shape')).opacity]})()`);
+    assert.deepEqual(styles,['0','1']);assert.ok((await cells())[valid].ink.length);
+  });
   await check('accepted shape survives mode switch',async()=>{assert.ok(isTriangle((await cells())[valid]));const before=await cells();await click('Drawing mode');await click('Drawing mode');assert.deepEqual(await cells(),before);});
   await check('scratch erase and undo',async()=>{const before=(await cells())[valid];assert.ok(isTriangle(before));await draw(valid,Array.from({length:9},(_,j)=>[j%2?.95:.05,.5]));await sleep(100);assert.equal((await cells())[valid].ink.length,0);assert.match((await cells())[valid].label,/Empty/);await click('Undo');assert.deepEqual((await cells())[valid],before);});
   await check('undo accepted stroke',async()=>{await click('Undo');assert.deepEqual((await cells())[valid],initial[valid]);});

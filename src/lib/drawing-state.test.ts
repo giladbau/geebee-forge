@@ -1,9 +1,25 @@
 import { describe, it, expect } from 'vitest';
-import { DrawingState, clipStroke } from './drawing-state';
+import { DrawingState, clipStroke, isScratch } from './drawing-state';
 import type { Puzzle } from './shape-sudoku';
 const puzzle: Puzzle = {size:3, initialBoard:[[0,null,null],[null,null,null],[null,null,null]], clues:[[true,false,false],[false,false,false],[false,false,false]], solution:[[0,1,2],[1,2,0],[2,0,1]]};
 const triangle = [[.2,.8],[.5,.2],[.8,.8],[.2,.8]];
 function draw(s: DrawingState, r=0,c=1) { s.begin(r,c,triangle[0]); triangle.slice(1).forEach(p=>s.point(p)); s.end(); }
+describe('natural scratch gestures',()=>{
+ const old=[triangle];
+ const scrub=[[.05,.38],[.92,.48],[.1,.6],[.98,.7],[.04,.5],[.9,.4]];
+ it.each([0,Math.PI/2,Math.PI/4])('accepts loose scrub rotated %s',angle=>{
+  const points=scrub.map(([x,y])=>[.5+(x-.5)*Math.cos(angle)-(y-.5)*Math.sin(angle),.5+(x-.5)*Math.sin(angle)+(y-.5)*Math.cos(angle)]);
+  expect(isScratch(points,old)).toBe(true);
+  const dense=points.flatMap((p,i)=>i?Array.from({length:20},(_,j)=>points[i-1].map((v,k)=>v+(p[k]-v)*(j+1)/20)):[p]);
+  expect(isScratch(dense,old)).toBe(true);
+ });
+ it('rejects ordinary shapes, jitter, distant scrubs, and absent old ink',()=>{
+  const circle=Array.from({length:80},(_,i)=>[.5+.35*Math.cos(i/79*2*Math.PI),.5+.35*Math.sin(i/79*2*Math.PI)]);
+  for(const points of [triangle,[[.1,.1],[.9,.9]],[[.1,.1],[.9,.9],[.9,.1],[.1,.9]],circle,circle.slice(0,40),Array.from({length:80},(_,i)=>[.5+(i%2)*.02,.5])])expect(isScratch(points,old)).toBe(false);
+  expect(isScratch(scrub,[])).toBe(false);
+  expect(isScratch(scrub.map(([x,y])=>[x+2,y+2]),old)).toBe(false);
+ });
+});
 describe('drawing transactions',()=>{
  it('splits outside excursions without inventing border ink',()=>{
   expect(clipStroke([[.5,.5],[2,.5],[2,.8],[.5,.8]])).toEqual([[[.5,.5],[1,.5]],[[1,.8],[.5,.8]]]);

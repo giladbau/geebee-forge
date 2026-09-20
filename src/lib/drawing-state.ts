@@ -3,18 +3,30 @@ import type { Strokes } from './shape-sudoku-lab/cnn';
 export interface DrawingCell { ink: Strokes; overlay: Cell; value: Cell; invalid: boolean; pending: boolean; revision: number }
 export interface RecognitionToken { row: number; column: number; revision: number; epoch: number; ink: Strokes }
 const copy = <T>(v:T):T => structuredClone(v);
-/** Provisional conservative horizontal scrub: five full-width reversals over old ink. */
+/** Rotation-tolerant scrub: four substantial overlapping passes, not event counts. */
 export function isScratch(points:number[][], ink:Strokes):boolean {
- const old=ink.flat();if(!old.length||points.length<7)return false;
+ const old=ink.flat();if(!old.length||points.length<5)return false;
  const minX=Math.min(...old.map(p=>p[0])),maxX=Math.max(...old.map(p=>p[0]));
  const minY=Math.min(...old.map(p=>p[1])),maxY=Math.max(...old.map(p=>p[1]));
- const span=Math.max(.35,maxX-minX);let turns=0,last=0,anchor=points[0][0];
- for(const p of points) {
-  if(p[1]<minY||p[1]>maxY)return false;
-  const dx=p[0]-anchor;if(Math.abs(dx)<span)continue;
-  const sign=Math.sign(dx);if(last&&sign!==last)turns++;last=sign;anchor=p[0];
+ const threshold=Math.max(.22,Math.hypot(maxX-minX,maxY-minY)*.4);
+ for(let angle=0;angle<Math.PI;angle+=Math.PI/12) {
+  const ux=Math.cos(angle),uy=Math.sin(angle),project=(p:number[])=>p[0]*ux+p[1]*uy;
+  let start=points[0],extreme=start,direction=0,overlaps=0;
+  const leg=(end:number[])=>{
+   const x=(start[0]+end[0])/2,y=(start[1]+end[1])/2;
+   if(x>=minX-.12&&x<=maxX+.12&&y>=minY-.12&&y<=maxY+.12)overlaps++;
+   start=end;
+  };
+  for(const p of points.slice(1)) {
+   if(!direction) {
+    if(Math.abs(project(p)-project(start))>=threshold){direction=Math.sign(project(p)-project(start));extreme=p;}
+   } else if(direction*(project(p)-project(extreme))>=0)extreme=p;
+   else if(direction*(project(extreme)-project(p))>=threshold){leg(extreme);direction=-direction;extreme=p;}
+  }
+  if(direction)leg(extreme);
+  if(overlaps>=4)return true;
  }
- return turns>=5 && Math.min(...points.map(p=>p[0]))<=minX && Math.max(...points.map(p=>p[0]))>=maxX;
+ return false;
 }
 /** Clip segments, splitting excursions rather than drawing along the cell border. */
 export function clipStroke(points:number[][]):Strokes {
