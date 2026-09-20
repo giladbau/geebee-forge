@@ -66,6 +66,12 @@ try {
   const triangle=[[.5,.1],[.9,.85],[.1,.85],[.5,.1]],base=`http://127.0.0.1:${server.address().port}`;
   await cdp('Emulation.setDeviceMetricsOverride',{width:1024,height:900,deviceScaleFactor:1,mobile:false});await cdp('Page.navigate',{url:process.argv[2]||base+'/shape-sudoku/'});await waitFor(`document.querySelector('.mode-actions button')`);await click('Drawing mode');
   await check('real CNN loaded',()=>waitFor(`document.querySelector('.drawing-help')?.textContent.includes('Experimental recognition')`));
+  // Random puzzles may already contain every triangle; choose a usable fixture.
+  for(let attempt=0;attempt<20;attempt++){
+    const cs=await cells(),size=Math.sqrt(cs.length);
+    if(cs.some((c,i)=>!c.clue&&!cs.some((d,j)=>/triangle/i.test(d.label)&&(Math.floor(i/size)===Math.floor(j/size)||i%size===j%size))))break;
+    await click('New Puzzle');
+  }
   const initial=await cells(),n=Math.sqrt(initial.length),isTriangle=c=>/triangle/i.test(c.label);
   const valid=initial.findIndex((c,i)=>!c.clue&&!initial.some((d,j)=>isTriangle(d)&&(Math.floor(i/n)===Math.floor(j/n)||i%n===j%n))),invalid=initial.findIndex((c,i)=>!c.clue&&initial.some((d,j)=>isTriangle(d)&&(Math.floor(i/n)===Math.floor(j/n)||i%n===j%n))),editable=initial.findIndex(c=>!c.clue);
   await check('mouse does not ink',async()=>{await draw(editable,triangle,'mouse');assert.deepEqual(await cells(),initial);});
@@ -83,8 +89,45 @@ try {
   await check('reset cancels scheduled inference',async()=>{await draw(editable,triangle);await click('Reset');await sleep(1600);assert.deepEqual(await cells(),initial);});
   await check('reset during preview prevents stale commit',async()=>{await draw(valid,triangle);await waitFor(preview(valid));await click('Reset');await sleep(900);assert.deepEqual(await cells(),initial);});
   const shot=await cdp('Page.captureScreenshot',{format:'png'});await writeFile(out+'/desktop.png',Buffer.from(shot.data,'base64'));
-  const sizes=[];for(const width of [320,390,768])await check('96px cell minimum and contained overflow '+width,async()=>{await cdp('Emulation.setDeviceMetricsOverride',{width,height:700,deviceScaleFactor:1,mobile:false});await sleep(100);const v=await evaluate(`(()=>{const s=document.querySelector('.board-scroll'),b=document.querySelector('.grid>button'),r=b.getBoundingClientRect();return {width:r.width,height:r.height,scrollWidth:s.scrollWidth,clientWidth:s.clientWidth,pageOverflow:document.documentElement.scrollWidth>innerWidth,touch:getComputedStyle(b).touchAction};})()`);sizes.push({viewport:width,...v});assert.ok(v.width>=96&&v.height>=96);assert.equal(v.pageOverflow,false);assert.match(v.touch,/pan-x pan-y/);});
+  const sizes=[];for(const width of [320,390,768])await check('96px cell minimum and contained overflow '+width,async()=>{await cdp('Emulation.setDeviceMetricsOverride',{width,height:700,deviceScaleFactor:1,mobile:false});await sleep(100);const v=await evaluate(`(()=>{const s=document.querySelector('.board-scroll'),b=document.querySelector('.grid>button'),r=b.getBoundingClientRect();return {width:r.width,height:r.height,scrollWidth:s.scrollWidth,clientWidth:s.clientWidth,pageOverflow:document.documentElement.scrollWidth>innerWidth,touch:getComputedStyle(b).touchAction};})()`);sizes.push({viewport:width,...v});assert.ok(v.width>=96&&v.height>=96);assert.equal(v.pageOverflow,false);assert.equal(v.touch,'none');assert.equal(await evaluate(`getComputedStyle(document.querySelector('.grid')).touchAction`),'none');assert.equal(await evaluate(`getComputedStyle(document.querySelector('.grid>button:disabled')).touchAction`),'none');});
   await check('real finger scroll without ink',async()=>{await cdp('Emulation.setDeviceMetricsOverride',{width:320,height:700,deviceScaleFactor:1,mobile:false});await evaluate(`document.querySelector('.board-scroll').scrollIntoView({block:'center'});document.querySelector('.board-scroll').scrollLeft=0`);await sleep(100);const r=await evaluate(`(()=>{const r=document.querySelector('.board-scroll').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width}})()`),before=await cells(),x=r.x+r.width-20,y=Math.max(20,Math.min(650,r.y+60));await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let j=1;j<=10;j++){await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-j*14,y}]});await sleep(25);}await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await sleep(200);assert.ok(await evaluate(`document.querySelector('.board-scroll').scrollLeft>0`),'gesture must actually scroll');assert.deepEqual(await cells(),before);});
+  await check('finger vertical overflow reaches page without ink',async()=>{
+    await evaluate(`document.querySelector('.board-scroll').scrollIntoView({block:'start'});window.scrollBy(0,-150)`);await sleep(100);
+    const r=await evaluate(`(()=>{const r=document.querySelector('.grid').getBoundingClientRect();return {x:Math.max(40,r.x+30),y:r.y+80}})()`),before=await cells(),top=await evaluate('scrollY');
+    await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[r]});
+    for(let j=1;j<=5;j++)await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x,y:r.y-j*12}]});
+    await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    assert.ok(await evaluate('scrollY')>top);assert.deepEqual(await cells(),before);
+  });
+  await check('finger cancellation and mode changes release capture',async()=>{
+    const r=await rect(editable),p={x:r.x+r.width/2,y:r.y+r.height/2};
+    await evaluate(`document.querySelector('.grid').addEventListener('pointerdown',e=>{if(e.pointerType==='touch')window.fingerId=e.pointerId})`);
+    await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});
+    await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x-10,y:p.y}]});
+    assert.equal(await evaluate(`document.querySelector('.grid').hasPointerCapture(window.fingerId)`),true);
+    await cdp('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+    assert.equal(await evaluate(`document.querySelector('.grid').hasPointerCapture(window.fingerId)`),false);
+    await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});
+    await click('Drawing mode');
+    assert.equal(await evaluate(`document.querySelector('.grid').hasPointerCapture(window.fingerId)`),false);
+    await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await click('Drawing mode');
+  });
+  await check('real pen retains capture without board or page pan; palm ignored',async()=>{
+    const r=await rect(editable),x=r.x+r.width*.4,y=r.y+r.height*.4;
+    await evaluate(`window.penEvents=[];document.querySelector('.grid').addEventListener('pointerdown',e=>{if(e.pointerType==='pen')window.penId=e.pointerId});document.querySelector('.grid').addEventListener('pointercancel',e=>window.penEvents.push(e.pointerType));window.scrollSnapshot=()=>[scrollX,scrollY,document.querySelector('.board-scroll').scrollLeft,document.querySelector('.board-scroll').scrollTop]`);
+    const before=await evaluate('scrollSnapshot()');
+    await cdp('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',buttons:1,clickCount:1,pointerType:'pen'});
+    await cdp('Input.dispatchMouseEvent',{type:'mouseMoved',x:x+25,y:y+30,button:'left',buttons:1,pointerType:'pen'});
+    assert.equal(await evaluate(`document.querySelectorAll('.grid>button')[${editable}].hasPointerCapture(window.penId)`),true);
+    await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});
+    await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-30,y:y-30}]});
+    await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    assert.deepEqual(await evaluate('scrollSnapshot()'),before);
+    assert.equal(await evaluate(`document.querySelectorAll('.grid>button')[${editable}].hasPointerCapture(window.penId)`),true);
+    await cdp('Input.dispatchMouseEvent',{type:'mouseReleased',x:x+25,y:y+30,button:'left',buttons:0,clickCount:1,pointerType:'pen'});
+    assert.deepEqual(await evaluate('scrollSnapshot()'),before);assert.deepEqual(await evaluate('penEvents'),[]);
+    assert.ok((await cells())[editable].ink.length);await click('Reset');
+  });
   const mobile=await cdp('Page.captureScreenshot',{format:'png'});await writeFile(out+'/mobile.png',Buffer.from(mobile.data,'base64'));await check('no runtime errors',async()=>assert.deepEqual(errors,[]));await check('no uploads',async()=>assert.ok(requests.every(r=>r.method==='GET')));
   await writeFile(out+'/summary.json',JSON.stringify({results,sizes,initial,valid,invalid,errors},null,2));if(results.some(r=>!r.pass))process.exitCode=1;
 }finally{socket?.close();const exited=new Promise(r=>browser.once('exit',r));browser.kill('SIGTERM');await exited;await new Promise(r=>server.close(r));await rm(profile,{recursive:true,force:true});}

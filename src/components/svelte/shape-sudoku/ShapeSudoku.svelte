@@ -90,7 +90,36 @@
 		activeInk=drawingState.activeStroke;canUndo=drawingState.canUndo;
 		modelStatus=drawing.status;
 	}
+	// Native pan must be disabled before pen-down. Only a separate finger gesture scrolls.
+	let finger: {id:number;x:number;y:number;element:HTMLDivElement}|null = null;
+	function cancelFinger() {
+		const owner=finger;finger=null;
+		if(owner?.element.hasPointerCapture(owner.id))owner.element.releasePointerCapture(owner.id);
+	}
+	function fingerStart(event:PointerEvent) {
+		if(!drawingMode||event.pointerType!=='touch')return;
+		event.preventDefault();
+		if(pen||finger)return;
+		const element=event.currentTarget as HTMLDivElement;
+		finger={id:event.pointerId,x:event.clientX,y:event.clientY,element};
+		try {element.setPointerCapture(event.pointerId);}catch{finger=null;}
+	}
+	function fingerMove(event:PointerEvent) {
+		if(!finger||event.pointerId!==finger.id)return;
+		event.preventDefault();
+		const dx=finger.x-event.clientX,dy=finger.y-event.clientY;
+		finger.x=event.clientX;finger.y=event.clientY;
+		const scroller=finger.element.parentElement!;
+		const left=scroller.scrollLeft,top=scroller.scrollTop;
+		scroller.scrollLeft+=dx;scroller.scrollTop+=dy;
+		// Pass only unconsumed deltas to the page at the board's overflow boundaries.
+		window.scrollBy({left:dx-(scroller.scrollLeft-left),top:dy-(scroller.scrollTop-top),behavior:'instant'});
+	}
+	function fingerEnd(event:PointerEvent) {
+		if(finger?.id===event.pointerId)cancelFinger();
+	}
 	function cancelDrawing() {
+		cancelFinger();
 		drawing.cancel();drawingState.cancel();
 		const owner=pen;pen=null;
 		if(owner?.element.hasPointerCapture?.(owner.id))owner.element.releasePointerCapture(owner.id);
@@ -509,6 +538,11 @@
 		<div class="board-scroll">
 		<div
 			class:drawing={drawingMode}
+			onpointerdowncapture={fingerStart}
+			onpointermove={fingerMove}
+			onpointerup={fingerEnd}
+			onpointercancel={fingerEnd}
+			onlostpointercapture={fingerEnd}
 			bind:this={gridElement}
 			class="grid"
 			data-board-effect={boardEffect ?? undefined}
@@ -623,8 +657,8 @@
 	.mode-actions { margin-bottom: 16px; }
 	.drawing-help { color: var(--color-text-muted); font-size: .88rem; }
 	.board-scroll { max-width: 100%; overflow: auto; touch-action: pan-x pan-y; }
-	.grid.drawing { width: max(100%, calc(var(--grid-size) * 98px + 16px)); grid-template-columns: repeat(var(--grid-size), minmax(96px, 1fr)); }
-	.grid.drawing button { overflow: hidden; touch-action: pan-x pan-y; user-select: none; -webkit-user-select: none; }
+	.grid.drawing { touch-action: none; width: max(100%, calc(var(--grid-size) * 98px + 16px)); grid-template-columns: repeat(var(--grid-size), minmax(96px, 1fr)); }
+	.grid.drawing button { overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
 	.ink-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
 	.ink-layer path { fill: none; stroke: var(--color-primary); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 	.recognition-overlay, .has-ink .current-shape { opacity: .32; pointer-events: none; }
