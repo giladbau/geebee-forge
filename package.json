@@ -10,6 +10,7 @@
 		"preview": "astro preview",
 		"check": "astro check",
 		"test": "vitest run --passWithNoTests",
+		"test:shape-cnn:browser": "node scripts/test-shape-cnn-browser.mjs",
 		"test:watch": "vitest"
 	},
 	"devDependencies": {

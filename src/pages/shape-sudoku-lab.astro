@@ -1,0 +1,11 @@
+---
+import { execSync } from 'node:child_process';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ShapeSudokuLab from '../components/svelte/shape-sudoku-lab/ShapeSudokuLab.svelte';
+const sha = process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || execSync('git rev-parse HEAD', {encoding:'utf8'}).trim();
+const dirty = execSync('git status --porcelain --untracked-files=normal', {encoding:'utf8'}).trim();
+const buildVersion = sha + (dirty ? '-dirty' : '');
+---
+<BaseLayout title="Experimental Shape CNN Lab | GeeBee Forge">
+  <ShapeSudokuLab client:only="svelte" buildVersion={buildVersion} />
+</BaseLayout>
