@@ -699,7 +699,10 @@
 	.mode-actions { margin-bottom: 16px; }
 	.drawing-help { color: var(--color-text-muted); font-size: .88rem; }
 	.board-scroll { max-width: 100%; overflow: auto; touch-action: pan-x pan-y; scroll-behavior: auto; }
-	.grid.drawing { touch-action: none; width: max(100%, calc(var(--grid-size) * 98px + 16px)); grid-template-columns: repeat(var(--grid-size), minmax(96px, 1fr)); }
+	/* Include both theme padding edges; 98px covers a 96px cell plus its gap,
+	   with the final unused gap accounting for the two 1px grid borders. */
+	.grid.drawing { touch-action: none; width: max(100%, calc(var(--grid-size) * 98px + 2 * var(--space-sm))); grid-template-columns: repeat(var(--grid-size), minmax(96px, 1fr)); }
+	.game-panel:has(.grid.drawing) { width: 100%; }
 	.grid.drawing button { overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
 	.ink-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
 	.ink-layer path { fill: none; stroke: var(--color-primary); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }

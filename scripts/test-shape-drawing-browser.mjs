@@ -181,6 +181,40 @@ try {
     await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-50,y,radiusX:35,radiusY:30}]});
     await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assert.deepEqual(await snapshot(),before);
   });
+  const layoutMeasurements=[];
+  for(const size of [4,8,9]) for(const width of [320,390,768,820,1024]) await check(`drawing bounds ${size}x${size} at ${width}`,async()=>{
+    await cdp('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:false});
+    await evaluate(`(()=>{const s=document.querySelector('select[aria-label="Grid size"]');s.value='${size}';s.dispatchEvent(new Event('change',{bubbles:true}));document.documentElement.style.scrollBehavior='auto';})()`);
+    await sleep(350);
+    const measure=()=>evaluate(`(()=>{const s=document.querySelector('.board-scroll'),g=document.querySelector('.grid'),r=g.getBoundingClientRect(),sr=s.getBoundingClientRect(),cs=getComputedStyle(g);return {grid:[r.width,r.height],scroller:s.clientWidth,padding:cs.padding,border:cs.borderWidth,scrollLeft:s.scrollLeft,maxScroll:s.scrollWidth-s.clientWidth,pageOverflow:document.documentElement.scrollWidth>innerWidth,cells:[...g.children].map(b=>{const c=b.getBoundingClientRect();return {width:c.width,height:c.height,left:c.left-r.left,right:c.right-r.left,top:c.top-r.top,bottom:c.bottom-r.top,visibleLeft:c.left-sr.left,visibleRight:c.right-sr.left};})};})()`);
+    await evaluate(`document.querySelector('.board-scroll').scrollLeft=0`);
+    const start=await measure();layoutMeasurements.push({size,viewport:width,...start});
+    assert.equal(start.cells.length,size*size);assert.equal(start.pageOverflow,false);
+    for(const c of start.cells){assert.ok(c.width>=96&&c.height>=96);assert.ok(c.left>=0&&c.top>=0&&c.right<=start.grid[0]&&c.bottom<=start.grid[1],JSON.stringify({size,width,grid:start.grid,cell:c,padding:start.padding}));}
+    for(let row=0;row<size;row++){const c=start.cells[row*size];assert.ok(c.visibleLeft>=0&&c.visibleRight<=start.scroller);}
+    await evaluate(`document.querySelector('.board-scroll').scrollLeft=1e6`);
+    const end=await measure();
+    for(let row=0;row<size;row++){const c=end.cells[row*size+size-1];assert.ok(c.visibleLeft>=0&&c.visibleRight<=end.scroller,'last column reachable');}
+    // Reach the right edge using actual Chromium touch input, not scrollLeft.
+    await evaluate(`document.querySelector('.board-scroll').scrollLeft=0;document.querySelector('.board-scroll').scrollIntoView({block:'start'});window.scrollBy(0,-120)`);
+    const before=await cells();
+    for(let swipe=0;swipe<12&&(await measure()).scrollLeft<start.maxScroll;swipe++){
+      const p=await evaluate(`(()=>{const r=document.querySelector('.board-scroll').getBoundingClientRect();return {x:r.right-25,y:r.top+60}})()`);
+      await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[p]});
+      for(let j=1;j<=5;j++)await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x-j*(start.scroller-50)/5,y:p.y}]});
+      await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    }
+    const touched=await measure();assert.equal(touched.scrollLeft,start.maxScroll,'touch reaches right edge');assert.deepEqual(await cells(),before);
+    const last=touched.cells.at(-1);assert.ok(last.visibleLeft>=0&&last.visibleRight<=touched.scroller);
+  });
+  await check('drawing uses available desktop width and respects theme padding',async()=>{
+    await evaluate(`document.querySelector('.game-shell').style.setProperty('--space-sm','16px')`);
+    await sleep(100);
+    const v=await evaluate(`(()=>{const g=document.querySelector('.grid'),s=document.querySelector('.board-scroll'),r=g.getBoundingClientRect(),c=g.lastElementChild.getBoundingClientRect();return {grid:r.width,right:c.right-r.left,bottom:c.bottom-r.top,height:r.height,available:s.clientWidth}})()`);
+    assert.ok(v.right<=v.grid&&v.bottom<=v.height,JSON.stringify(v));
+    assert.ok(v.available>850,'large drawing board should use available desktop width');
+  });
+  await writeFile(out+'/layout.json',JSON.stringify(layoutMeasurements,null,2));
   const mobile=await cdp('Page.captureScreenshot',{format:'png'});await writeFile(out+'/mobile.png',Buffer.from(mobile.data,'base64'));await check('no runtime errors',async()=>assert.deepEqual(errors,[]));await check('no uploads',async()=>assert.ok(requests.every(r=>r.method==='GET')));
   await writeFile(out+'/summary.json',JSON.stringify({results,sizes,initial,valid,invalid,errors},null,2));if(results.some(r=>!r.pass))process.exitCode=1;
 }finally{socket?.close();const exited=new Promise(r=>browser.once('exit',r));browser.kill('SIGTERM');await exited;await new Promise(r=>server.close(r));await rm(profile,{recursive:true,force:true});}
