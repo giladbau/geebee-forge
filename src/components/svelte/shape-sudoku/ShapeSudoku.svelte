@@ -5,9 +5,10 @@
 		applyMove,
 		generatePuzzle,
 		isCompleteAndValid,
-		resetBoard,
 		type Cell,
 	} from '$lib/shape-sudoku';
+	import { DrawingState } from '$lib/drawing-state';
+	import { DrawingController } from '$lib/drawing-controller';
 	import ShapeIcon, { SHAPES } from './ShapeIcon.svelte';
 
 	const MOTION = {
@@ -73,7 +74,63 @@
 	const initialPuzzle = generatePuzzle(4);
 	let size = $state(4);
 	let puzzle = $state(initialPuzzle);
-	let board = $state(resetBoard(initialPuzzle));
+	const drawingState = new DrawingState(initialPuzzle);
+	drawingState.setMode(false);
+	let board = $state(drawingState.board());
+	let drawingMode = $state(false);
+	let drawingCells = $state(initialPuzzle.initialBoard.map((row,r)=>row.map((_,c)=>drawingState.cell(r,c))));
+	let activeInk = $state<{row:number;col:number;points:number[][]}|null>(null);
+	let modelStatus = $state('idle');
+	let canUndo = $state(false);
+	let pen: {id:number;row:number;column:number;element:HTMLButtonElement;rect:DOMRect}|null = null;
+	const drawing = new DrawingController(drawingState, syncDrawing, (r,c)=>{if(isCompleteAndValid(board))beginCompletion(r,c);});
+	function syncDrawing() {
+		board=drawingState.board();
+		drawingCells=board.map((row,r)=>row.map((_,c)=>drawingState.cell(r,c)));
+		activeInk=drawingState.activeStroke;canUndo=drawingState.canUndo;
+		modelStatus=drawing.status;
+	}
+	function cancelDrawing() {
+		drawing.cancel();drawingState.cancel();
+		const owner=pen;pen=null;
+		if(owner?.element.hasPointerCapture?.(owner.id))owner.element.releasePointerCapture(owner.id);
+		drawingState.setMode(drawingMode);syncDrawing();
+	}
+	function toggleDrawing() {
+		cancelAllTimers();cancelDrawing();drawingMode=!drawingMode;
+		drawingState.setMode(drawingMode);selectedSymbol=undefined;draggingSymbol=null;syncDrawing();
+		if(drawingMode){drawing.load();if(drawing.status==='ready')drawing.resume();}
+	}
+	function undoDrawing() {
+		cancelAllTimers();cancelDrawing();drawingState.undo();syncDrawing();
+		completionOrigin=null;dialogShownForPuzzle=false;dismissWinDialog(false);clearFeedback();
+		if(drawingMode)drawing.resume();
+	}
+	function penStart(event:PointerEvent,row:number,column:number) {
+		if(!drawingMode||event.pointerType!=='pen'||pen||puzzle.clues[row][column])return;
+		event.preventDefault();
+		const element=event.currentTarget as HTMLButtonElement,rect=element.getBoundingClientRect();
+		if(!rect.width||!rect.height)return;
+		cancelDrawing();
+		if(!drawingState.begin(row,column,[(event.clientX-rect.left)/rect.width,(event.clientY-rect.top)/rect.height]))return;
+		pen={id:event.pointerId,row,column,element,rect};
+		try {element.setPointerCapture(event.pointerId);}catch{drawingState.cancel();pen=null;}
+		syncDrawing();
+	}
+	function penMove(event:PointerEvent) {
+		if(!pen||event.pointerId!==pen.id)return;event.preventDefault();
+		const events=event.getCoalescedEvents?.()??[];
+		for(const sample of events.length?events:[event])drawingState.point([(sample.clientX-pen.rect.left)/pen.rect.width,(sample.clientY-pen.rect.top)/pen.rect.height]);
+		syncDrawing();
+	}
+	function penEnd(event:PointerEvent,cancel=false) {
+		if(!pen||event.pointerId!==pen.id)return;event.preventDefault();
+		const owner=pen;if(!cancel)penMove(event);pen=null;
+		if(cancel)drawingState.cancel();else drawingState.end();
+		if(owner.element.hasPointerCapture?.(owner.id))owner.element.releasePointerCapture(owner.id);
+		syncDrawing();drawing.resume();
+	}
+	function inkPath(points:number[][]) {return points.map((p,i)=>`${i?'L':'M'} ${p[0]*100} ${p[1]*100}`).join(' ');}
 	let selectedSymbol = $state<Cell | undefined>(undefined);
 	let feedback = $state('');
 	let conflictCells = $state<string[]>([]);
@@ -192,14 +249,14 @@
 	function startNewPuzzle(effect: 'new-puzzle' | 'size-change' = 'new-puzzle'): void {
 		dialogShownForPuzzle = false;
 		puzzle = generatePuzzle(size);
-		board = resetBoard(puzzle);
+		cancelDrawing();drawingState.reset(puzzle);syncDrawing();
 		selectedSymbol = undefined;
 		clearFeedback();
 		startBoardEffect(effect);
 	}
 
 	function resetPuzzle(): void {
-		board = resetBoard(puzzle);
+		cancelDrawing();drawingState.reset(puzzle);syncDrawing();
 		selectedSymbol = undefined;
 		clearFeedback();
 		startBoardEffect('reset');
@@ -266,13 +323,15 @@
 	}
 
 	function revealHint(): void {
+		cancelDrawing();
 		const previousBoard = board;
 		const nextBoard = applyHint(puzzle, board);
-		board = nextBoard;
+		// The validated result is applied through the drawing state below.
 		clearFeedback();
 		for (let row = 0; row < puzzle.size; row += 1) {
 			for (let column = 0; column < puzzle.size; column += 1) {
 				if (previousBoard[row][column] !== nextBoard[row][column]) {
+					drawingState.replace(row,column,nextBoard[row][column]);syncDrawing();
 					startCellEffect(row, column, 'hint', previousBoard[row][column]);
 					if (!isCompleteAndValid(previousBoard) && isCompleteAndValid(nextBoard)) {
 						beginCompletion(row, column);
@@ -284,12 +343,13 @@
 	}
 
 	function placeSymbol(row: number, column: number, symbol: Cell | undefined = selectedSymbol): void {
-		if (symbol === undefined) return;
+		if (drawingMode || symbol === undefined) return;
 		const previousCell = board[row][column];
 		const previousBoard = board;
 		const nextBoard = applyMove(puzzle, board, row, column, symbol);
 		if (nextBoard) {
-			board = nextBoard;
+			drawingState.replace(row,column,nextBoard[row][column]);syncDrawing();
+			// The validated result is applied through the drawing state below.
 			clearFeedback();
 			if (
 				completionOrigin === null &&
@@ -353,6 +413,7 @@
 	}
 
 	onDestroy(() => {
+		cancelDrawing();drawing.destroy();
 		cancelAllTimers();
 	});
 
@@ -401,9 +462,20 @@
 			</label>
 		</header>
 		<p class="instructions" id="shape-sudoku-instructions">
-			Put each shape once in every row and column. Pick a shape, then pick a square.
+			Put each shape once in every row and column. {drawingMode ? 'Draw with your Pencil inside an empty square.' : 'Pick a shape, then pick a square.'}
 		</p>
 
+		<div class="actions mode-actions">
+			<button type="button" aria-pressed={drawingMode} onclick={toggleDrawing}>Drawing mode</button>
+			<button type="button" disabled={!canUndo} onclick={undoDrawing}>Undo</button>
+		</div>
+		{#if drawingMode}
+			<p class="drawing-help" aria-live="polite">Pencil draws; fingers scroll. Pause to preview a shape. Scrub back and forth to erase.
+			{#if modelStatus === 'loading'} Loading drawing recognizer…
+			{:else if modelStatus === 'error'} Recognition unavailable. Ink is kept. <button type="button" onclick={()=>drawing.load()}>Retry recognizer</button>
+			{:else if modelStatus === 'ready'} Experimental recognition — uncertain drawings stay as ink.{/if}</p>
+		{/if}
+		{#if !drawingMode}
 		<div class="palette" role="group" aria-label="Shape palette">
 			{#each paletteShapes as shape, symbol}
 				<button
@@ -433,7 +505,10 @@
 			</button>
 		</div>
 
+		{/if}
+		<div class="board-scroll">
 		<div
+			class:drawing={drawingMode}
 			bind:this={gridElement}
 			class="grid"
 			data-board-effect={boardEffect ?? undefined}
@@ -447,11 +522,20 @@
 		>
 			{#each board as row, rowIndex}
 				{#each row as cell, columnIndex}
+					{@const inkCell = drawingCells[rowIndex][columnIndex]}
+					{@const live = activeInk?.row === rowIndex && activeInk.col === columnIndex ? activeInk.points : null}
 					{@const isClue = puzzle.clues[rowIndex][columnIndex]}
 					{@const activeCellEffect = cellEffect?.row === rowIndex && cellEffect.column === columnIndex}
 					<button
 						type="button"
 						class:clue={isClue}
+						class:invalid-drawing={drawingMode && inkCell.invalid}
+						class:has-ink={drawingMode && inkCell.ink.length > 0}
+						onpointerdown={(e)=>penStart(e,rowIndex,columnIndex)}
+						onpointermove={penMove}
+						onpointerup={(e)=>penEnd(e)}
+						onpointercancel={(e)=>penEnd(e,true)}
+						onlostpointercapture={(e)=>penEnd(e,true)}
 						class:conflict={conflictCells.includes(`${rowIndex}-${columnIndex}`)}
 						class:effect-place={activeCellEffect && cellEffect?.kind === 'place'}
 						class:effect-replace={activeCellEffect && cellEffect?.kind === 'replace'}
@@ -474,6 +558,14 @@
 								<ShapeIcon symbol={cellEffect.previousSymbol} />
 							</span>
 						{/if}
+						{#if drawingMode}
+							<svg class="ink-layer" viewBox="0 0 100 100" aria-hidden="true">
+								{#each inkCell.ink as stroke}<path d={inkPath(stroke)} />{/each}
+								{#if live}<path d={inkPath(live)} />{/if}
+							</svg>
+							{#if cell === null && inkCell.overlay !== null}<span class="shape-layer recognition-overlay"><ShapeIcon symbol={inkCell.overlay} /></span>{/if}
+							{#if inkCell.invalid}<span class="invalid-cue" aria-label="This shape does not fit here">!</span>{/if}
+						{/if}
 						{#if cell !== null}
 							{#key `${rowIndex}-${columnIndex}-${cell}-${activeCellEffect ? cellEffect?.key : 0}`}
 								<span
@@ -487,6 +579,7 @@
 					</button>
 				{/each}
 			{/each}
+		</div>
 		</div>
 		<p class="status-slot" role="status" aria-live="polite">
 			{#if feedback}<span>{feedback}</span>{/if}
@@ -527,6 +620,17 @@
 </main>
 
 <style>
+	.mode-actions { margin-bottom: 16px; }
+	.drawing-help { color: var(--color-text-muted); font-size: .88rem; }
+	.board-scroll { max-width: 100%; overflow: auto; touch-action: pan-x pan-y; }
+	.grid.drawing { width: max(100%, calc(var(--grid-size) * 98px + 16px)); grid-template-columns: repeat(var(--grid-size), minmax(96px, 1fr)); }
+	.grid.drawing button { overflow: hidden; touch-action: pan-x pan-y; user-select: none; -webkit-user-select: none; }
+	.ink-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+	.ink-layer path { fill: none; stroke: var(--color-primary); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+	.recognition-overlay, .has-ink .current-shape { opacity: .32; pointer-events: none; }
+	.grid button.invalid-drawing { background: var(--color-error-soft); }
+	.invalid-cue { position: absolute; right: 5px; bottom: 3px; color: var(--color-error); font-weight: 800; font-size: 18px; }
+
 	.game-shell {
 		min-height: 100vh;
 		padding: 68px var(--space-lg) 64px;
