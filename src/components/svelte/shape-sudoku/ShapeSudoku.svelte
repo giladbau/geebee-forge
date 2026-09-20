@@ -91,29 +91,57 @@
 		modelStatus=drawing.status;
 	}
 	// Native pan must be disabled before pen-down. Only a separate finger gesture scrolls.
-	let finger: {id:number;x:number;y:number;element:HTMLDivElement}|null = null;
+	let finger: {id:number;x:number;y:number;element:HTMLDivElement;scroller:HTMLElement;
+		left:number;top:number;pageX:number;pageY:number;axis:'x'|'y'|null;target:'board'|'page'|null}|null = null;
 	function cancelFinger() {
 		const owner=finger;finger=null;
 		if(owner?.element.hasPointerCapture(owner.id))owner.element.releasePointerCapture(owner.id);
 	}
+	const activeTouches=new Set<number>(),suppressedTouches=new Set<number>(),activePens=new Set<number>();
+	// Contact size is only supplementary: devices may report a palm as a tiny touch.
+	function broadContact(event:PointerEvent) {return Math.max(event.width,event.height)>=40;}
+	function pointerFinished(event:PointerEvent) {
+		activePens.delete(event.pointerId);
+		activeTouches.delete(event.pointerId);suppressedTouches.delete(event.pointerId);
+		fingerEnd(event);
+	}
 	function fingerStart(event:PointerEvent) {
-		if(!drawingMode||event.pointerType!=='touch')return;
-		event.preventDefault();
-		if(pen||finger)return;
-		const element=event.currentTarget as HTMLDivElement;
-		finger={id:event.pointerId,x:event.clientX,y:event.clientY,element};
+		if(!drawingMode)return;
+		if(event.pointerType==='pen'){
+			activePens.add(event.pointerId);
+			for(const id of activeTouches)suppressedTouches.add(id);
+			cancelFinger(); // Includes pen-down over a locked clue, which cannot ink.
+			return;
+		}
+		if(event.pointerType!=='touch')return;
+		event.preventDefault();activeTouches.add(event.pointerId);
+		if(activePens.size||pen||broadContact(event))suppressedTouches.add(event.pointerId);
+		if(suppressedTouches.has(event.pointerId)||finger||!event.isPrimary)return;
+		const element=event.currentTarget as HTMLDivElement,scroller=element.parentElement!;
+		// Instant no-op stops any in-flight smooth scrolling before taking ownership.
+		scroller.scrollTo({left:scroller.scrollLeft,top:scroller.scrollTop,behavior:'instant'});
+		window.scrollTo({left:window.scrollX,top:window.scrollY,behavior:'instant'});
+		finger={id:event.pointerId,x:event.clientX,y:event.clientY,element,scroller,
+			left:scroller.scrollLeft,top:scroller.scrollTop,pageX:window.scrollX,pageY:window.scrollY,axis:null,target:null};
 		try {element.setPointerCapture(event.pointerId);}catch{finger=null;}
 	}
 	function fingerMove(event:PointerEvent) {
 		if(!finger||event.pointerId!==finger.id)return;
 		event.preventDefault();
-		const dx=finger.x-event.clientX,dy=finger.y-event.clientY;
-		finger.x=event.clientX;finger.y=event.clientY;
-		const scroller=finger.element.parentElement!;
-		const left=scroller.scrollLeft,top=scroller.scrollTop;
-		scroller.scrollLeft+=dx;scroller.scrollTop+=dy;
-		// Pass only unconsumed deltas to the page at the board's overflow boundaries.
-		window.scrollBy({left:dx-(scroller.scrollLeft-left),top:dy-(scroller.scrollTop-top),behavior:'instant'});
+		const owner=finger,dx=owner.x-event.clientX,dy=owner.y-event.clientY;
+		const scroller=owner.scroller;
+		if(!owner.axis){
+			if(Math.max(Math.abs(dx),Math.abs(dy))<6)return;
+			owner.axis=Math.abs(dx)>Math.abs(dy)?'x':'y';
+			// Choose once, including at boundaries: never chain an owned pan to the page.
+			owner.target=owner.axis==='x'||scroller.scrollHeight>scroller.clientHeight+1?'board':'page';
+		}
+		if(owner.target==='page'){
+			window.scrollTo({left:owner.pageX,top:owner.pageY+dy,behavior:'instant'});
+		}else{
+			scroller.scrollTo({left:owner.left+(owner.axis==='x'?dx:0),
+				top:owner.top+(owner.axis==='y'?dy:0),behavior:'instant'});
+		}
 	}
 	function fingerEnd(event:PointerEvent) {
 		if(finger?.id===event.pointerId)cancelFinger();
@@ -468,6 +496,8 @@
 	});
 </script>
 
+<svelte:window onpointerup={pointerFinished} onpointercancel={pointerFinished} />
+
 <main class="game-shell" style={quietGardenStyle} data-reduced-motion={prefersReducedMotion}>
 	<section class="game-panel" aria-labelledby="shape-sudoku-title">
 		<header>
@@ -668,7 +698,7 @@
 
 	.mode-actions { margin-bottom: 16px; }
 	.drawing-help { color: var(--color-text-muted); font-size: .88rem; }
-	.board-scroll { max-width: 100%; overflow: auto; touch-action: pan-x pan-y; }
+	.board-scroll { max-width: 100%; overflow: auto; touch-action: pan-x pan-y; scroll-behavior: auto; }
 	.grid.drawing { touch-action: none; width: max(100%, calc(var(--grid-size) * 98px + 16px)); grid-template-columns: repeat(var(--grid-size), minmax(96px, 1fr)); }
 	.grid.drawing button { overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
 	.ink-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }

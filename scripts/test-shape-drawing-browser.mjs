@@ -1,7 +1,7 @@
 // Run after npm run build. Optional URL argument tests a deployed Astro route.
 import assert from 'node:assert/strict';
 import { hasCompletionAfterMove } from '../src/lib/shape-sudoku.ts';
-const names=['triangle','square','star','circle','sun','crescent','cloud','lightning','rainbow'];
+const names=['triangle','square','star','circle','crescent','cloud','lightning','rainbow','sun'];
 const boardFrom=cs=>{const n=Math.sqrt(cs.length);return Array.from({length:n},(_,r)=>cs.slice(r*n,(r+1)*n).map(c=>{const i=names.findIndex(name=>new RegExp('^(Locked )?'+name+'( |,)','i').test(c.label));return i<0?null:i;}));};
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
@@ -99,11 +99,32 @@ try {
   const shot=await cdp('Page.captureScreenshot',{format:'png'});await writeFile(out+'/desktop.png',Buffer.from(shot.data,'base64'));
   const sizes=[];for(const width of [320,390,768])await check('96px cell minimum and contained overflow '+width,async()=>{await cdp('Emulation.setDeviceMetricsOverride',{width,height:700,deviceScaleFactor:1,mobile:false});await sleep(100);const v=await evaluate(`(()=>{const s=document.querySelector('.board-scroll'),b=document.querySelector('.grid>button'),r=b.getBoundingClientRect();return {width:r.width,height:r.height,scrollWidth:s.scrollWidth,clientWidth:s.clientWidth,pageOverflow:document.documentElement.scrollWidth>innerWidth,touch:getComputedStyle(b).touchAction};})()`);sizes.push({viewport:width,...v});assert.ok(v.width>=96&&v.height>=96);assert.equal(v.pageOverflow,false);assert.equal(v.touch,'none');assert.equal(await evaluate(`getComputedStyle(document.querySelector('.grid')).touchAction`),'none');assert.equal(await evaluate(`getComputedStyle(document.querySelector('.grid>button:disabled')).touchAction`),'none');});
   await check('real finger scroll without ink',async()=>{await cdp('Emulation.setDeviceMetricsOverride',{width:320,height:700,deviceScaleFactor:1,mobile:false});await evaluate(`document.querySelector('.board-scroll').scrollIntoView({block:'center'});document.querySelector('.board-scroll').scrollLeft=0`);await sleep(100);const r=await evaluate(`(()=>{const r=document.querySelector('.board-scroll').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width}})()`),before=await cells(),x=r.x+r.width-20,y=Math.max(20,Math.min(650,r.y+60));await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});for(let j=1;j<=10;j++){await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-j*14,y}]});await sleep(25);}await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await sleep(200);assert.ok(await evaluate(`document.querySelector('.board-scroll').scrollLeft>0`),'gesture must actually scroll');assert.deepEqual(await cells(),before);});
-  await check('finger vertical overflow reaches page without ink',async()=>{
+  await check('horizontal ownership locks axis and never hands off at boundary',async()=>{
+    await evaluate(`document.documentElement.style.scrollBehavior='auto';document.querySelector('.board-scroll').scrollIntoView({block:'center'});document.querySelector('.board-scroll').scrollLeft=0`);await sleep(100);
+    const r=await evaluate(`(()=>{const r=document.querySelector('.board-scroll').getBoundingClientRect();return {x:r.right-20,y:r.top+60}})()`);
+    const snapshot=()=>evaluate(`[scrollX,scrollY,document.querySelector('.board-scroll').scrollLeft,document.querySelector('.board-scroll').scrollTop]`),before=await snapshot();
+    await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[r]});
+    await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x-2,y:r.y-2}]});
+    assert.deepEqual(await snapshot(),before,'sub-threshold jitter must not scroll');
+    let previous=before[2];
+    for(let j=1;j<=14;j++){
+      await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x-j*16,y:r.y-(j%3)*2}]});
+      const now=await snapshot();assert.deepEqual(now.slice(0,2),before.slice(0,2),'horizontal pan must not move page');assert.equal(now[3],before[3],'jitter must not pan vertically');assert.ok(now[2]>=previous,'board pan must be monotonic');previous=now[2];
+    }
+    await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    assert.ok(previous>before[2]);
+  });
+  await check('finger vertical gesture selects page without ink',async()=>{
     await evaluate(`document.querySelector('.board-scroll').scrollIntoView({block:'start'});window.scrollBy(0,-150)`);await sleep(100);
     const r=await evaluate(`(()=>{const r=document.querySelector('.grid').getBoundingClientRect();return {x:Math.max(40,r.x+30),y:r.y+80}})()`),before=await cells(),top=await evaluate('scrollY');
     await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[r]});
-    for(let j=1;j<=5;j++)await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x,y:r.y-j*12}]});
+    const boardLeft=await evaluate(`document.querySelector('.board-scroll').scrollLeft`);
+    let previous=top;
+    for(let j=1;j<=5;j++){
+      await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:r.x+(j%2)*2,y:r.y-j*12}]});await sleep(40);
+      const now=await evaluate('scrollY');assert.ok(now>=previous,'page pan must be monotonic');assert.equal(now,top+j*12,'page pan tracks absolute displacement');previous=now;
+      assert.equal(await evaluate(`document.querySelector('.board-scroll').scrollLeft`),boardLeft);
+    }
     await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
     assert.ok(await evaluate('scrollY')>top);assert.deepEqual(await cells(),before);
   });
@@ -135,6 +156,30 @@ try {
     await cdp('Input.dispatchMouseEvent',{type:'mouseReleased',x:x+25,y:y+30,button:'left',buttons:0,clickCount:1,pointerType:'pen'});
     assert.deepEqual(await evaluate('scrollSnapshot()'),before);assert.deepEqual(await evaluate('penEvents'),[]);
     assert.ok((await cells())[editable].ink.length);await click('Reset');
+  });
+  for (const order of ['before','during','clue']) await check('palm lifetime rejection '+order,async()=>{
+    const index=order==='clue'?initial.findIndex(c=>c.clue):editable;
+    const r=await rect(index),x=r.x+r.width*.5,y=r.y+r.height*.5;
+    const snapshot=()=>evaluate(`[scrollX,scrollY,document.querySelector('.board-scroll').scrollLeft,document.querySelector('.board-scroll').scrollTop]`);
+    const touch=async(type,dx=0)=>cdp('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x:x-dx,y}]});
+    const pen=async(type)=>cdp('Input.dispatchMouseEvent',{type,x,y,button:'left',buttons:type==='mouseReleased'?0:1,clickCount:1,pointerType:'pen'});
+    if(order!=='during')await touch('touchStart');
+    await pen('mousePressed');
+    if(order==='during')await touch('touchStart');
+    const before=await snapshot();
+    await touch('touchMove',25);assert.deepEqual(await snapshot(),before,'palm cannot scroll during pen');
+    await pen('mouseReleased');
+    const ink=await cells();
+    await touch('touchMove',55);assert.deepEqual(await snapshot(),before,'resting palm cannot resume after pen lift');
+    await touch('touchEnd');assert.deepEqual(await cells(),ink,'palm cannot ink or place');
+    await click('Reset');
+  });
+  await check('broad palm contact does not pan before pen',async()=>{
+    const r=await rect(editable),x=r.x+r.width*.5,y=r.y+r.height*.5;
+    const snapshot=()=>evaluate(`[scrollX,scrollY,document.querySelector('.board-scroll').scrollLeft]`),before=await snapshot();
+    await cdp('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y,radiusX:35,radiusY:30}]});
+    await cdp('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:x-50,y,radiusX:35,radiusY:30}]});
+    await cdp('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});assert.deepEqual(await snapshot(),before);
   });
   const mobile=await cdp('Page.captureScreenshot',{format:'png'});await writeFile(out+'/mobile.png',Buffer.from(mobile.data,'base64'));await check('no runtime errors',async()=>assert.deepEqual(errors,[]));await check('no uploads',async()=>assert.ok(requests.every(r=>r.method==='GET')));
   await writeFile(out+'/summary.json',JSON.stringify({results,sizes,initial,valid,invalid,errors},null,2));if(results.some(r=>!r.pass))process.exitCode=1;

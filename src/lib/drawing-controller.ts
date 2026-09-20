@@ -1,6 +1,7 @@
 import { DrawingState, type RecognitionToken } from './drawing-state';
 import { provisionalRecognition } from './drawing-recognition';
 import { LABELS } from './shape-sudoku-lab/cnn';
+import { gameSymbolForLabel } from './shape-symbols';
 
 /** Browser adapter. Tokens stay here; the worker never receives puzzle information. */
 export class DrawingController {
@@ -33,7 +34,8 @@ export class DrawingController {
     if(data.revision!==token.revision||data.tile!==`${token.row}-${token.column}`)return;
     const ranked=data.result?.ranked;
     const scores=LABELS.map(label=>Array.isArray(ranked)?ranked.find((r:any)=>r?.label===label)?.score:undefined);
-    const symbol=provisionalRecognition(token.ink,scores);
+    const modelIndex=provisionalRecognition(token.ink,scores);
+    const symbol=modelIndex===null?null:gameSymbolForLabel(LABELS[modelIndex]);
     if(!this.state.preview(token,symbol))return;
     this.changed();
     if(symbol!==null)this.later(()=>{const accepted=this.state.commit(token);this.changed();if(accepted)this.placed(token.row,token.column);},600);

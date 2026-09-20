@@ -22,6 +22,12 @@ async function fillWithValidShape(cell: HTMLElement): Promise<HTMLElement> {
 }
 
 describe('ShapeSudoku', () => {
+ it('keeps nine unique game symbols with sun reserved for 9x9', () => {
+  const names = SHAPES.map(shape => shape.name);
+  expect(names).toEqual(['triangle','square','star','circle','crescent','cloud','lightning','rainbow','sun']);
+  expect(new Set(names).size).toBe(9);
+  for (let size=3; size<=8; size++) expect(names.slice(0,size)).not.toContain('sun');
+ });
  it('defaults to drawing mode with an explicit toggle',()=>{
   render(ShapeSudoku);
   expect(screen.getByRole('button',{name:'Drawing mode'})).toHaveAttribute('aria-pressed','true');
@@ -33,11 +39,11 @@ describe('ShapeSudoku', () => {
 			'#6489C4',
 			'#C8759E',
 			'#C99C43',
-			'#6C9B79',
 			'#8976B6',
 			'#CE8559',
 			'#559995',
 			'#7376B5',
+			'#6C9B79',
 		]);
 	});
 
@@ -364,11 +370,11 @@ describe('ShapeSudoku', () => {
 				'Select square shape',
 				'Select star shape',
 				'Select circle shape',
-				'Select sun shape',
 				'Select crescent shape',
 				'Select cloud shape',
 				'Select lightning shape',
 				'Select rainbow shape',
+				'Select sun shape',
 			]);
 		expect(within(screen.getByRole('group', { name: '9 by 9 Shape Sudoku grid' })).getAllByRole('button'))
 			.toHaveLength(81);

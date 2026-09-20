@@ -2,6 +2,19 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { DrawingController } from './drawing-controller';
 import { DrawingState } from './drawing-state';
 import { generatePuzzle } from './shape-sudoku';
+import { LABELS } from './shape-sudoku-lab/cnn';
+
+it.each([[4,8],[5,4],[6,5],[7,6],[8,7]])('maps accepted model index %i to game symbol %i', (modelIndex, symbol) => {
+ const {controller,state,row,column}=setup();
+ const preview=vi.spyOn(state,'preview');
+ controller.load();const worker=FakeWorker.last;worker.send({type:'ready'});
+ vi.advanceTimersByTime(400);const request=worker.postMessage.mock.calls[1][0];
+ // Deliberately reversed: ranking order is not model order or game order.
+ const ranked=LABELS.map((label,index)=>({label,score:index===modelIndex?.95:.005})).reverse();
+ worker.send({...request,type:'result',result:{ranked}});
+ expect(preview).toHaveBeenCalledWith(expect.anything(),symbol);
+ controller.destroy();
+});
 class FakeWorker {
  static last: FakeWorker;
  onmessage: ((e:{data:any})=>void)|null=null;
