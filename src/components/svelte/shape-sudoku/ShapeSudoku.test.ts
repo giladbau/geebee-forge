@@ -3,7 +3,14 @@ import { fireEvent, render, screen, within } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 
 import ShapeSudoku from './ShapeSudoku.svelte';
+import { flushSync } from 'svelte';
 import { SHAPES } from './ShapeIcon.svelte';
+
+function renderClickMode() {
+ const view=render(ShapeSudoku);
+ flushSync(()=>screen.getByRole('button',{name:'Drawing mode'}).click());
+ return view;
+}
 
 async function fillWithValidShape(cell: HTMLElement): Promise<HTMLElement> {
 	for (const shapeButton of screen.getAllByRole('button', { name: /Select .* shape/ })) {
@@ -15,22 +22,33 @@ async function fillWithValidShape(cell: HTMLElement): Promise<HTMLElement> {
 }
 
 describe('ShapeSudoku', () => {
+ it('keeps nine unique game symbols with sun reserved for 9x9', () => {
+  const names = SHAPES.map(shape => shape.name);
+  expect(names).toEqual(['triangle','square','star','circle','crescent','cloud','lightning','rainbow','sun']);
+  expect(new Set(names).size).toBe(9);
+  for (let size=3; size<=8; size++) expect(names.slice(0,size)).not.toContain('sun');
+ });
+ it('defaults to drawing mode with an explicit toggle',()=>{
+  render(ShapeSudoku);
+  expect(screen.getByRole('button',{name:'Drawing mode'})).toHaveAttribute('aria-pressed','true');
+  expect(screen.queryByRole('group',{name:'Shape palette'})).not.toBeInTheDocument();
+ });
 	it('uses the nine stable Quiet Garden shape colors in symbol order', () => {
 		expect(SHAPES.map((shape) => shape.color)).toEqual([
 			'#D97872',
 			'#6489C4',
 			'#C8759E',
 			'#C99C43',
-			'#6C9B79',
 			'#8976B6',
 			'#CE8559',
 			'#559995',
 			'#7376B5',
+			'#6C9B79',
 		]);
 	});
 
 	it('exposes the exact Quiet Garden visual and motion tokens on the game shell', () => {
-		const { container } = render(ShapeSudoku);
+		const { container } = renderClickMode();
 		const shell = container.querySelector('.game-shell');
 		expect(shell).not.toBeNull();
 		const styles = getComputedStyle(shell!);
@@ -82,7 +100,7 @@ describe('ShapeSudoku', () => {
 	it('keeps one stable polite status slot before, during, and after conflict feedback', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const statusSlot = screen.getByRole('status');
 			expect(statusSlot).toHaveClass('status-slot');
 			expect(statusSlot).toHaveAttribute('aria-live', 'polite');
@@ -112,7 +130,7 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('renders the default game controls, four-shape palette, and 4 by 4 grid', () => {
-		render(ShapeSudoku);
+		renderClickMode();
 
 		const sizeSelect = screen.getByRole('combobox', { name: 'Grid size' });
 		expect(sizeSelect).toHaveValue('4');
@@ -128,14 +146,14 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('keeps the visible and accessible star labels aligned', () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const star = screen.getByRole('button', { name: 'Select star shape' });
 		expect(star).toHaveAccessibleName('Select star shape');
 		expect(star.lastElementChild).toHaveTextContent(/^star$/);
 	});
 
 	it('keeps every grid cell square so an all-empty row matches the height of filled rows', () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const cells = screen.getAllByRole('button', { name: /^Empty cell/ });
 		expect(cells.length).toBeGreaterThan(0);
 		const emptyCell = cells[0];
@@ -153,7 +171,7 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('places a selected reusable shape and clears it with the eraser', async () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const cell = screen.getAllByRole('button', { name: /^Empty cell/ })[0];
 		const shapeButtons = screen.getAllByRole('button', { name: /Select .* shape/ });
 
@@ -172,7 +190,7 @@ describe('ShapeSudoku', () => {
 	it('marks a successful empty-cell placement with one transient keyed place effect', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const cell = screen.getAllByRole('button', { name: /^Empty cell/ })[0];
 			const shapeButtons = screen.getAllByRole('button', { name: /Select .* shape/ });
 
@@ -195,7 +213,7 @@ describe('ShapeSudoku', () => {
 	it('records replacement and exits the old keyed shape before the replacement settles', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const cell = screen.getAllByRole('button', { name: /^Empty cell/ })[0];
 			const shapeButtons = screen.getAllByRole('button', { name: /Select .* shape/ });
 
@@ -225,7 +243,7 @@ describe('ShapeSudoku', () => {
 	it('erases board state immediately while the removed shape gets a transient erase effect', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const cell = screen.getAllByRole('button', { name: /^Empty cell/ })[0];
 			for (const shapeButton of screen.getAllByRole('button', { name: /Select .* shape/ })) {
 				await fireEvent.click(shapeButton);
@@ -249,7 +267,7 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('locks clue cells and identifies their shape and position', () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const clue = screen.getAllByRole('button', { name: /^Locked .* clue, row \d, column \d$/ })[0];
 
 		expect(clue).toBeDisabled();
@@ -257,7 +275,7 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('rejects a conflicting move without changing the cell and announces feedback', async () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const emptyCells = screen.getAllByRole('button', { name: /^Empty cell/ });
 		const clues = screen.getAllByRole('button', { name: /^Locked/ });
 		let target: HTMLElement | undefined;
@@ -295,7 +313,7 @@ describe('ShapeSudoku', () => {
 	it('limits attempted and direct-conflict cell feedback to the 160ms routine duration', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const target = screen.getAllByRole('button', { name: /^Empty cell/ })[0];
 			const targetPosition = target.getAttribute('aria-label')?.match(/row (\d+), column (\d+)/);
 			const conflictClue = screen.getAllByRole('button', { name: /^Locked/ }).find((clue) => {
@@ -321,7 +339,7 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('fills one hint, resets to the clues, and regenerates at a selected size', async () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const initialEmptyNames = screen
 			.getAllByRole('button', { name: /^Empty cell/ })
 			.map((cell) => cell.getAttribute('aria-label'));
@@ -352,11 +370,11 @@ describe('ShapeSudoku', () => {
 				'Select square shape',
 				'Select star shape',
 				'Select circle shape',
-				'Select sun shape',
 				'Select crescent shape',
 				'Select cloud shape',
 				'Select lightning shape',
 				'Select rainbow shape',
+				'Select sun shape',
 			]);
 		expect(within(screen.getByRole('group', { name: '9 by 9 Shape Sudoku grid' })).getAllByRole('button'))
 			.toHaveLength(81);
@@ -365,7 +383,7 @@ describe('ShapeSudoku', () => {
 	it('marks the exact newly filled hint cell with one halo that resolves within 500ms', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const emptyCells = screen.getAllByRole('button', { name: /^Empty cell/ });
 			await fireEvent.click(screen.getByRole('button', { name: 'Hint' }));
 			const hintedCells = emptyCells.filter(
@@ -384,7 +402,7 @@ describe('ShapeSudoku', () => {
 	it('crossfades reset, new puzzle, and size change as one board while clearing cell effects', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			await fireEvent.click(screen.getByRole('button', { name: 'Hint' }));
 			expect(document.querySelector('.effect-hint')).toBeInTheDocument();
 
@@ -417,7 +435,7 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('cancels stale drag presentation state on reset, new puzzle, and size change', async () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const shape = screen.getAllByRole('button', { name: /Select .* shape/ })[0];
 		const dataTransfer = {
 			dropEffect: 'none',
@@ -444,7 +462,7 @@ describe('ShapeSudoku', () => {
 	});
 
 	it('shows a checkmark and completion message after the final correct move', async () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const emptyCells = screen.getAllByRole('button', { name: /^Empty cell/ });
 		const shapeButtons = screen.getAllByRole('button', { name: /Select .* shape/ });
 
@@ -464,7 +482,7 @@ describe('ShapeSudoku', () => {
 	it('records the final move coordinate exactly once on the first incomplete-to-complete transition', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const emptyCells = screen.getAllByRole('button', { name: /^Empty cell/ });
 			for (const cell of emptyCells.slice(0, -1)) await fillWithValidShape(cell);
 			const finalCell = emptyCells.at(-1)!;
@@ -492,7 +510,7 @@ describe('ShapeSudoku', () => {
 	it('stages completion cells by Manhattan distance within the 500ms ripple window', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const emptyCells = screen.getAllByRole('button', { name: /^Empty cell/ });
 			for (const cell of emptyCells) await fillWithValidShape(cell);
 
@@ -523,7 +541,7 @@ describe('ShapeSudoku', () => {
 	it('opens the exact native win dialog only after the 500ms completion ripple', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const dialog = document.querySelector('dialog');
 			expect(dialog).not.toBeNull();
 			for (const cell of screen.getAllByRole('button', { name: /^Empty cell/ })) {
@@ -550,7 +568,7 @@ describe('ShapeSudoku', () => {
 	it('Look at my puzzle preserves the completed board, restores focus, and never reopens it', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const normalNewPuzzle = screen.getByRole('button', { name: 'New Puzzle' });
 			const emptyCells = screen.getAllByRole('button', { name: /^Empty cell/ });
 			for (const cell of emptyCells.slice(0, -1)) await fillWithValidShape(cell);
@@ -577,7 +595,7 @@ describe('ShapeSudoku', () => {
 	it('ignores backdrop clicks and treats Escape like Look at my puzzle', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const restoreTarget = screen.getByRole('button', { name: 'Reset' });
 			const emptyCells = screen.getAllByRole('button', { name: /^Empty cell/ });
 			for (const cell of emptyCells.slice(0, -1)) await fillWithValidShape(cell);
@@ -605,7 +623,7 @@ describe('ShapeSudoku', () => {
 	it('contains Tab and Shift+Tab within the two native-dialog actions', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			for (const cell of screen.getAllByRole('button', { name: /^Empty cell/ })) {
 				await fillWithValidShape(cell);
 			}
@@ -637,7 +655,7 @@ describe('ShapeSudoku', () => {
 	it('starts a fresh same-size puzzle from the dialog and focuses an editable cell', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			for (const cell of screen.getAllByRole('button', { name: /^Empty cell/ })) {
 				await fillWithValidShape(cell);
 			}
@@ -660,7 +678,7 @@ describe('ShapeSudoku', () => {
 	it('uses the same completion origin, ripple, and dialog path when Hint fills the final cell', async () => {
 		vi.useFakeTimers();
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			while (screen.getAllByRole('button', { name: /^Empty cell/ }).length > 1) {
 				await fireEvent.click(screen.getByRole('button', { name: 'Hint' }));
 			}
@@ -695,7 +713,7 @@ describe('ShapeSudoku', () => {
 			dispatchEvent: vi.fn(),
 		}));
 		try {
-			render(ShapeSudoku);
+			renderClickMode();
 			const initialEmptyCount = screen.getAllByRole('button', { name: /^Empty cell/ }).length;
 			await fireEvent.click(screen.getByRole('button', { name: 'Hint' }));
 			expect(screen.getAllByRole('button', { name: /^Empty cell/ })).toHaveLength(
@@ -723,7 +741,7 @@ describe('ShapeSudoku', () => {
 		async (cancellation) => {
 			vi.useFakeTimers();
 			try {
-				const view = render(ShapeSudoku);
+				const view = renderClickMode();
 				while (screen.queryAllByRole('button', { name: /^Empty cell/ }).length > 0) {
 					await fireEvent.click(screen.getByRole('button', { name: 'Hint' }));
 				}
@@ -750,7 +768,7 @@ describe('ShapeSudoku', () => {
 	);
 
 	it('supports native drag and drop from reusable palette tiles', async () => {
-		render(ShapeSudoku);
+		renderClickMode();
 		const target = screen.getAllByRole('button', { name: /^Empty cell/ })[0];
 		const shapeButtons = screen.getAllByRole('button', { name: /Select .* shape/ });
 		let payload = '';

@@ -5,9 +5,10 @@
 		applyMove,
 		generatePuzzle,
 		isCompleteAndValid,
-		resetBoard,
 		type Cell,
 	} from '$lib/shape-sudoku';
+	import { DrawingState } from '$lib/drawing-state';
+	import { DrawingController } from '$lib/drawing-controller';
 	import ShapeIcon, { SHAPES } from './ShapeIcon.svelte';
 
 	const MOTION = {
@@ -73,7 +74,120 @@
 	const initialPuzzle = generatePuzzle(4);
 	let size = $state(4);
 	let puzzle = $state(initialPuzzle);
-	let board = $state(resetBoard(initialPuzzle));
+	const drawingState = new DrawingState(initialPuzzle);
+	drawingState.setMode(true);
+	let board = $state(drawingState.board());
+	let drawingMode = $state(true);
+	let drawingCells = $state(initialPuzzle.initialBoard.map((row,r)=>row.map((_,c)=>drawingState.cell(r,c))));
+	let activeInk = $state<{row:number;col:number;points:number[][]}|null>(null);
+	let modelStatus = $state('idle');
+	let canUndo = $state(false);
+	let pen: {id:number;row:number;column:number;element:HTMLButtonElement;rect:DOMRect}|null = null;
+	const drawing = new DrawingController(drawingState, syncDrawing, (r,c)=>{if(isCompleteAndValid(board))beginCompletion(r,c);});
+	function syncDrawing() {
+		board=drawingState.board();
+		drawingCells=board.map((row,r)=>row.map((_,c)=>drawingState.cell(r,c)));
+		activeInk=drawingState.activeStroke;canUndo=drawingState.canUndo;
+		modelStatus=drawing.status;
+	}
+	// Native pan must be disabled before pen-down. Only a separate finger gesture scrolls.
+	let finger: {id:number;x:number;y:number;element:HTMLDivElement;scroller:HTMLElement;
+		left:number;top:number;pageX:number;pageY:number;axis:'x'|'y'|null;target:'board'|'page'|null}|null = null;
+	function cancelFinger() {
+		const owner=finger;finger=null;
+		if(owner?.element.hasPointerCapture(owner.id))owner.element.releasePointerCapture(owner.id);
+	}
+	const activeTouches=new Set<number>(),suppressedTouches=new Set<number>(),activePens=new Set<number>();
+	// Contact size is only supplementary: devices may report a palm as a tiny touch.
+	function broadContact(event:PointerEvent) {return Math.max(event.width,event.height)>=40;}
+	function pointerFinished(event:PointerEvent) {
+		activePens.delete(event.pointerId);
+		activeTouches.delete(event.pointerId);suppressedTouches.delete(event.pointerId);
+		fingerEnd(event);
+	}
+	function fingerStart(event:PointerEvent) {
+		if(!drawingMode)return;
+		if(event.pointerType==='pen'){
+			activePens.add(event.pointerId);
+			for(const id of activeTouches)suppressedTouches.add(id);
+			cancelFinger(); // Includes pen-down over a locked clue, which cannot ink.
+			return;
+		}
+		if(event.pointerType!=='touch')return;
+		event.preventDefault();activeTouches.add(event.pointerId);
+		if(activePens.size||pen||broadContact(event))suppressedTouches.add(event.pointerId);
+		if(suppressedTouches.has(event.pointerId)||finger||!event.isPrimary)return;
+		const element=event.currentTarget as HTMLDivElement,scroller=element.parentElement!;
+		// Instant no-op stops any in-flight smooth scrolling before taking ownership.
+		scroller.scrollTo({left:scroller.scrollLeft,top:scroller.scrollTop,behavior:'instant'});
+		window.scrollTo({left:window.scrollX,top:window.scrollY,behavior:'instant'});
+		finger={id:event.pointerId,x:event.clientX,y:event.clientY,element,scroller,
+			left:scroller.scrollLeft,top:scroller.scrollTop,pageX:window.scrollX,pageY:window.scrollY,axis:null,target:null};
+		try {element.setPointerCapture(event.pointerId);}catch{finger=null;}
+	}
+	function fingerMove(event:PointerEvent) {
+		if(!finger||event.pointerId!==finger.id)return;
+		event.preventDefault();
+		const owner=finger,dx=owner.x-event.clientX,dy=owner.y-event.clientY;
+		const scroller=owner.scroller;
+		if(!owner.axis){
+			if(Math.max(Math.abs(dx),Math.abs(dy))<6)return;
+			owner.axis=Math.abs(dx)>Math.abs(dy)?'x':'y';
+			// Choose once, including at boundaries: never chain an owned pan to the page.
+			owner.target=owner.axis==='x'||scroller.scrollHeight>scroller.clientHeight+1?'board':'page';
+		}
+		if(owner.target==='page'){
+			window.scrollTo({left:owner.pageX,top:owner.pageY+dy,behavior:'instant'});
+		}else{
+			scroller.scrollTo({left:owner.left+(owner.axis==='x'?dx:0),
+				top:owner.top+(owner.axis==='y'?dy:0),behavior:'instant'});
+		}
+	}
+	function fingerEnd(event:PointerEvent) {
+		if(finger?.id===event.pointerId)cancelFinger();
+	}
+	function cancelDrawing() {
+		cancelFinger();
+		drawing.cancel();drawingState.cancel();
+		const owner=pen;pen=null;
+		if(owner?.element.hasPointerCapture?.(owner.id))owner.element.releasePointerCapture(owner.id);
+		drawingState.setMode(drawingMode);syncDrawing();
+	}
+	function toggleDrawing() {
+		cancelAllTimers();cancelDrawing();drawingMode=!drawingMode;
+		drawingState.setMode(drawingMode);selectedSymbol=undefined;draggingSymbol=null;syncDrawing();
+		if(drawingMode){drawing.load();if(drawing.status==='ready')drawing.resume();}
+	}
+	function undoDrawing() {
+		cancelAllTimers();cancelDrawing();drawingState.undo();syncDrawing();
+		completionOrigin=null;dialogShownForPuzzle=false;dismissWinDialog(false);clearFeedback();
+		if(drawingMode)drawing.resume();
+	}
+	function penStart(event:PointerEvent,row:number,column:number) {
+		if(!drawingMode||event.pointerType!=='pen'||pen||puzzle.clues[row][column])return;
+		event.preventDefault();
+		const element=event.currentTarget as HTMLButtonElement,rect=element.getBoundingClientRect();
+		if(!rect.width||!rect.height)return;
+		cancelDrawing();
+		if(!drawingState.begin(row,column,[(event.clientX-rect.left)/rect.width,(event.clientY-rect.top)/rect.height]))return;
+		pen={id:event.pointerId,row,column,element,rect};
+		try {element.setPointerCapture(event.pointerId);}catch{drawingState.cancel();pen=null;}
+		syncDrawing();
+	}
+	function penMove(event:PointerEvent) {
+		if(!pen||event.pointerId!==pen.id)return;event.preventDefault();
+		const events=event.getCoalescedEvents?.()??[];
+		for(const sample of events.length?events:[event])drawingState.point([(sample.clientX-pen.rect.left)/pen.rect.width,(sample.clientY-pen.rect.top)/pen.rect.height]);
+		syncDrawing();
+	}
+	function penEnd(event:PointerEvent,cancel=false) {
+		if(!pen||event.pointerId!==pen.id)return;event.preventDefault();
+		const owner=pen;if(!cancel)penMove(event);pen=null;
+		if(cancel)drawingState.cancel();else drawingState.end();
+		if(owner.element.hasPointerCapture?.(owner.id))owner.element.releasePointerCapture(owner.id);
+		syncDrawing();drawing.resume();
+	}
+	function inkPath(points:number[][]) {return points.map((p,i)=>`${i?'L':'M'} ${p[0]*100} ${p[1]*100}`).join(' ');}
 	let selectedSymbol = $state<Cell | undefined>(undefined);
 	let feedback = $state('');
 	let conflictCells = $state<string[]>([]);
@@ -192,14 +306,14 @@
 	function startNewPuzzle(effect: 'new-puzzle' | 'size-change' = 'new-puzzle'): void {
 		dialogShownForPuzzle = false;
 		puzzle = generatePuzzle(size);
-		board = resetBoard(puzzle);
+		cancelDrawing();drawingState.reset(puzzle);syncDrawing();
 		selectedSymbol = undefined;
 		clearFeedback();
 		startBoardEffect(effect);
 	}
 
 	function resetPuzzle(): void {
-		board = resetBoard(puzzle);
+		cancelDrawing();drawingState.reset(puzzle);syncDrawing();
 		selectedSymbol = undefined;
 		clearFeedback();
 		startBoardEffect('reset');
@@ -266,13 +380,15 @@
 	}
 
 	function revealHint(): void {
+		cancelDrawing();
 		const previousBoard = board;
 		const nextBoard = applyHint(puzzle, board);
-		board = nextBoard;
+		// The validated result is applied through the drawing state below.
 		clearFeedback();
 		for (let row = 0; row < puzzle.size; row += 1) {
 			for (let column = 0; column < puzzle.size; column += 1) {
 				if (previousBoard[row][column] !== nextBoard[row][column]) {
+					drawingState.replace(row,column,nextBoard[row][column]);syncDrawing();
 					startCellEffect(row, column, 'hint', previousBoard[row][column]);
 					if (!isCompleteAndValid(previousBoard) && isCompleteAndValid(nextBoard)) {
 						beginCompletion(row, column);
@@ -284,12 +400,13 @@
 	}
 
 	function placeSymbol(row: number, column: number, symbol: Cell | undefined = selectedSymbol): void {
-		if (symbol === undefined) return;
+		if (drawingMode || symbol === undefined) return;
 		const previousCell = board[row][column];
 		const previousBoard = board;
 		const nextBoard = applyMove(puzzle, board, row, column, symbol);
 		if (nextBoard) {
-			board = nextBoard;
+			drawingState.replace(row,column,nextBoard[row][column]);syncDrawing();
+			// The validated result is applied through the drawing state below.
 			clearFeedback();
 			if (
 				completionOrigin === null &&
@@ -353,10 +470,12 @@
 	}
 
 	onDestroy(() => {
+		cancelDrawing();drawing.destroy();
 		cancelAllTimers();
 	});
 
 	onMount(() => {
+		drawing.load();
 		if (typeof window.matchMedia !== 'function') return;
 		const mediaQuery = window.matchMedia(REDUCED_MOTION_QUERY);
 		const updatePreference = (event: MediaQueryListEvent | MediaQueryList): void => {
@@ -376,6 +495,8 @@
 		return () => mediaQuery.removeEventListener('change', updatePreference);
 	});
 </script>
+
+<svelte:window onpointerup={pointerFinished} onpointercancel={pointerFinished} />
 
 <main class="game-shell" style={quietGardenStyle} data-reduced-motion={prefersReducedMotion}>
 	<section class="game-panel" aria-labelledby="shape-sudoku-title">
@@ -401,9 +522,20 @@
 			</label>
 		</header>
 		<p class="instructions" id="shape-sudoku-instructions">
-			Put each shape once in every row and column. Pick a shape, then pick a square.
+			Put each shape once in every row and column. {drawingMode ? 'Draw with your Pencil inside an empty square.' : 'Pick a shape, then pick a square.'}
 		</p>
 
+		<div class="actions mode-actions">
+			<button type="button" aria-pressed={drawingMode} onclick={toggleDrawing}>Drawing mode</button>
+			<button type="button" disabled={!canUndo} onclick={undoDrawing}>Undo</button>
+		</div>
+		{#if drawingMode}
+			<p class="drawing-help" aria-live="polite">Pencil draws; fingers scroll. Pause to preview a shape. Scrub back and forth to erase.
+			{#if modelStatus === 'loading'} Loading drawing recognizer…
+			{:else if modelStatus === 'error'} Recognition unavailable. Ink is kept. <button type="button" onclick={()=>drawing.load()}>Retry recognizer</button>
+			{:else if modelStatus === 'ready'} Experimental recognition — uncertain drawings stay as ink.{/if}</p>
+		{/if}
+		{#if !drawingMode}
 		<div class="palette" role="group" aria-label="Shape palette">
 			{#each paletteShapes as shape, symbol}
 				<button
@@ -433,7 +565,15 @@
 			</button>
 		</div>
 
+		{/if}
+		<div class="board-scroll">
 		<div
+			class:drawing={drawingMode}
+			onpointerdowncapture={fingerStart}
+			onpointermove={fingerMove}
+			onpointerup={fingerEnd}
+			onpointercancel={fingerEnd}
+			onlostpointercapture={fingerEnd}
 			bind:this={gridElement}
 			class="grid"
 			data-board-effect={boardEffect ?? undefined}
@@ -447,11 +587,21 @@
 		>
 			{#each board as row, rowIndex}
 				{#each row as cell, columnIndex}
+					{@const inkCell = drawingCells[rowIndex][columnIndex]}
+					{@const live = activeInk?.row === rowIndex && activeInk.col === columnIndex ? activeInk.points : null}
 					{@const isClue = puzzle.clues[rowIndex][columnIndex]}
 					{@const activeCellEffect = cellEffect?.row === rowIndex && cellEffect.column === columnIndex}
 					<button
 						type="button"
 						class:clue={isClue}
+						class:invalid-drawing={drawingMode && inkCell.invalid}
+						class:has-ink={drawingMode && inkCell.ink.length > 0}
+						class:accepted-ink={drawingMode && cell !== null && inkCell.ink.length > 0}
+						onpointerdown={(e)=>penStart(e,rowIndex,columnIndex)}
+						onpointermove={penMove}
+						onpointerup={(e)=>penEnd(e)}
+						onpointercancel={(e)=>penEnd(e,true)}
+						onlostpointercapture={(e)=>penEnd(e,true)}
 						class:conflict={conflictCells.includes(`${rowIndex}-${columnIndex}`)}
 						class:effect-place={activeCellEffect && cellEffect?.kind === 'place'}
 						class:effect-replace={activeCellEffect && cellEffect?.kind === 'replace'}
@@ -474,6 +624,15 @@
 								<ShapeIcon symbol={cellEffect.previousSymbol} />
 							</span>
 						{/if}
+						{#if drawingMode}
+							<svg class="ink-layer" viewBox="0 0 100 100" aria-hidden="true">
+								{#each inkCell.ink as stroke}<path d={inkPath(stroke)} />{/each}
+							</svg>
+							<!-- Live scrub remains visible after accepted ink fades. -->
+							{#if live}<svg class="ink-layer live-ink" viewBox="0 0 100 100" aria-hidden="true"><path d={inkPath(live)} /></svg>{/if}
+							{#if cell === null && inkCell.overlay !== null}<span class="shape-layer recognition-overlay"><ShapeIcon symbol={inkCell.overlay} /></span>{/if}
+							{#if inkCell.invalid}<span class="invalid-cue" aria-label="This shape does not fit here">!</span>{/if}
+						{/if}
 						{#if cell !== null}
 							{#key `${rowIndex}-${columnIndex}-${cell}-${activeCellEffect ? cellEffect?.key : 0}`}
 								<span
@@ -487,6 +646,7 @@
 					</button>
 				{/each}
 			{/each}
+		</div>
 		</div>
 		<p class="status-slot" role="status" aria-live="polite">
 			{#if feedback}<span>{feedback}</span>{/if}
@@ -527,6 +687,29 @@
 </main>
 
 <style>
+ .accepted-ink .ink-layer:not(.live-ink) { animation: settle-ink 300ms ease 500ms both; }
+ .accepted-ink .current-shape { animation: settle-shape 300ms ease 500ms both; }
+ @keyframes settle-ink { from { opacity: 1; } to { opacity: 0; } }
+ @keyframes settle-shape { from { opacity: .32; } to { opacity: 1; } }
+ @media (prefers-reduced-motion: reduce) {
+  .accepted-ink .ink-layer:not(.live-ink) { animation: none; opacity: 0; }
+  .accepted-ink.has-ink .current-shape { animation: none; opacity: 1; }
+ }
+
+	.mode-actions { margin-bottom: 16px; }
+	.drawing-help { color: var(--color-text-muted); font-size: .88rem; }
+	.board-scroll { max-width: 100%; overflow: auto; touch-action: pan-x pan-y; scroll-behavior: auto; }
+	/* Include both theme padding edges; 98px covers a 96px cell plus its gap,
+	   with the final unused gap accounting for the two 1px grid borders. */
+	.grid.drawing { touch-action: none; width: max(100%, calc(var(--grid-size) * 98px + 2 * var(--space-sm))); grid-template-columns: repeat(var(--grid-size), minmax(96px, 1fr)); }
+	.game-panel:has(.grid.drawing) { width: 100%; }
+	.grid.drawing button { overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+	.ink-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; }
+	.ink-layer path { fill: none; stroke: var(--color-primary); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+	.recognition-overlay, .has-ink .current-shape { opacity: .32; pointer-events: none; }
+	.grid button.invalid-drawing { background: var(--color-error-soft); }
+	.invalid-cue { position: absolute; right: 5px; bottom: 3px; color: var(--color-error); font-weight: 800; font-size: 18px; }
+
 	.game-shell {
 		min-height: 100vh;
 		padding: 68px var(--space-lg) 64px;
