@@ -127,11 +127,11 @@ describe('ShapeSudoku', () => {
 		expect(within(grid).getAllByRole('button')).toHaveLength(16);
 	});
 
-	it('keeps the full faceted-heart accessible name while using the compact preview label', () => {
+	it('keeps the visible and accessible star labels aligned', () => {
 		render(ShapeSudoku);
-		const heart = screen.getByRole('button', { name: 'Select faceted heart shape' });
-		expect(heart).toHaveAccessibleName('Select faceted heart shape');
-		expect(heart.lastElementChild).toHaveTextContent(/^Heart$/);
+		const star = screen.getByRole('button', { name: 'Select star shape' });
+		expect(star).toHaveAccessibleName('Select star shape');
+		expect(star.lastElementChild).toHaveTextContent(/^star$/);
 	});
 
 	it('keeps every grid cell square so an all-empty row matches the height of filled rows', () => {
@@ -253,7 +253,7 @@ describe('ShapeSudoku', () => {
 		const clue = screen.getAllByRole('button', { name: /^Locked .* clue, row \d, column \d$/ })[0];
 
 		expect(clue).toBeDisabled();
-		expect(clue).toHaveAccessibleName(/^Locked (triangle|square|faceted heart|star) clue/);
+		expect(clue).toHaveAccessibleName(/^Locked (triangle|square|star|circle) clue/);
 	});
 
 	it('rejects a conflicting move without changing the cell and announces feedback', async () => {
@@ -350,13 +350,13 @@ describe('ShapeSudoku', () => {
 			.toEqual([
 				'Select triangle shape',
 				'Select square shape',
-				'Select faceted heart shape',
 				'Select star shape',
-				'Select pentagon shape',
-				'Select hexagon shape',
-				'Select cross shape',
-				'Select trapezoid shape',
-				'Select arrow shape',
+				'Select circle shape',
+				'Select sun shape',
+				'Select crescent shape',
+				'Select cloud shape',
+				'Select lightning shape',
+				'Select rainbow shape',
 			]);
 		expect(within(screen.getByRole('group', { name: '9 by 9 Shape Sudoku grid' })).getAllByRole('button'))
 			.toHaveLength(81);

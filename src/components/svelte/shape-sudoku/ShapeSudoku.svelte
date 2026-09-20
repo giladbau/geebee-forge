@@ -418,7 +418,7 @@
 					ondragend={() => (draggingSymbol = null)}
 				>
 					<span class="palette-icon"><ShapeIcon {symbol} /></span>
-					<span>{shape.name === 'faceted heart' ? 'Heart' : shape.name}</span>
+					<span>{shape.name}</span>
 				</button>
 			{/each}
 			<button
